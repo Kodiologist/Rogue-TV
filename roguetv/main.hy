@@ -82,16 +82,28 @@
   (setv key (T.inkey))
 
   (setv inp (cond
+
     [(= key.code T.KEY-ESCAPE)
       [:quit-game]]
-    [(or (in key.code [T.KEY-UP T.KEY-KP-8]) (= key "8"))
+
+    [(or (= key.code T.KEY-UP) (= key "8"))
       [:move Pos.NORTH]]
-    [(or (in key.code [T.KEY-DOWN T.KEY-KP-2]) (= key "2"))
+    [(or (= key.code T.KEY-DOWN) (= key "2"))
       [:move Pos.SOUTH]]
-    [(or (in key.code [T.KEY-LEFT T.KEY-KP-4]) (= key "4"))
+    [(or (= key.code T.KEY-LEFT) (= key "4"))
       [:move Pos.WEST]]
-    [(or (in key.code [T.KEY-RIGHT T.KEY-KP-6]) (= key "6"))
+    [(or (= key.code T.KEY-RIGHT) (= key "6"))
       [:move Pos.EAST]]
+
+    [(or (= key.code T.KEY-HOME) (= key "7"))
+      [:move Pos.NW]]
+    [(or (= key.code T.KEY-PGUP) (= key "9"))
+      [:move Pos.NE]]
+    [(or (= key.code T.KEY-END) (= key "1"))
+      [:move Pos.SW]]
+    [(or (= key.code T.KEY-PGDN) (= key "3"))
+      [:move Pos.SE]]
+
     [True
       [:nop]]))
 
