@@ -19,10 +19,18 @@
 
 (def T (blessed.Terminal))
 
+(def time-left 0)  ; In simulated seconds.
+
 ;; * Utility
 
 (defmacro set-self [&rest props]
   `(do ~@(amap `(setv (. self ~it) ~it)  props)))
+
+(defn minsec [s]
+  (.format "{}:{:02}" (// s 60) (% s 60)))
+
+(defn len-taxicab [p]
+  (+ (abs p.x) (abs p.y)))
 
 ;; * Map
 
@@ -111,10 +119,13 @@
   (cond
     [(= cmd :move)
       (let [[p-from player.pos] [p-to (+ p-from (first args))]]
-        (when (and (on-map p-to) (not (. (mget p-to) blocks-movement)))
-          (setv player.pos p-to)))])
-
-  cmd)
+        (if (and (on-map p-to) (not (. (mget p-to) blocks-movement))) (do
+          (setv player.pos p-to)
+          [:moved args])
+        (do ; else
+          [:nop []])))]
+     [True
+       [cmd args]]))
 
 ;; * Display
 
@@ -136,7 +147,7 @@
     (+ BORDER-Y (- MAP-HEIGHT 1 pos.y))
     (+ BORDER-X pos.x))))
 
-(defn redraw-map []
+(defn draw-map []
   ; Draw all the map tiles first.
   (for [y (range MAP-HEIGHT)]
     (cursor-to-pos (Pos 0 y))
@@ -147,11 +158,18 @@
     (cursor-to-pos cr.pos)
     (echo-thing cr.pos.x cr.pos.y cr)))
 
+(defn draw-status-line []
+  (echo
+    (T.move (+ BORDER-Y MAP-HEIGHT) BORDER-X)
+    (if (<= time-left 0) "Game Over" (minsec time-left))))
+
 (defn full-redraw []
+  (draw-status-line)
   (kwc tcod.map-compute-fov fov-map
     player.pos.x player.pos.y
     :algo tcod.FOV-BASIC)
-  (redraw-map))
+  (draw-map)
+  (.flush sys.stdout))
 
 ;; * Main loop
 
@@ -166,11 +184,14 @@
       (not (get dugout "map" x y)))))
 (def seen-map (amap (* [False] MAP-HEIGHT) (range MAP-WIDTH)))
 
+(setv time-left (* 2 60))
+
 (with [[(T.hidden-cursor)] [(T.cbreak)] [(T.fullscreen)]]
 
   (while True
     (full-redraw)
-    (.flush sys.stdout)
-    (setv cmd (players-turn))
-    (when (= cmd :quit-game)
+    (setv [result args] (players-turn))
+    (when (= result :moved)
+      (-= time-left (len-taxicab (first args))))
+    (when (= result :quit-game)
       (break))))
