@@ -9,13 +9,15 @@
 
 ;; * Parameters
 
-(def MAP-WIDTH 60)
-(def MAP-HEIGHT 17)
+(def MAP-WIDTH 80)
+(def MAP-HEIGHT 40)
 
-(def BORDER-Y 1)
-(def BORDER-X 2)
+(def MESSAGE-LINES 3)
 
 ;; * Declarations
+
+(def BOTTOM-BORDER (+ MESSAGE-LINES 1))
+  ; The extra 1 is for the status line.
 
 (def T (blessed.Terminal))
 
@@ -35,7 +37,7 @@
 ;; * Drawable
 
 (defclass Drawable [object] [
-  [__init__ (fn [self &optional char color-fg color-bg]
+  [__init__ (fn [self char &optional color-fg color-bg]
     (set-self char color-fg color-bg)
     None)]])
 
@@ -46,7 +48,7 @@
 ;; * Map
 
 (defclass Tile [Drawable] [
-  [__init__ (fn [self &optional char color-fg color-bg blocks-movement]
+  [__init__ (fn [self char &optional color-fg color-bg blocks-movement]
     (.__init__ (super Tile self) char color-fg color-bg)
     (set-self blocks-movement)
     None)]])
@@ -61,8 +63,9 @@
 (defclass Wall [Tile] [
   [__init__ (fn [self]
     (kwc .__init__ (super Wall self)
-      :+blocks-movement
-      :color-bg T.on-black)
+      :char "#"
+      :color-bg T.on-black
+      :+blocks-movement)
     None)]])
 
 (def gmap
@@ -82,7 +85,7 @@
 (defclass ItemType [Drawable] [
   [defined []]
 
-  [__init__ (fn [self tid name &optional char color-fg color-bg]
+  [__init__ (fn [self tid name char &optional color-fg color-bg]
     (.__init__ (super ItemType self) char color-fg color-bg)
     (set-self tid name)
     (.append ItemType.defined self)
@@ -163,44 +166,48 @@
 (defn echo [&rest args]
   (apply print args {"end" "" "sep" ""}))
 
-(defn echo-drawable [x y d]
-  (when (tcod.map-is-in-fov fov-map x y)
-    (setv (get seen-map x y) True))
-  (unless (get seen-map x y)
-    (setv d UnseenSquare))
-  (def char (or d.char "?"))
-  (def color-fg (or d.color-fg T.black))
-  (def color-bg (or d.color-bg T.on-bright-white))
-  (echo (color-fg (color-bg char))))
+(defn term-coords [pos]
+  (, (+ (- pos.x player.pos.x) (// T.width 2))
+    (+ (- player.pos.y pos.y) (// T.height 2))))
 
-(defn cursor-to-pos [pos]
-  (echo (T.move
-    (+ BORDER-Y (- MAP-HEIGHT 1 pos.y))
-    (+ BORDER-X pos.x))))
+(defn on-screen [tx ty]
+  (and (<= 0 tx (- T.width 1))
+    (<= 0 ty (- T.height 1 BOTTOM-BORDER))))
+
+(defn echo-drawable [d pos]
+  (setv [px py] [pos.x pos.y])
+  (setv [tx ty] (term-coords pos))
+  (when (tcod.map-is-in-fov fov-map px py)
+    (setv (get seen-map px py) True))
+  (when (on-screen tx ty)
+    (unless (get seen-map px py)
+      (setv d UnseenSquare))
+    (def char (or d.char "?"))
+    (def color-fg (or d.color-fg T.black))
+    (def color-bg (or d.color-bg T.on-bright-white))
+    (echo (T.move ty tx) (color-fg (color-bg char)))))
 
 (defn draw-map []
   ; Draw all the map tiles first.
   (for [y (range MAP-HEIGHT)]
-    (cursor-to-pos (Pos 0 y))
     (for [x (range MAP-WIDTH)]
-      (echo-drawable x y (mget (Pos x y)))))
+      (echo-drawable (mget (Pos x y)) (Pos x y))))
   ; Now draw all the items on the map.
-  (for [it Item.extant]
-    (when it.pos
-      (cursor-to-pos it.pos)
-      (echo-drawable it.pos.x it.pos.y it.itype)))
+  (for [item Item.extant]
+    (when item.pos
+      (echo-drawable item.itype item.pos)))
   ; Now draw the creatures.
   (for [cr Creature.extant]
     (when cr.pos
-      (cursor-to-pos cr.pos)
-      (echo-drawable cr.pos.x cr.pos.y cr))))
+      (echo-drawable cr cr.pos))))
 
 (defn draw-status-line []
   (echo
-    (T.move (+ BORDER-Y MAP-HEIGHT) BORDER-X)
+    (T.move (- T.height 1 MESSAGE-LINES) 0)
     (if (<= time-left 0) "Game Over" (minsec time-left))))
 
 (defn full-redraw []
+  (echo (T.clear))
   (draw-status-line)
   (kwc tcod.map-compute-fov fov-map
     player.pos.x player.pos.y
