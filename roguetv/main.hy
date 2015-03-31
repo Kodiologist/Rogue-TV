@@ -32,11 +32,23 @@
 (defn len-taxicab [p]
   (+ (abs p.x) (abs p.y)))
 
+;; * Drawable
+
+(defclass Drawable [object] [
+  [__init__ (fn [self &optional char color-fg color-bg]
+    (set-self char color-fg color-bg)
+    None)]])
+
+(setv UnseenSquare (kwc Drawable
+  :char " "
+  :color-bg T.on-bright-black))
+
 ;; * Map
 
-(defclass Tile [object] [
+(defclass Tile [Drawable] [
   [__init__ (fn [self &optional char color-fg color-bg blocks-movement]
-    (set-self char color-fg color-bg blocks-movement)    
+    (.__init__ (super Tile self) char color-fg color-bg)
+    (set-self blocks-movement)
     None)]])
 
 (defclass Floor [Tile] [
@@ -53,11 +65,6 @@
       :color-bg T.on-black)
     None)]])
 
-(defclass UnseenSquare [object] [ ; Not a real tile.
-  [char " "]
-  [color-fg None]
-  [color-bg T.on-bright-black]])
-
 (def gmap
   (amap (amap None (range MAP-HEIGHT)) (range MAP-WIDTH)))
 
@@ -70,14 +77,38 @@
 (defn on-map [pos]
   (and (<= 0 pos.x (dec MAP-WIDTH)) (<= 0 pos.y (dec MAP-HEIGHT))))
 
+;; * Item
+
+(defclass ItemType [Drawable] [
+  [defined []]
+
+  [__init__ (fn [self tid name &optional char color-fg color-bg]
+    (.__init__ (super ItemType self) char color-fg color-bg)
+    (set-self tid name)
+    (.append ItemType.defined self)
+    None)]])
+
+(defclass Item [object] [
+  [extant []]
+
+  [__init__ (fn [self itype &optional pos]
+    (set-self itype pos)
+    (.append Item.extant self)
+    None)]])
+
+(def toaster (kwc ItemType
+  :tid "toaster" :name "a toaster"
+  :char "%" :color-fg T.green))
+
 ;; * Creature
 
-(defclass Creature [object] [
-  [alive []]
+(defclass Creature [Drawable] [
+  [extant []]
 
   [__init__ (fn [self &optional char color-fg color-bg pos]
-    (set-self char color-fg color-bg pos)
-    (.append Creature.alive self)
+    (.__init__ (super Creature self) char color-fg color-bg)
+    (set-self pos)
+    (.append Creature.extant self)
     None)]])
 
 (setv player (kwc Creature
@@ -132,14 +163,14 @@
 (defn echo [&rest args]
   (apply print args {"end" "" "sep" ""}))
 
-(defn echo-thing [x y t]
+(defn echo-drawable [x y d]
   (when (tcod.map-is-in-fov fov-map x y)
     (setv (get seen-map x y) True))
   (unless (get seen-map x y)
-    (setv t UnseenSquare))
-  (def char (or t.char "?"))
-  (def color-fg (or t.color-fg T.black))
-  (def color-bg (or t.color-bg T.on-bright-white))
+    (setv d UnseenSquare))
+  (def char (or d.char "?"))
+  (def color-fg (or d.color-fg T.black))
+  (def color-bg (or d.color-bg T.on-bright-white))
   (echo (color-fg (color-bg char))))
 
 (defn cursor-to-pos [pos]
@@ -152,11 +183,17 @@
   (for [y (range MAP-HEIGHT)]
     (cursor-to-pos (Pos 0 y))
     (for [x (range MAP-WIDTH)]
-      (echo-thing x y (mget (Pos x y)))))
-  ; Now draw all the creatures on the map.
-  (for [cr Creature.alive]
-    (cursor-to-pos cr.pos)
-    (echo-thing cr.pos.x cr.pos.y cr)))
+      (echo-drawable x y (mget (Pos x y)))))
+  ; Now draw all the items on the map.
+  (for [it Item.extant]
+    (when it.pos
+      (cursor-to-pos it.pos)
+      (echo-drawable it.pos.x it.pos.y it.itype)))
+  ; Now draw the creatures.
+  (for [cr Creature.extant]
+    (when cr.pos
+      (cursor-to-pos cr.pos)
+      (echo-drawable cr.pos.x cr.pos.y cr))))
 
 (defn draw-status-line []
   (echo
@@ -183,6 +220,8 @@
       (not (get dugout "map" x y))
       (not (get dugout "map" x y)))))
 (def seen-map (amap (* [False] MAP-HEIGHT) (range MAP-WIDTH)))
+
+(kwc Item :itype toaster :pos player.pos)
 
 (setv time-left (* 2 60))
 
