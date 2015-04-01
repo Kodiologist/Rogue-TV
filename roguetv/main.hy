@@ -166,52 +166,50 @@
 (defn echo [&rest args]
   (apply print args {"end" "" "sep" ""}))
 
-(defn term-coords [pos]
-  (, (+ (- pos.x player.pos.x) (// T.width 2))
-    (+ (- player.pos.y pos.y) (// T.height 2))))
+(defn ty->py [ty]
+  (+ (- (// T.height 2) ty) player.pos.y))
+(defn tx->px [tx]
+  (+ (- tx (// T.width 2)) player.pos.x))
 
-(defn on-screen [tx ty]
-  (and (<= 0 tx (- T.width 1))
-    (<= 0 ty (- T.height 1 BOTTOM-BORDER))))
-
-(defn echo-drawable [d pos]
-  (setv [px py] [pos.x pos.y])
-  (setv [tx ty] (term-coords pos))
-  (when (tcod.map-is-in-fov fov-map px py)
-    (setv (get seen-map px py) True))
-  (when (on-screen tx ty)
-    (unless (get seen-map px py)
-      (setv d UnseenSquare))
-    (def char (or d.char "?"))
-    (def color-fg (or d.color-fg T.black))
-    (def color-bg (or d.color-bg T.on-bright-white))
-    (echo (T.move ty tx) (color-fg (color-bg char)))))
+(defn echo-drawable [d]
+  (echo
+    ((or d.color-fg identity)
+      ((or d.color-bg identity)
+        d.char))))
 
 (defn draw-map []
-  ; Draw all the map tiles first.
-  (for [y (range MAP-HEIGHT)]
-    (for [x (range MAP-WIDTH)]
-      (echo-drawable (mget (Pos x y)) (Pos x y))))
-  ; Now draw all the items on the map.
-  (for [item Item.extant]
-    (when item.pos
-      (echo-drawable item.itype item.pos)))
-  ; Now draw the creatures.
-  (for [cr Creature.extant]
-    (when cr.pos
-      (echo-drawable cr cr.pos))))
+  (echo (T.move 0 0))
+  (for [ty (range (- T.height BOTTOM-BORDER))]
+    (setv py (ty->py ty))
+    (for [tx (range T.width)]
+      (setv px (tx->px tx))
+      (setv p (Pos px py))
+      (if
+        (and (<= 0 px (dec MAP-WIDTH)) (<= 0 py (dec MAP-HEIGHT))
+          (get seen-map px py))
+        (echo-drawable (or
+          (afind-or (= it.pos p) Creature.extant)
+          (let [[i (afind-or (= it.pos p) Item.extant)]]
+            (and i i.itype))
+          (mget p)))
+        (echo (UnseenSquare.color-bg " "))))))
 
 (defn draw-status-line []
   (echo
     (T.move (- T.height 1 MESSAGE-LINES) 0)
     (if (<= time-left 0) "Game Over" (minsec time-left))))
 
-(defn full-redraw []
-  (echo (T.clear))
-  (draw-status-line)
+(defn recompute-fov []
   (kwc tcod.map-compute-fov fov-map
     player.pos.x player.pos.y
     :algo tcod.FOV-BASIC)
+  (for [x (range MAP-WIDTH)]
+    (for [y (range MAP-HEIGHT)]
+      (when (tcod.map-is-in-fov fov-map x y)
+        (setv (get seen-map x y) True)))))
+
+(defn full-redraw []
+  (draw-status-line)
   (draw-map)
   (.flush sys.stdout))
 
@@ -232,12 +230,15 @@
 
 (setv time-left (* 2 60))
 
+(recompute-fov)
+
 (with [[(T.hidden-cursor)] [(T.cbreak)] [(T.fullscreen)]]
 
   (while True
     (full-redraw)
     (setv [result args] (players-turn))
     (when (= result :moved)
+      (recompute-fov)
       (-= time-left (len-taxicab (first args))))
     (when (= result :quit-game)
       (break))))
