@@ -19,6 +19,14 @@
 
 (def KEY-ESCAPE "\x1b")
 
+(setv color-numbers {
+  :black 0
+  :white 15
+  :light-gray 7
+  :dark-gray 8
+  :green 2
+  :yellow 3})
+
 ;; * Declarations
 
 (def BOTTOM-BORDER (+ MESSAGE-LINES 1))
@@ -167,17 +175,27 @@
 
 ;; * Display
 
-(defn echo [str &optional [color-fg :black] [color-bg :white]]
-  (T.addstr str (curses.color-pair (get color-pairs (, color-fg color-bg)))))
+(def color-pairs {})
+(defn get-color [fg bg]
+  (curses.color-pair (try
+    (get color-pairs (, fg bg))
+    (catch [_ KeyError]
+      ; This color pair hasn't been initialized yet. So do that.
+      (setv i (+ 2 (len color-pairs)))
+      (curses.init-pair i (get color-numbers fg) (get color-numbers bg))
+      (setv (get color-pairs (, fg bg)) i)
+      i))))
+
+(defn echo [str color-fg color-bg]
+  (T.addstr str (get-color color-fg color-bg)))
+
+(defn echo-drawable [d]
+  (echo d.char (or d.color-fg :black) (or d.color-bg :white)))
 
 (defn ty->py [ty]
   (+ (- (// SCREEN-HEIGHT 2) ty) player.pos.y))
 (defn tx->px [tx]
   (+ (- tx (// SCREEN-WIDTH 2)) player.pos.x))
-
-(defn echo-drawable [d]
-  (T.addstr d.char (curses.color-pair
-    (get color-pairs (, (or d.color-fg :black) (or d.color-bg :white))))))
 
 (defn draw-map []
   (T.move 0 0)
@@ -194,19 +212,19 @@
           (let [[i (afind-or (= it.pos p) Item.extant)]]
             (and i i.itype))
           (mget p)))
-        (kwc echo " " :color-bg UNSEEN-COLOR)))))
+        (echo " " :black UNSEEN-COLOR)))))
 
 (defn draw-status-line []
   (setv text (if (<= time-left 0) "Game Over" (minsec time-left)))
   (T.insstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
     (+ text (* " " (- SCREEN-WIDTH (len text))))
-    (curses.color-pair (get color-pairs (, :black :white)))))
+    (get-color :black :white)))
 
 (defn draw-bottom-message-log []
   (for [i (range MESSAGE-LINES)]
     (T.insstr (- SCREEN-HEIGHT (inc i)) 0
       (* " " (dec (* SCREEN-WIDTH MESSAGE-LINES)))
-      (curses.color-pair (get color-pairs (, :black :white))))))
+      (get-color :black :white))))
 
 (defn recompute-fov []
   (kwc tcod.map-compute-fov fov-map
@@ -222,23 +240,6 @@
   (draw-bottom-message-log)
   (draw-map)
   (T.refresh))
-
-(defn init-colors []
-  (setv WHITE 15)
-  (setv c {
-    :black curses.COLOR-BLACK
-    :white WHITE
-    :light-gray 7
-    :dark-gray 8
-    :green curses.COLOR-GREEN
-    :yellow 3})
-  (setv l (sorted (frozenset (concat
-    (lc [[k cn] (.items c)] [
-      (, k      :white cn                 WHITE)
-      (, :black k      curses.COLOR-BLACK cn)])))))
-  (for [[i [fg-k bg-k fg-cn bg-cn]] (enumerate l)]
-    (curses.init-pair (inc i) fg-cn bg-cn)
-    (setv (get color-pairs (, fg-k bg-k)) (inc i))))
 
 ;; * Main loop
 
@@ -265,8 +266,6 @@
   (setv [SCREEN-HEIGHT SCREEN-WIDTH] (T.getmaxyx))
 
   (curses.curs_set 0) ; Make the cursor invisible.
-
-  (init-colors)
 
   (while True
     (full-redraw)
