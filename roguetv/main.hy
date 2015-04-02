@@ -40,6 +40,7 @@
 (def SCREEN-WIDTH None)
 (def SCREEN-HEIGHT None)
 (def color-pairs {})
+(def last-new-message-number -1)
 
 (def current-time 0)  ; In simulated seconds, counting up.
 (def time-limit None)
@@ -147,33 +148,40 @@
 ;; * Input
 
 (defn players-turn []
-  (setv key (T.getkey))
 
-  (setv inp (cond
+  (while True
+    (setv key (T.getkey))
+    (setv inp (cond
 
-    [(= key KEY-ESCAPE)
-      [:quit-game]]
+      [(= key KEY-ESCAPE)
+        [:quit-game]]
 
-    [(in key ["KEY_UP" "8"])
-      [:move Pos.NORTH]]
-    [(in key ["KEY_DOWN" "2"])
-      [:move Pos.SOUTH]]
-    [(in key ["KEY_LEFT" "4"])
-      [:move Pos.WEST]]
-    [(in key ["KEY_RIGHT" "6"])
-      [:move Pos.EAST]]
+      [(in key ["KEY_UP" "8"])
+        [:move Pos.NORTH]]
+      [(in key ["KEY_DOWN" "2"])
+        [:move Pos.SOUTH]]
+      [(in key ["KEY_LEFT" "4"])
+        [:move Pos.WEST]]
+      [(in key ["KEY_RIGHT" "6"])
+        [:move Pos.EAST]]
 
-    [(in key ["KEY_HOME" "7"])
-      [:move Pos.NW]]
-    [(in key ["KEY_PPAGE" "9"])
-      [:move Pos.NE]]
-    [(in key ["KEY_END" "1"])
-      [:move Pos.SW]]
-    [(in key ["KEY_NPAGE" "3"])
-      [:move Pos.SE]]
+      [(in key ["KEY_HOME" "7"])
+        [:move Pos.NW]]
+      [(in key ["KEY_PPAGE" "9"])
+        [:move Pos.NE]]
+      [(in key ["KEY_END" "1"])
+        [:move Pos.SW]]
+      [(in key ["KEY_NPAGE" "3"])
+        [:move Pos.SE]]
 
-    [True
-      [:nop]]))
+      [True
+        [:retry-input]]))
+
+    (unless (= inp :retry-input)
+      (break)))
+
+  (global last-new-message-number)
+  (setv last-new-message-number (dec (len message-log)))
 
   (setv [cmd args] [(first inp) (slice inp 1)])
   (cond
@@ -238,17 +246,7 @@
   (T.addstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
     (if time-limit (minsec (- time-limit current-time)) "Game Over")))
 
-(def last-old-message-number -1)
-(def last-new-message-number -1)
-  ; These variables are used to keep track of which messages
-  ; should be highlighted as new. The rule is that a message
-  ; is considered new until a messager newer than it shows up
-  ; in a distinct redraw loop.
 (defn draw-bottom-message-log []
-  (global last-old-message-number) (global last-new-message-number)
-  (when (> (dec (len message-log)) last-new-message-number)
-    (setv last-old-message-number last-new-message-number)
-    (setv last-new-message-number (dec (len message-log))))
   (setv lines (concat
     (lc [[n text] (slice message-log (- MESSAGE-LINES))]
       (amap (, n it) (textwrap.wrap text SCREEN-WIDTH)))))
@@ -258,7 +256,7 @@
       (if (< i (len lines)) (get lines i 1) "")
       (and
         (< i (len lines))
-        (> (get lines i 0) last-old-message-number)
+        (> (get lines i 0) last-new-message-number)
         NEW-MSG-HIGHLIGHT))))
 
 (defn full-redraw []
