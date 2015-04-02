@@ -177,7 +177,7 @@
       [True
         [:retry-input]]))
 
-    (unless (= inp :retry-input)
+    (unless (= (first inp) :retry-input)
       (break)))
 
   (global last-new-message-number)
