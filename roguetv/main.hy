@@ -1,7 +1,7 @@
 (require kodhy.macros)
 
 (import
-  sys
+  sys textwrap
   curses
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
@@ -19,10 +19,12 @@
 (def BG-COLOR :white)
 (def UNSEEN-COLOR :dark-gray)
 
+(def NEW-MSG-HIGHLIGHT curses.A-BOLD)
+
 (def KEY-ESCAPE "\x1b")
 
 (def color-numbers {
-  :black 0
+  :black 16
   :white 15
   :light-gray 7
   :dark-gray 8
@@ -39,7 +41,8 @@
 (def SCREEN-HEIGHT None)
 (def color-pairs {})
 
-(def time-left 0)  ; In simulated seconds.
+(def current-time 0)  ; In simulated seconds, counting up.
+(def time-limit None)
 
 ;; * Utility
 
@@ -200,6 +203,10 @@
 (defn default-color []
   (get-color FG-COLOR BG-COLOR))
 
+(def message-log [])
+(defn msg [text]
+  (.append message-log (, (len message-log) text)))
+
 (defn echo [str color-fg color-bg]
   (T.addstr str (get-color color-fg color-bg)))
 
@@ -228,16 +235,33 @@
         (echo " " FG-COLOR UNSEEN-COLOR)))))
 
 (defn draw-status-line []
-  (setv text (if (<= time-left 0) "Game Over" (minsec time-left)))
+  (setv text (if time-limit (minsec (- time-limit current-time)) "Game Over"))
   (T.insstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
-    (+ text (* " " (- SCREEN-WIDTH (len text))))
+    (.ljust text SCREEN-WIDTH)
     (default-color)))
 
+(def last-old-message-number -1)
+(def last-new-message-number -1)
+  ; These variables are used to keep track of which messages
+  ; should be highlighted as new. The rule is that a message
+  ; is considered new until a messager newer than it shows up
+  ; in a distinct redraw loop.
 (defn draw-bottom-message-log []
+  (global last-old-message-number) (global last-new-message-number)
+  (when (> (dec (len message-log)) last-new-message-number)
+    (setv last-old-message-number last-new-message-number)
+    (setv last-new-message-number (dec (len message-log))))
+  (setv lines (concat
+    (lc [[n text] (slice message-log (- MESSAGE-LINES))]
+      (amap (, n it) (textwrap.wrap text SCREEN-WIDTH)))))
+  (setv lines (slice lines (- MESSAGE-LINES)))
   (for [i (range MESSAGE-LINES)]
-    (T.insstr (- SCREEN-HEIGHT (inc i)) 0
-      (* " " (dec (* SCREEN-WIDTH MESSAGE-LINES)))
-      (default-color))))
+    (T.insstr (+ i (- SCREEN-HEIGHT MESSAGE-LINES)) 0
+      (.ljust (if (< i (len lines)) (get lines i 1) "") SCREEN-WIDTH)
+      (| (default-color) (and
+        (< i (len lines))
+        (> (get lines i 0) last-old-message-number)
+        NEW-MSG-HIGHLIGHT)))))
 
 (defn full-redraw []
   (draw-status-line)
@@ -260,12 +284,12 @@
 
 (kwc Item :itype toaster :pos player.pos)
 
-(setv time-left (* 2 60))
+(setv time-limit (* 2 60))
 
 (recompute-fov)
 
 (curses.wrapper (fn [scr]
-  (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT) (global time-left)
+  (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT) (global current-time) (global time-limit)
   (setv T scr)
   (setv [SCREEN-HEIGHT SCREEN-WIDTH] (T.getmaxyx))
 
@@ -276,6 +300,11 @@
     (setv [result args] (players-turn))
     (when (= result :moved)
       (recompute-fov)
-      (-= time-left (len-taxicab (first args))))
+      (whenn (afind-or (= it.pos player.pos) Item.extant)
+        (msg (.format "You see here {}." it.itype.name)))
+      (+= current-time (len-taxicab (first args)))
+      (when (and time-limit (>= current-time time-limit))
+        (msg "Time's up!")
+        (setv time-limit None)))
     (when (= result :quit-game)
       (break)))))
