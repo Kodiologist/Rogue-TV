@@ -217,15 +217,14 @@
     (setv py (ty->py ty))
     (for [tx (range SCREEN-WIDTH)]
       (setv px (tx->px tx))
-      (setv p (Pos px py))
       (if
         (and (<= 0 px (dec MAP-WIDTH)) (<= 0 py (dec MAP-HEIGHT))
           (get seen-map px py))
-        (echo-drawable (or
+        (echo-drawable (let [[p (Pos px py)]] (or
           (afind-or (= it.pos p) Creature.extant)
           (let [[i (afind-or (= it.pos p) Item.extant)]]
             (and i i.itype))
-          (mget p)))
+          (mget p))))
         (echo " " FG-COLOR UNSEEN-COLOR)))))
 
 (defn draw-status-line []
