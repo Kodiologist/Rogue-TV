@@ -175,6 +175,9 @@
       [(in key ["KEY_NPAGE" "3"])
         [:move Pos.SE]]
 
+      [(= key ":")
+        [:examine-ground]]
+
       [True
         [:retry-input]]))
 
@@ -186,15 +189,37 @@
 
   (setv [cmd args] [(first inp) (slice inp 1)])
   (cond
+
     [(= cmd :move)
       (let [[p-from player.pos] [p-to (+ p-from (first args))]]
         (if (and (on-map p-to) (not (. (mget p-to) blocks-movement))) (do
           (setv player.pos p-to)
+          (describe-tile player.pos)
           [:moved args])
         (do ; else
           [:nop []])))]
-     [True
-       [cmd args]]))
+
+    [(= cmd :examine-ground) (do
+      (kwc describe-tile player.pos :+verbose)
+      [:nop []])]
+
+    [True
+      [cmd args]]))
+
+;; * Messages
+
+(def message-log [])
+(defn msg [text]
+  (.append message-log (, (len message-log) text)))
+
+(defn describe-tile [pos &optional verbose]
+  (setv items (filt (= it.pos pos) Item.extant))
+  (cond
+    [items
+      (for [item items]
+        (msg (.format "You see here {}." item.itype.name)))]
+    [verbose
+      (msg "The floor is unremarkable.")]))
 
 ;; * Display
 
@@ -211,10 +236,6 @@
 
 (defn default-color []
   (get-color FG-COLOR BG-COLOR))
-
-(def message-log [])
-(defn msg [text]
-  (.append message-log (, (len message-log) text)))
 
 (defn echo [str color-fg color-bg]
   (T.addstr str (get-color color-fg color-bg)))
@@ -303,8 +324,6 @@
     (setv last-action-duration 0)
     (when (= result :moved)
       (recompute-fov)
-      (whenn (afind-or (= it.pos player.pos) Item.extant)
-        (msg (.format "You see here {}." it.itype.name)))
       (setv last-action-duration (len-taxicab (first args)))
       (+= current-time last-action-duration)
       (when (and time-limit (>= current-time time-limit))
