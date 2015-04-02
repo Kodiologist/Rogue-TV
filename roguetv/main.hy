@@ -44,6 +44,7 @@
 
 (def current-time 0)  ; In simulated seconds, counting up.
 (def time-limit None)
+(def last-action-duration 0)
 
 ;; * Utility
 
@@ -244,7 +245,10 @@
 
 (defn draw-status-line []
   (T.addstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
-    (if time-limit (minsec (- time-limit current-time)) "Game Over")))
+    (.rjust (minsec (max 0 (- (or time-limit 0) current-time)))
+      (len "10:00")))
+  (when last-action-duration
+    (T.addstr (.format " ({})" last-action-duration))))
 
 (defn draw-bottom-message-log []
   (setv lines (concat
@@ -286,7 +290,7 @@
 (recompute-fov)
 
 (curses.wrapper (fn [scr]
-  (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT) (global current-time) (global time-limit)
+  (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT) (global current-time) (global time-limit) (global last-action-duration)
 
   (setv T scr)
   (setv [SCREEN-HEIGHT SCREEN-WIDTH] (T.getmaxyx))
@@ -296,11 +300,13 @@
   (while True
     (full-redraw)
     (setv [result args] (players-turn))
+    (setv last-action-duration 0)
     (when (= result :moved)
       (recompute-fov)
       (whenn (afind-or (= it.pos player.pos) Item.extant)
         (msg (.format "You see here {}." it.itype.name)))
-      (+= current-time (len-taxicab (first args)))
+      (setv last-action-duration (len-taxicab (first args)))
+      (+= current-time last-action-duration)
       (when (and time-limit (>= current-time time-limit))
         (msg "Time's up!")
         (setv time-limit None)))
