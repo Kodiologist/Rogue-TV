@@ -13,6 +13,8 @@
 (def MAP-WIDTH 80)
 (def MAP-HEIGHT 40)
 
+(def INVENTORY-LIMIT 10)
+
 (def MESSAGE-LINES 3)
 
 (def FG-COLOR :black)
@@ -131,6 +133,8 @@
   :tid "toaster" :name "a toaster"
   :char "%" :color-fg :green))
 
+(def inventory [])
+
 ;; * Creature
 
 (defclass Creature [Drawable] [
@@ -178,6 +182,9 @@
       [(= key ":")
         [:examine-ground]]
 
+      [(= key ",")
+        [:pick-up]]
+
       [True
         [:retry-input]]))
 
@@ -190,21 +197,40 @@
   (setv [cmd args] [(first inp) (slice inp 1)])
   (cond
 
+    [(= cmd :quit-game)
+      :quit-game]
+
     [(= cmd :move)
       (let [[p-from player.pos] [p-to (+ p-from (first args))]]
-        (if (and (on-map p-to) (not (. (mget p-to) blocks-movement))) (do
-          (setv player.pos p-to)
-          (describe-tile player.pos)
-          [:moved args])
-        (do ; else
-          [:nop []])))]
+        (if (and (on-map p-to) (not (. (mget p-to) blocks-movement)))
+          (do
+            (setv player.pos p-to)
+            (recompute-fov)
+            (describe-tile player.pos)
+            (len-taxicab (first args)))
+          0))]
 
     [(= cmd :examine-ground) (do
       (kwc describe-tile player.pos :+verbose)
-      [:nop []])]
+      0)]
+
+    [(= cmd :pick-up) (do
+      (setv item (afind-or (= it.pos player.pos) Item.extant))
+      (cond
+        [(nil? item) (do
+          (msg "There's nothing here to pick up.")
+          0)]
+        [(= (len inventory) INVENTORY-LIMIT) (do
+          (msg "Your inventory is full.")
+          0)]
+        [True (do
+          (msg (.format "You pick up {}." item.itype.name))
+          (setv item.pos None)
+          (.append inventory item)
+          1)]))]
 
     [True
-      [cmd args]]))
+      0]))
 
 ;; * Messages
 
@@ -213,11 +239,10 @@
   (.append message-log (, (len message-log) text)))
 
 (defn describe-tile [pos &optional verbose]
-  (setv items (filt (= it.pos pos) Item.extant))
+  (setv item (afind-or (= it.pos pos) Item.extant))
   (cond
-    [items
-      (for [item items]
-        (msg (.format "You see here {}." item.itype.name)))]
+    [item
+      (msg (.format "You see here {}." item.itype.name))]
     [verbose
       (msg "The floor is unremarkable.")]))
 
@@ -304,7 +329,15 @@
       (not (get dugout "map" x y)))))
 (def seen-map (amap (* [False] MAP-HEIGHT) (range MAP-WIDTH)))
 
-(kwc Item :itype toaster :pos player.pos)
+(setv toasters 15)
+(for [x (range -2 3)]
+  (for [y (range -2 3)]
+    (setv p (+ player.pos (Pos x y)))
+    (when (instance? Floor (mget p))
+      (kwc Item :itype toaster :pos p)
+      (-= toasters 1)
+      (when (zero? toasters)
+        (break)))))
 
 (setv time-limit (* 2 60))
 
@@ -320,14 +353,19 @@
 
   (while True
     (full-redraw)
-    (setv [result args] (players-turn))
-    (setv last-action-duration 0)
-    (when (= result :moved)
-      (recompute-fov)
-      (setv last-action-duration (len-taxicab (first args)))
-      (+= current-time last-action-duration)
-      (when (and time-limit (>= current-time time-limit))
-        (msg "Time's up!")
-        (setv time-limit None)))
-    (when (= result :quit-game)
-      (break)))))
+    (setv result (players-turn))
+    (cond
+
+      [(= result :quit-game)
+        (break)]
+
+      [(numeric? result) (do
+        (setv last-action-duration result)
+        (when last-action-duration
+          (+= current-time last-action-duration)
+          (when (and time-limit (>= current-time time-limit))
+            (msg "Time's up!")
+            (setv time-limit None))))]
+
+      [True
+        (raise (ValueError (.format "Illegal players-turn result: {}" result)))]))))
