@@ -15,6 +15,8 @@
 
 (def MESSAGE-LINES 3)
 
+(setv FG-COLOR :black)
+(setv BG-COLOR :white)
 (setv UNSEEN-COLOR :dark-gray)
 
 (def KEY-ESCAPE "\x1b")
@@ -76,7 +78,7 @@
   [__init__ (fn [self]
     (kwc .__init__ (super Wall self)
       :char "#"
-      :color-bg :black
+      :color-bg FG-COLOR
       :+blocks-movement)
     None)]])
 
@@ -195,11 +197,14 @@
       (setv (get color-pairs (, fg bg)) i)
       i))))
 
+(defn default-color []
+  (get-color FG-COLOR BG-COLOR))
+
 (defn echo [str color-fg color-bg]
   (T.addstr str (get-color color-fg color-bg)))
 
 (defn echo-drawable [d]
-  (echo d.char (or d.color-fg :black) (or d.color-bg :white)))
+  (echo d.char (or d.color-fg FG-COLOR) (or d.color-bg BG-COLOR)))
 
 (defn ty->py [ty]
   (+ (- (// SCREEN-HEIGHT 2) ty) player.pos.y))
@@ -221,19 +226,19 @@
           (let [[i (afind-or (= it.pos p) Item.extant)]]
             (and i i.itype))
           (mget p)))
-        (echo " " :black UNSEEN-COLOR)))))
+        (echo " " FG-COLOR UNSEEN-COLOR)))))
 
 (defn draw-status-line []
   (setv text (if (<= time-left 0) "Game Over" (minsec time-left)))
   (T.insstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
     (+ text (* " " (- SCREEN-WIDTH (len text))))
-    (get-color :black :white)))
+    (default-color)))
 
 (defn draw-bottom-message-log []
   (for [i (range MESSAGE-LINES)]
     (T.insstr (- SCREEN-HEIGHT (inc i)) 0
       (* " " (dec (* SCREEN-WIDTH MESSAGE-LINES)))
-      (get-color :black :white))))
+      (default-color))))
 
 (defn full-redraw []
   (draw-status-line)
