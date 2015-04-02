@@ -2,8 +2,8 @@
 
 (import
   sys
-  [libtcodpy :as tcod]
   curses
+  [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   heidegger.digger
   [kodhy.util [concat]])
@@ -15,13 +15,13 @@
 
 (def MESSAGE-LINES 3)
 
-(setv FG-COLOR :black)
-(setv BG-COLOR :white)
-(setv UNSEEN-COLOR :dark-gray)
+(def FG-COLOR :black)
+(def BG-COLOR :white)
+(def UNSEEN-COLOR :dark-gray)
 
 (def KEY-ESCAPE "\x1b")
 
-(setv color-numbers {
+(def color-numbers {
   :black 0
   :white 15
   :light-gray 7
@@ -137,7 +137,7 @@
     (.append Creature.extant self)
     None)]])
 
-(setv player (kwc Creature
+(def player (kwc Creature
   :char "@" :color-bg :yellow
   :pos (Pos (/ MAP-WIDTH 2) (/ MAP-HEIGHT 2))))
 
