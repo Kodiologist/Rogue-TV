@@ -3,9 +3,10 @@
 (import
   sys
   [libtcodpy :as tcod]
-  blessed
+  curses
   [heidegger.pos [Pos]]
-  heidegger.digger)
+  heidegger.digger
+  [kodhy.util [concat]])
 
 ;; * Parameters
 
@@ -14,12 +15,19 @@
 
 (def MESSAGE-LINES 3)
 
+(setv UNSEEN-COLOR :dark-gray)
+
+(def KEY-ESCAPE "\x1b")
+
 ;; * Declarations
 
 (def BOTTOM-BORDER (+ MESSAGE-LINES 1))
   ; The extra 1 is for the status line.
 
-(def T (blessed.Terminal))
+(def T None) ; This will be set to a curses screen.
+(def SCREEN-WIDTH None)
+(def SCREEN-HEIGHT None)
+(def color-pairs {})
 
 (def time-left 0)  ; In simulated seconds.
 
@@ -41,10 +49,6 @@
     (set-self char color-fg color-bg)
     None)]])
 
-(setv UnseenSquare (kwc Drawable
-  :char " "
-  :color-bg T.on-bright-black))
-
 ;; * Map
 
 (defclass Tile [Drawable] [
@@ -64,7 +68,7 @@
   [__init__ (fn [self]
     (kwc .__init__ (super Wall self)
       :char "#"
-      :color-bg T.on-black
+      :color-bg :black
       :+blocks-movement)
     None)]])
 
@@ -101,7 +105,7 @@
 
 (def toaster (kwc ItemType
   :tid "toaster" :name "a toaster"
-  :char "%" :color-fg T.green))
+  :char "%" :color-fg :green))
 
 ;; * Creature
 
@@ -115,35 +119,35 @@
     None)]])
 
 (setv player (kwc Creature
-  :char "@" :color-bg T.on-bright-yellow
+  :char "@" :color-bg :yellow
   :pos (Pos (/ MAP-WIDTH 2) (/ MAP-HEIGHT 2))))
 
 ;; * Input
 
 (defn players-turn []
-  (setv key (T.inkey))
+  (setv key (T.getkey))
 
   (setv inp (cond
 
-    [(= key.code T.KEY-ESCAPE)
+    [(= key KEY-ESCAPE)
       [:quit-game]]
 
-    [(or (= key.code T.KEY-UP) (= key "8"))
+    [(in key ["KEY_UP" "8"])
       [:move Pos.NORTH]]
-    [(or (= key.code T.KEY-DOWN) (= key "2"))
+    [(in key ["KEY_DOWN" "2"])
       [:move Pos.SOUTH]]
-    [(or (= key.code T.KEY-LEFT) (= key "4"))
+    [(in key ["KEY_LEFT" "4"])
       [:move Pos.WEST]]
-    [(or (= key.code T.KEY-RIGHT) (= key "6"))
+    [(in key ["KEY_RIGHT" "6"])
       [:move Pos.EAST]]
 
-    [(or (= key.code T.KEY-HOME) (= key "7"))
+    [(in key ["KEY_HOME" "7"])
       [:move Pos.NW]]
-    [(or (= key.code T.KEY-PGUP) (= key "9"))
+    [(in key ["KEY_PPAGE" "9"])
       [:move Pos.NE]]
-    [(or (= key.code T.KEY-END) (= key "1"))
+    [(in key ["KEY_END" "1"])
       [:move Pos.SW]]
-    [(or (= key.code T.KEY-PGDN) (= key "3"))
+    [(in key ["KEY_NPAGE" "3"])
       [:move Pos.SE]]
 
     [True
@@ -163,25 +167,23 @@
 
 ;; * Display
 
-(defn echo [&rest args]
-  (apply print args {"end" "" "sep" ""}))
+(defn echo [str &optional [color-fg :black] [color-bg :white]]
+  (T.addstr str (curses.color-pair (get color-pairs (, color-fg color-bg)))))
 
 (defn ty->py [ty]
-  (+ (- (// T.height 2) ty) player.pos.y))
+  (+ (- (// SCREEN-HEIGHT 2) ty) player.pos.y))
 (defn tx->px [tx]
-  (+ (- tx (// T.width 2)) player.pos.x))
+  (+ (- tx (// SCREEN-WIDTH 2)) player.pos.x))
 
 (defn echo-drawable [d]
-  (echo
-    ((or d.color-fg identity)
-      ((or d.color-bg identity)
-        d.char))))
+  (T.addstr d.char (curses.color-pair
+    (get color-pairs (, (or d.color-fg :black) (or d.color-bg :white))))))
 
 (defn draw-map []
-  (echo (T.move 0 0))
-  (for [ty (range (- T.height BOTTOM-BORDER))]
+  (T.move 0 0)
+  (for [ty (range (- SCREEN-HEIGHT BOTTOM-BORDER))]
     (setv py (ty->py ty))
-    (for [tx (range T.width)]
+    (for [tx (range SCREEN-WIDTH)]
       (setv px (tx->px tx))
       (setv p (Pos px py))
       (if
@@ -192,12 +194,19 @@
           (let [[i (afind-or (= it.pos p) Item.extant)]]
             (and i i.itype))
           (mget p)))
-        (echo (UnseenSquare.color-bg " "))))))
+        (kwc echo " " :color-bg UNSEEN-COLOR)))))
 
 (defn draw-status-line []
-  (echo
-    (T.move (- T.height 1 MESSAGE-LINES) 0)
-    (if (<= time-left 0) "Game Over" (minsec time-left))))
+  (setv text (if (<= time-left 0) "Game Over" (minsec time-left)))
+  (T.insstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
+    (+ text (* " " (- SCREEN-WIDTH (len text))))
+    (curses.color-pair (get color-pairs (, :black :white)))))
+
+(defn draw-bottom-message-log []
+  (for [i (range MESSAGE-LINES)]
+    (T.insstr (- SCREEN-HEIGHT (inc i)) 0
+      (* " " (dec (* SCREEN-WIDTH MESSAGE-LINES)))
+      (curses.color-pair (get color-pairs (, :black :white))))))
 
 (defn recompute-fov []
   (kwc tcod.map-compute-fov fov-map
@@ -210,8 +219,26 @@
 
 (defn full-redraw []
   (draw-status-line)
+  (draw-bottom-message-log)
   (draw-map)
-  (.flush sys.stdout))
+  (T.refresh))
+
+(defn init-colors []
+  (setv WHITE 15)
+  (setv c {
+    :black curses.COLOR-BLACK
+    :white WHITE
+    :light-gray 7
+    :dark-gray 8
+    :green curses.COLOR-GREEN
+    :yellow 3})
+  (setv l (sorted (frozenset (concat
+    (lc [[k cn] (.items c)] [
+      (, k      :white cn                 WHITE)
+      (, :black k      curses.COLOR-BLACK cn)])))))
+  (for [[i [fg-k bg-k fg-cn bg-cn]] (enumerate l)]
+    (curses.init-pair (inc i) fg-cn bg-cn)
+    (setv (get color-pairs (, fg-k bg-k)) (inc i))))
 
 ;; * Main loop
 
@@ -232,7 +259,14 @@
 
 (recompute-fov)
 
-(with [[(T.hidden-cursor)] [(T.cbreak)] [(T.fullscreen)]]
+(curses.wrapper (fn [scr]
+  (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT) (global time-left)
+  (setv T scr)
+  (setv [SCREEN-HEIGHT SCREEN-WIDTH] (T.getmaxyx))
+
+  (curses.curs_set 0) ; Make the cursor invisible.
+
+  (init-colors)
 
   (while True
     (full-redraw)
@@ -241,4 +275,4 @@
       (recompute-fov)
       (-= time-left (len-taxicab (first args))))
     (when (= result :quit-game)
-      (break))))
+      (break)))))
