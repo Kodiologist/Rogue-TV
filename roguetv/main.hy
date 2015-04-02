@@ -235,10 +235,8 @@
         (echo " " FG-COLOR UNSEEN-COLOR)))))
 
 (defn draw-status-line []
-  (setv text (if time-limit (minsec (- time-limit current-time)) "Game Over"))
-  (T.insstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
-    (.ljust text SCREEN-WIDTH)
-    (default-color)))
+  (T.addstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
+    (if time-limit (minsec (- time-limit current-time)) "Game Over")))
 
 (def last-old-message-number -1)
 (def last-new-message-number -1)
@@ -257,13 +255,14 @@
   (setv lines (slice lines (- MESSAGE-LINES)))
   (for [i (range MESSAGE-LINES)]
     (T.insstr (+ i (- SCREEN-HEIGHT MESSAGE-LINES)) 0
-      (.ljust (if (< i (len lines)) (get lines i 1) "") SCREEN-WIDTH)
-      (| (default-color) (and
+      (if (< i (len lines)) (get lines i 1) "")
+      (and
         (< i (len lines))
         (> (get lines i 0) last-old-message-number)
-        NEW-MSG-HIGHLIGHT)))))
+        NEW-MSG-HIGHLIGHT))))
 
 (defn full-redraw []
+  (T.erase)
   (draw-status-line)
   (draw-bottom-message-log)
   (draw-map)
@@ -290,10 +289,11 @@
 
 (curses.wrapper (fn [scr]
   (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT) (global current-time) (global time-limit)
+
   (setv T scr)
   (setv [SCREEN-HEIGHT SCREEN-WIDTH] (T.getmaxyx))
-
-  (curses.curs_set 0) ; Make the cursor invisible.
+  (curses.curs-set 0) ; Make the cursor invisible.
+  (T.bkgd (ord " ") (default-color)) ; Set the background color.
 
   (while True
     (full-redraw)
