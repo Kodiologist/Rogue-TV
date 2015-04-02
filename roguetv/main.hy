@@ -92,6 +92,15 @@
 (defn on-map [pos]
   (and (<= 0 pos.x (dec MAP-WIDTH)) (<= 0 pos.y (dec MAP-HEIGHT))))
 
+(defn recompute-fov []
+  (kwc tcod.map-compute-fov fov-map
+    player.pos.x player.pos.y
+    :algo tcod.FOV-BASIC)
+  (for [x (range MAP-WIDTH)]
+    (for [y (range MAP-HEIGHT)]
+      (when (tcod.map-is-in-fov fov-map x y)
+        (setv (get seen-map x y) True)))))
+
 ;; * Item
 
 (defclass ItemType [Drawable] [
@@ -225,15 +234,6 @@
     (T.insstr (- SCREEN-HEIGHT (inc i)) 0
       (* " " (dec (* SCREEN-WIDTH MESSAGE-LINES)))
       (get-color :black :white))))
-
-(defn recompute-fov []
-  (kwc tcod.map-compute-fov fov-map
-    player.pos.x player.pos.y
-    :algo tcod.FOV-BASIC)
-  (for [x (range MAP-WIDTH)]
-    (for [y (range MAP-HEIGHT)]
-      (when (tcod.map-is-in-fov fov-map x y)
-        (setv (get seen-map x y) True)))))
 
 (defn full-redraw []
   (draw-status-line)
