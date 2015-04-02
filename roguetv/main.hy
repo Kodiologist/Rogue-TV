@@ -222,8 +222,8 @@
           (get seen-map px py))
         (echo-drawable (let [[p (Pos px py)]] (or
           (afind-or (= it.pos p) Creature.extant)
-          (let [[i (afind-or (= it.pos p) Item.extant)]]
-            (and i i.itype))
+          (whenn (afind-or (= it.pos p) Item.extant)
+            it.itype)
           (mget p))))
         (echo " " FG-COLOR UNSEEN-COLOR)))))
 
