@@ -35,6 +35,11 @@
 
 ;; * Declarations
 
+(defclass X [object] [])
+(def G (X))
+  ; This object will store various global variables as attributes
+  ; so we can elide 'global' declarations.
+
 (def BOTTOM-BORDER (+ MESSAGE-LINES 1))
   ; The extra 1 is for the status line.
 
@@ -42,11 +47,12 @@
 (def SCREEN-WIDTH None)
 (def SCREEN-HEIGHT None)
 (def color-pairs {})
-(def last-new-message-number -1)
+(def G.last-new-message-number -1)
 
-(def current-time 0)  ; In simulated seconds, counting up.
-(def time-limit None)
-(def last-action-duration 0)
+; Times are in simulated sections.
+(def G.current-time 0)
+(def G.time-limit None)
+(def G.last-action-duration 0)
 
 ;; * Utility
 
@@ -191,8 +197,7 @@
     (unless (= (first inp) :retry-input)
       (break)))
 
-  (global last-new-message-number)
-  (setv last-new-message-number (dec (len message-log)))
+  (setv G.last-new-message-number (dec (len message-log)))
 
   (setv [cmd args] [(first inp) (slice inp 1)])
   (cond
@@ -291,10 +296,10 @@
 
 (defn draw-status-line []
   (T.addstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
-    (.rjust (minsec (max 0 (- (or time-limit 0) current-time)))
+    (.rjust (minsec (max 0 (- (or G.time-limit 0) G.current-time)))
       (len "10:00")))
-  (when last-action-duration
-    (T.addstr (.format " ({})" last-action-duration))))
+  (when G.last-action-duration
+    (T.addstr (.format " ({})" G.last-action-duration))))
 
 (defn draw-bottom-message-log []
   (setv lines (concat
@@ -306,7 +311,7 @@
       (if (< i (len lines)) (get lines i 1) "")
       (and
         (< i (len lines))
-        (> (get lines i 0) last-new-message-number)
+        (> (get lines i 0) G.last-new-message-number)
         NEW-MSG-HIGHLIGHT))))
 
 (defn full-redraw []
@@ -339,12 +344,12 @@
       (when (zero? toasters)
         (break)))))
 
-(setv time-limit (* 2 60))
+(setv G.time-limit (* 2 60))
 
 (recompute-fov)
 
 (curses.wrapper (fn [scr]
-  (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT) (global current-time) (global time-limit) (global last-action-duration)
+  (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT)
 
   (setv T scr)
   (setv [SCREEN-HEIGHT SCREEN-WIDTH] (T.getmaxyx))
@@ -360,12 +365,12 @@
         (break)]
 
       [(numeric? result) (do
-        (setv last-action-duration result)
-        (when last-action-duration
-          (+= current-time last-action-duration)
-          (when (and time-limit (>= current-time time-limit))
+        (setv G.last-action-duration result)
+        (when G.last-action-duration
+          (+= G.current-time G.last-action-duration)
+          (when (and G.time-limit (>= G.current-time G.time-limit))
             (msg "Time's up!")
-            (setv time-limit None))))]
+            (setv G.time-limit None))))]
 
       [True
         (raise (ValueError (.format "Illegal players-turn result: {}" result)))]))))
