@@ -1,7 +1,7 @@
 (require kodhy.macros)
 
 (import
-  sys textwrap
+  sys os textwrap
   curses
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
@@ -348,6 +348,10 @@
 
 (recompute-fov)
 
+(unless (in "ESCDELAY" os.environ)
+  (setv (get os.environ "ESCDELAY") "10"))
+    ; This ensures curses will respond to the escape key quickly
+    ; in keypad mode (which is enabled by curses.wrapper).
 (curses.wrapper (fn [scr]
   (global T) (global SCREEN-WIDTH) (global SCREEN-HEIGHT)
 
