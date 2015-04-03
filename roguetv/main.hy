@@ -188,13 +188,12 @@
       [(= key ":")
         [:examine-ground]]
 
+      [(= key "i")
+        [:inventory]]
       [(= key ",")
-        [:pick-up]]
+        [:pick-up]]))
 
-      [True
-        [:retry-input]]))
-
-    (unless (= (first inp) :retry-input)
+    (when inp
       (break)))
 
   (setv G.last-new-message-number (dec (len message-log)))
@@ -219,6 +218,12 @@
       (kwc describe-tile player.pos :+verbose)
       0)]
 
+    [(= cmd :inventory) (do
+      (if inventory
+        (inventory-loop)
+        (msg "Your inventory is empty."))
+      0)]
+
     [(= cmd :pick-up) (do
       (setv item (afind-or (= it.pos player.pos) Item.extant))
       (cond
@@ -236,6 +241,29 @@
 
     [True
       0]))
+
+(defn inventory-loop []
+
+  (while True
+
+    (draw-inventory)
+    (T.refresh)
+
+    (while True
+      (setv key (T.getkey))
+      (setv inp (cond
+
+        [(in key [" " "\n" KEY-ESCAPE])
+          [:quit]]))
+
+      (when inp
+        (break)))
+
+    (setv [cmd args] [(first inp) (slice inp 1)])
+    (cond
+
+      [(= cmd :quit)
+        (break)])))
 
 ;; * Messages
 
@@ -313,6 +341,24 @@
         (< i (len lines))
         (> (get lines i 0) G.last-new-message-number)
         NEW-MSG-HIGHLIGHT))))
+
+(defn draw-inventory []
+  (setv lines (+
+    [[None "You are carrying:"]]
+    (amap
+      [it (.format "  {} � {}" "x" it.itype.name)]
+        ; The character � will be replaced with the item's symbol.
+      inventory)
+    (* [[None "      ---"]] (- INVENTORY-LIMIT (len inventory)))))
+  (setv width (min SCREEN-WIDTH (inc (max (amap (len (second it)) lines)))))
+  (for [[n [item text]] (enumerate lines)]
+    (T.move n 0)
+    (setv text (slice (.ljust text width) 0 width))
+    (setv parts (.split text "�" 1))
+    (T.addstr (first parts))
+    (when (> (len parts) 1)
+      (echo-drawable item.itype)
+      (T.addstr (second parts)))))
 
 (defn full-redraw []
   (T.erase)
