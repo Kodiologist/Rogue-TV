@@ -25,6 +25,8 @@
 
 (def KEY-ESCAPE "\x1b")
 
+(def invlets (list "abcdefghijklmnopqrstuvwxyz"))
+
 (def color-numbers {
   :black 16
   :white 15
@@ -169,9 +171,9 @@
 
 (defclass Item [MapObject] [
 
-  [__init__ (fn [self itype &optional pos]
+  [__init__ (fn [self itype &optional pos invlet]
     (.__init__ (super Item self) pos)
-    (set-self itype)
+    (set-self itype invlet)
     None)]])
 
 (kwc ItemType
@@ -188,6 +190,19 @@
   :char "+" :color-fg :blue)
 
 (def inventory [])
+
+(defn add-to-inventory [item]
+  (.move item None)
+  (setv il-in-use (amap it.invlet inventory))
+  (when (or (not item.invlet) (in item.invlet il-in-use))
+    ; Assign the oldest invlet not used for an item already in
+    ; the inventory.
+    (setv item.invlet (afind-or (not-in it il-in-use) invlets))
+    ; Move this invlet to the end of 'invlets' (since it's now
+    ; the most recently used).
+    (invlets.remove item.invlet)
+    (invlets.append item.invlet))
+  (.append inventory item))
 
 ;; * Creature
 
@@ -282,8 +297,7 @@
         (msg (.format "(You can carry up to {} items.)" INVENTORY-LIMIT))
         (ret 0))
       (msg (.format "You pick up {}." item.itype.name))
-      (.move item None)
-      (.append inventory item)
+      (add-to-inventory item)
       1)]
 
     [(= cmd :drop) (do
@@ -317,12 +331,14 @@
   (draw-inventory prompt)
   (T.refresh)
 
+  (setv il (amap it.invlet inventory))
+
   (while True
     (setv key (T.getkey))
     (setv inp (cond
 
-      [(and select (in key string.lowercase))
-        (.index string.lowercase key)]
+      [(and select (in key il))
+        (.index il key)]
 
       [(in key [" " "\n" KEY-ESCAPE])
         :quit]))
@@ -412,7 +428,7 @@
   (setv lines (+
     [[None prompt]]
     (amap
-      [it (.format "  {} � {}" "x" it.itype.name)]
+      [it (.format "  {} � {}" it.invlet it.itype.name)]
         ; The character � will be replaced with the item's symbol.
       inventory)
     (* [[None "      ---"]] (- INVENTORY-LIMIT (len inventory)))))
