@@ -112,18 +112,6 @@
 (defn on-map [pos]
   (and (<= 0 pos.x (dec MAP-WIDTH)) (<= 0 pos.y (dec MAP-HEIGHT))))
 
-(defn room-for-creature? [pos]
-  (and
-    (on-map pos)
-    (not (. (mget pos) blocks-movement))
-    (not (Creature.at pos))))
-
-(defn room-for-item? [pos]
-  (and
-    (on-map pos)
-    (not (. (mget pos) blocks-movement))
-    (not (Item.at pos))))
-
 (defn recompute-fov []
   (kwc tcod.map-compute-fov fov-map
     player.pos.x player.pos.y
@@ -155,6 +143,12 @@
 
   [at (classmethod (fn [self pos]
     (get self.omap pos.x pos.y)))]])
+
+(defn room-for? [mo-class pos]
+  (and
+    (on-map pos)
+    (not (. (mget pos) blocks-movement))
+    (not (.at mo-class pos))))
 
 ;; * Item
 
@@ -246,7 +240,7 @@
 
     [(= cmd :move)
       (let [[p-from player.pos] [p-to (+ p-from (first args))]]
-        (unless (room-for-creature? p-to)
+        (unless (room-for? Creature p-to)
           (ret 0))
         (.move player p-to)
         (recompute-fov)
@@ -285,7 +279,7 @@
       (when (none? i)
         ; Action canceled.
         (ret 0))
-      (setv clear-spot (afind-or (room-for-item? it) (+
+      (setv clear-spot (afind-or (room-for? Item it) (+
         ; Try to drop at the player's feet…
         [player.pos]
         ; …or at a random orthogonal neigbor…
@@ -444,7 +438,7 @@
 (for [x (range -2 3)]
   (for [y (range -2 3)]
     (setv p (+ player.pos (Pos x y)))
-    (when (room-for-item? p)
+    (when (room-for? Item p)
       (kwc Item :itype toaster :pos p)
       (-= toasters 1)
       (when (zero? toasters)
