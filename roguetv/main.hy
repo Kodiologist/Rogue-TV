@@ -1,7 +1,7 @@
 (require kodhy.macros)
 
 (import
-  sys os textwrap
+  sys os random string textwrap
   curses
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
@@ -59,6 +59,11 @@
 (defmacro set-self [&rest props]
   `(do ~@(amap `(setv (. self ~it) ~it)  props)))
 
+(defn shuffle [l]
+  (setv l (list l))
+  (random.shuffle l)
+  l)
+
 (defn minsec [s]
   (.format "{}:{:02}" (// s 60) (% s 60)))
 
@@ -106,6 +111,18 @@
 
 (defn on-map [pos]
   (and (<= 0 pos.x (dec MAP-WIDTH)) (<= 0 pos.y (dec MAP-HEIGHT))))
+
+(defn room-for-creature? [pos]
+  (and
+    (on-map pos)
+    (not (. (mget pos) blocks-movement))
+    (not (afind-or (= it.pos pos) Creature.extant))))
+
+(defn room-for-item? [pos]
+  (and
+    (on-map pos)
+    (not (. (mget pos) blocks-movement))
+    (not (afind-or (= it.pos pos) Item.extant))))
 
 (defn recompute-fov []
   (kwc tcod.map-compute-fov fov-map
@@ -191,7 +208,9 @@
       [(= key "i")
         [:inventory]]
       [(= key ",")
-        [:pick-up]]))
+        [:pick-up]]
+      [(= key "d")
+        [:drop]]))
 
     (when inp
       (break)))
@@ -206,7 +225,7 @@
 
     [(= cmd :move)
       (let [[p-from player.pos] [p-to (+ p-from (first args))]]
-        (if (and (on-map p-to) (not (. (mget p-to) blocks-movement)))
+        (if (room-for-creature? p-to)
           (do
             (setv player.pos p-to)
             (recompute-fov)
@@ -220,7 +239,7 @@
 
     [(= cmd :inventory) (do
       (if inventory
-        (inventory-loop)
+        (kwc inventory-loop :!select "You are carrying:")
         (msg "Your inventory is empty."))
       0)]
 
@@ -232,6 +251,7 @@
           0)]
         [(= (len inventory) INVENTORY-LIMIT) (do
           (msg "Your inventory is full.")
+          (msg (.format "(You can carry up to {} items.)" INVENTORY-LIMIT))
           0)]
         [True (do
           (msg (.format "You pick up {}." item.itype.name))
@@ -239,31 +259,55 @@
           (.append inventory item)
           1)]))]
 
+    [(= cmd :drop)
+      (if inventory
+        (let [[i (inventory-loop "What do you want to drop?")]]
+          (if (none? i)
+            (do
+              (msg "Canceled.")
+              0)
+            (let [[clear-spot (afind-or (room-for-item? it) (+
+                ; Try to drop at the player's feet…
+                [player.pos]
+                ; …or at a random orthogonal neigbor…
+                (shuffle (amap (+ player.pos it) Pos.ORTHS))
+                ; …or at a random diagonal neighbor.
+                (shuffle (amap (+ player.pos it) Pos.DIAGS))))]]
+              (if clear-spot
+                (let [[item (.pop inventory i)]]
+                  (setv item.pos clear-spot)
+                  (msg (.format "You drop {}." item.itype.name))
+                  1)
+                (do
+                  (msg "There's no room to drop anything here.")
+                  0)))))
+        (do
+          (msg "You don't have anything to drop.")
+          0))]
+
     [True
       0]))
 
-(defn inventory-loop []
+(defn inventory-loop [prompt &optional [select True]]
+
+  (draw-inventory prompt)
+  (T.refresh)
 
   (while True
+    (setv key (T.getkey))
+    (setv inp (cond
 
-    (draw-inventory)
-    (T.refresh)
+      [(and select (in key string.lowercase))
+        (.index string.lowercase key)]
 
-    (while True
-      (setv key (T.getkey))
-      (setv inp (cond
+      [(in key [" " "\n" KEY-ESCAPE])
+        :quit]))
 
-        [(in key [" " "\n" KEY-ESCAPE])
-          [:quit]]))
+    (unless (none? inp)
+      (break)))
 
-      (when inp
-        (break)))
-
-    (setv [cmd args] [(first inp) (slice inp 1)])
-    (cond
-
-      [(= cmd :quit)
-        (break)])))
+  (when (and (numeric? inp) (< inp (len inventory)))
+    inp))
 
 ;; * Messages
 
@@ -342,9 +386,9 @@
         (> (get lines i 0) G.last-new-message-number)
         NEW-MSG-HIGHLIGHT))))
 
-(defn draw-inventory []
+(defn draw-inventory [prompt]
   (setv lines (+
-    [[None "You are carrying:"]]
+    [[None prompt]]
     (amap
       [it (.format "  {} � {}" "x" it.itype.name)]
         ; The character � will be replaced with the item's symbol.
@@ -384,7 +428,7 @@
 (for [x (range -2 3)]
   (for [y (range -2 3)]
     (setv p (+ player.pos (Pos x y)))
-    (when (instance? Floor (mget p))
+    (when (room-for-item? p)
       (kwc Item :itype toaster :pos p)
       (-= toasters 1)
       (when (zero? toasters)
