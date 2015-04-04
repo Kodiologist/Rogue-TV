@@ -49,7 +49,7 @@
 (def color-pairs {})
 (def G.last-new-message-number -1)
 
-; Times are in simulated sections.
+; Times are in simulated seconds.
 (def G.current-time 0)
 (def G.time-limit None)
 (def G.last-action-duration 0)
