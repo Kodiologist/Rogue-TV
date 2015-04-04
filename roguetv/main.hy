@@ -116,13 +116,13 @@
   (and
     (on-map pos)
     (not (. (mget pos) blocks-movement))
-    (not (afind-or (= it.pos pos) Creature.extant))))
+    (not (Creature.at pos))))
 
 (defn room-for-item? [pos]
   (and
     (on-map pos)
     (not (. (mget pos) blocks-movement))
-    (not (afind-or (= it.pos pos) Item.extant))))
+    (not (Item.at pos))))
 
 (defn recompute-fov []
   (kwc tcod.map-compute-fov fov-map
@@ -132,6 +132,29 @@
     (for [y (range MAP-HEIGHT)]
       (when (tcod.map-is-in-fov fov-map x y)
         (setv (get seen-map x y) True)))))
+
+(defclass MapObject [object] [
+
+  [init-omap (classmethod (fn [self width height]
+    (setv self.omap (amap (* [None] height) (range width)))))]
+
+  [__init__ (fn [self &optional pos]
+    ; 'pos' may be None whenever the object isn't currently
+    ; on the map.
+    (setv self.pos None)
+    (.move self pos)
+    None)]
+
+  [move (fn [self p-to]
+    ; Set p-to to None to remove the object from the map.
+    (when self.pos
+      (setv (get self.omap self.pos.x self.pos.y) None))
+    (when p-to
+      (setv (get self.omap p-to.x p-to.y) self))
+    (setv self.pos p-to))]
+
+  [at (classmethod (fn [self pos]
+    (get self.omap pos.x pos.y)))]])
 
 ;; * Item
 
@@ -144,12 +167,11 @@
     (.append ItemType.defined self)
     None)]])
 
-(defclass Item [object] [
-  [extant []]
+(defclass Item [MapObject] [
 
   [__init__ (fn [self itype &optional pos]
-    (set-self itype pos)
-    (.append Item.extant self)
+    (.__init__ (super Item self) pos)
+    (set-self itype)
     None)]])
 
 (def toaster (kwc ItemType
@@ -160,18 +182,17 @@
 
 ;; * Creature
 
-(defclass Creature [Drawable] [
+(defclass Creature [Drawable MapObject] [
   [extant []]
 
   [__init__ (fn [self &optional char color-fg color-bg pos]
-    (.__init__ (super Creature self) char color-fg color-bg)
-    (set-self pos)
+    (Drawable.__init__ self char color-fg color-bg)
+    (MapObject.__init__ self pos)
     (.append Creature.extant self)
     None)]])
 
 (def player (kwc Creature
-  :char "@" :color-bg :yellow
-  :pos (Pos (/ MAP-WIDTH 2) (/ MAP-HEIGHT 2))))
+  :char "@" :color-bg :yellow))
 
 ;; * Input
 
@@ -227,7 +248,7 @@
       (let [[p-from player.pos] [p-to (+ p-from (first args))]]
         (if (room-for-creature? p-to)
           (do
-            (setv player.pos p-to)
+            (.move player p-to)
             (recompute-fov)
             (describe-tile player.pos)
             (len-taxicab (first args)))
@@ -244,7 +265,7 @@
       0)]
 
     [(= cmd :pick-up) (do
-      (setv item (afind-or (= it.pos player.pos) Item.extant))
+      (setv item (Item.at player.pos))
       (cond
         [(nil? item) (do
           (msg "There's nothing here to pick up.")
@@ -255,7 +276,7 @@
           0)]
         [True (do
           (msg (.format "You pick up {}." item.itype.name))
-          (setv item.pos None)
+          (.move item None)
           (.append inventory item)
           1)]))]
 
@@ -275,7 +296,7 @@
                 (shuffle (amap (+ player.pos it) Pos.DIAGS))))]]
               (if clear-spot
                 (let [[item (.pop inventory i)]]
-                  (setv item.pos clear-spot)
+                  (.move item clear-spot)
                   (msg (.format "You drop {}." item.itype.name))
                   1)
                 (do
@@ -316,10 +337,9 @@
   (.append message-log (, (len message-log) text)))
 
 (defn describe-tile [pos &optional verbose]
-  (setv item (afind-or (= it.pos pos) Item.extant))
   (cond
-    [item
-      (msg (.format "You see here {}." item.itype.name))]
+    [(Item.at pos)
+      (msg (.format "You see here {}." (. (Item.at pos) itype name)))]
     [verbose
       (msg "The floor is unremarkable.")]))
 
@@ -360,9 +380,8 @@
         (and (<= 0 px (dec MAP-WIDTH)) (<= 0 py (dec MAP-HEIGHT))
           (get seen-map px py))
         (echo-drawable (let [[p (Pos px py)]] (or
-          (afind-or (= it.pos p) Creature.extant)
-          (whenn (afind-or (= it.pos p) Item.extant)
-            it.itype)
+          (Creature.at p)
+          (whenn (Item.at p) it.itype)
           (mget p))))
         (echo " " FG-COLOR UNSEEN-COLOR)))))
 
@@ -423,6 +442,9 @@
       (not (get dugout "map" x y))
       (not (get dugout "map" x y)))))
 (def seen-map (amap (* [False] MAP-HEIGHT) (range MAP-WIDTH)))
+(.init-omap Item MAP-WIDTH MAP-HEIGHT)
+(.init-omap Creature MAP-WIDTH MAP-HEIGHT)
+(.move player (Pos (/ MAP-WIDTH 2) (/ MAP-HEIGHT 2)))
 
 (setv toasters 15)
 (for [x (range -2 3)]
