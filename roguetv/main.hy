@@ -35,8 +35,8 @@
 
 ;; * Declarations
 
-(defclass X [object] [])
-(def G (X))
+(defclass G [object] [])
+(def G (G))
   ; This object will store various global variables as attributes
   ; so we can elide 'global' declarations.
 
