@@ -31,6 +31,8 @@
   :light-gray 7
   :dark-gray 8
   :green 2
+  :blue 12
+  :red 9
   :yellow 3})
 
 ;; * Declarations
@@ -63,6 +65,9 @@
   (setv l (list l))
   (random.shuffle l)
   l)
+
+(defn pick [l]
+  (first (random.sample l 1)))
 
 (defn minsec [s]
   (.format "{}:{:02}" (// s 60) (% s 60)))
@@ -152,13 +157,14 @@
 
 ;; * Item
 
+(def itypes {})
+
 (defclass ItemType [Drawable] [
-  [defined []]
 
   [__init__ (fn [self tid name char &optional color-fg color-bg]
     (.__init__ (super ItemType self) char color-fg color-bg)
     (set-self tid name)
-    (.append ItemType.defined self)
+    (setv (get itypes tid) self)
     None)]])
 
 (defclass Item [MapObject] [
@@ -168,9 +174,18 @@
     (set-self itype)
     None)]])
 
-(def toaster (kwc ItemType
+(kwc ItemType
   :tid "toaster" :name "a toaster"
-  :char "%" :color-fg :green))
+  :char "%" :color-fg :green)
+(kwc ItemType
+  :tid "galoshes" :name "a pair of galoshes"
+  :char "[" :color-fg :yellow)
+(kwc ItemType
+  :tid "ottoman" :name "an ottoman"
+  :char "_" :color-fg :red)
+(kwc ItemType
+  :tid "food-processor" :name "a food processor"
+  :char "+" :color-fg :blue)
 
 (def inventory [])
 
@@ -434,14 +449,14 @@
 (.init-omap Creature MAP-WIDTH MAP-HEIGHT)
 (.move player (Pos (/ MAP-WIDTH 2) (/ MAP-HEIGHT 2)))
 
-(setv toasters 15)
+(setv starting-items 15)
 (for [x (range -2 3)]
   (for [y (range -2 3)]
     (setv p (+ player.pos (Pos x y)))
     (when (room-for? Item p)
-      (kwc Item :itype toaster :pos p)
-      (-= toasters 1)
-      (when (zero? toasters)
+      (kwc Item :itype (pick (.values itypes)) :pos p)
+      (-= starting-items 1)
+      (when (zero? starting-items)
         (break)))))
 
 (setv G.time-limit (* 2 60))
