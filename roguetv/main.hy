@@ -6,7 +6,7 @@
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [concat]])
+  [kodhy.util [concat ret]])
 
 ;; * Parameters
 
@@ -239,20 +239,19 @@
   (setv G.last-new-message-number (dec (len message-log)))
 
   (setv [cmd args] [(first inp) (slice inp 1)])
-  (cond
+  (block (cond
 
     [(= cmd :quit-game)
       :quit-game]
 
     [(= cmd :move)
       (let [[p-from player.pos] [p-to (+ p-from (first args))]]
-        (if (room-for-creature? p-to)
-          (do
-            (.move player p-to)
-            (recompute-fov)
-            (describe-tile player.pos)
-            (len-taxicab (first args)))
-          0))]
+        (unless (room-for-creature? p-to)
+          (ret 0))
+        (.move player p-to)
+        (recompute-fov)
+        (describe-tile player.pos)
+        (len-taxicab (first args)))]
 
     [(= cmd :examine-ground) (do
       (kwc describe-tile player.pos :+verbose)
@@ -266,48 +265,43 @@
 
     [(= cmd :pick-up) (do
       (setv item (Item.at player.pos))
-      (cond
-        [(nil? item) (do
-          (msg "There's nothing here to pick up.")
-          0)]
-        [(= (len inventory) INVENTORY-LIMIT) (do
-          (msg "Your inventory is full.")
-          (msg (.format "(You can carry up to {} items.)" INVENTORY-LIMIT))
-          0)]
-        [True (do
-          (msg (.format "You pick up {}." item.itype.name))
-          (.move item None)
-          (.append inventory item)
-          1)]))]
+      (when (nil? item)
+        (msg "There's nothing here to pick up.")
+        (ret 0))
+      (when (= (len inventory) INVENTORY-LIMIT)
+        (msg "Your inventory is full.")
+        (msg (.format "(You can carry up to {} items.)" INVENTORY-LIMIT))
+        (ret 0))
+      (msg (.format "You pick up {}." item.itype.name))
+      (.move item None)
+      (.append inventory item)
+      1)]
 
-    [(= cmd :drop)
-      (if inventory
-        (let [[i (inventory-loop "What do you want to drop?")]]
-          (if (none? i)
-            (do
-              (msg "Canceled.")
-              0)
-            (let [[clear-spot (afind-or (room-for-item? it) (+
-                ; Try to drop at the player's feet…
-                [player.pos]
-                ; …or at a random orthogonal neigbor…
-                (shuffle (amap (+ player.pos it) Pos.ORTHS))
-                ; …or at a random diagonal neighbor.
-                (shuffle (amap (+ player.pos it) Pos.DIAGS))))]]
-              (if clear-spot
-                (let [[item (.pop inventory i)]]
-                  (.move item clear-spot)
-                  (msg (.format "You drop {}." item.itype.name))
-                  1)
-                (do
-                  (msg "There's no room to drop anything here.")
-                  0)))))
-        (do
-          (msg "You don't have anything to drop.")
-          0))]
+    [(= cmd :drop) (do
+      (unless inventory
+        (msg "You don't have anything to drop.")
+        (ret 0))
+      (setv i (inventory-loop "What do you want to drop?"))
+      (when (none? i)
+        ; Action canceled.
+        (ret 0))
+      (setv clear-spot (afind-or (room-for-item? it) (+
+        ; Try to drop at the player's feet…
+        [player.pos]
+        ; …or at a random orthogonal neigbor…
+        (shuffle (amap (+ player.pos it) Pos.ORTHS))
+        ; …or at a random diagonal neighbor.
+        (shuffle (amap (+ player.pos it) Pos.DIAGS)))))
+      (unless clear-spot
+        (msg "There's no room to drop anything here.")
+        (ret 0))
+      (setv item (.pop inventory i))
+      (.move item clear-spot)
+      (msg (.format "You drop {}." item.itype.name))
+      1)]
 
     [True
-      0]))
+      0])))
 
 (defn inventory-loop [prompt &optional [select True]]
 
