@@ -342,8 +342,12 @@
     (setv key (T.getkey))
     (setv inp (cond
 
-      [(and select (in key il))
-        (.index il key)]
+      [(and select (in key invlets))
+        (if (in key il)
+          (.index il key)
+          (do
+            (msg "You don't have such an item.")
+            :quit))]
 
       [(in key [" " "\n" KEY-ESCAPE])
         :quit]))
