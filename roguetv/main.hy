@@ -174,7 +174,12 @@
   [__init__ (fn [self itype &optional pos invlet]
     (.__init__ (super Item self) pos)
     (set-self itype invlet)
-    None)]])
+    None)]
+
+  [invstr (fn [self]
+    (.format "{} - {}"
+      self.invlet
+      self.itype.name))]])
 
 (kwc ItemType
   :tid "toaster" :name "a toaster"
@@ -293,11 +298,10 @@
         (msg "There's nothing here to pick up.")
         (ret 0))
       (when (= (len inventory) INVENTORY-LIMIT)
-        (msg "Your inventory is full.")
-        (msg (.format "(You can carry up to {} items.)" INVENTORY-LIMIT))
+        (msg (.format "Your inventory is full. (You can carry up to {} items.)" INVENTORY-LIMIT))
         (ret 0))
-      (msg (.format "You pick up {}." item.itype.name))
       (add-to-inventory item)
+      (msg (+ "Taken:  " (item.invstr)))
       1)]
 
     [(= cmd :drop) (do
@@ -320,7 +324,7 @@
         (ret 0))
       (setv item (.pop inventory i))
       (.move item clear-spot)
-      (msg (.format "You drop {}." item.itype.name))
+      (msg (+ "Dropped: " (item.invstr)))
       1)]
 
     [True
