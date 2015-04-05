@@ -298,10 +298,11 @@
         (msg "There's nothing here to pick up.")
         (ret 0))
       (when (= (len inventory) INVENTORY-LIMIT)
-        (msg (.format "Your inventory is full. (You can carry up to {} items.)" INVENTORY-LIMIT))
+        (msg "Your inventory is full. (You can carry up to {} items.)"
+          INVENTORY-LIMIT)
         (ret 0))
       (add-to-inventory item)
-      (msg (+ "Taken:  " (item.invstr)))
+      (msg "Taken:  {}" (item.invstr))
       1)]
 
     [(= cmd :drop) (do
@@ -324,7 +325,7 @@
         (ret 0))
       (setv item (.pop inventory i))
       (.move item clear-spot)
-      (msg (+ "Dropped: " (item.invstr)))
+      (msg "Dropped:  {}" (item.invstr))
       1)]
 
     [True
@@ -356,13 +357,15 @@
 ;; * Messages
 
 (def message-log [])
-(defn msg [text]
-  (.append message-log (, (len message-log) text)))
+(defn msg [&rest format-args]
+  (.append message-log (,
+    (len message-log)
+    (apply .format format-args))))
 
 (defn describe-tile [pos &optional verbose]
   (cond
     [(Item.at pos)
-      (msg (.format "You see here {}." (. (Item.at pos) itype name)))]
+      (msg "You see here {}." (. (Item.at pos) itype name))]
     [verbose
       (msg "The floor is unremarkable.")]))
 
