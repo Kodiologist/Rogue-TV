@@ -63,6 +63,9 @@
 (defmacro set-self [&rest props]
   `(do ~@(amap `(setv (. self ~it) ~it)  props)))
 
+(defmacro set-self-nn [&rest props]
+  `(do ~@(amap `(unless (none? ~it) (setv (. self ~it) ~it))  props)))
+
 (defn shuffle [l]
   (setv l (list l))
   (random.shuffle l)
@@ -80,32 +83,22 @@
 ;; * Drawable
 
 (defclass Drawable [object] [
-  [__init__ (fn [self char &optional color-fg color-bg]
-    (set-self char color-fg color-bg)
-    None)]])
+  [char None]
+  [color-fg FG-COLOR]
+  [color-bg BG-COLOR]])
 
 ;; * Map
 
 (defclass Tile [Drawable] [
-  [__init__ (fn [self char &optional color-fg color-bg blocks-movement]
-    (.__init__ (super Tile self) char color-fg color-bg)
-    (set-self blocks-movement)
-    None)]])
+  [blocks-movement True]])
 
 (defclass Floor [Tile] [
-  [__init__ (fn [self]
-    (kwc .__init__ (super Floor self)
-      :char "."
-      :!blocks-movement)
-    None)]])
+  [char "."]
+  [blocks-movement False]])
 
 (defclass Wall [Tile] [
-  [__init__ (fn [self]
-    (kwc .__init__ (super Wall self)
-      :char "#"
-      :color-bg FG-COLOR
-      :+blocks-movement)
-    None)]])
+  [char "#"]
+  [color-bg FG-COLOR]])
 
 (def gmap
   (amap (amap None (range MAP-HEIGHT)) (range MAP-WIDTH)))
@@ -164,8 +157,8 @@
 (defclass ItemType [Drawable] [
 
   [__init__ (fn [self tid name char &optional color-fg color-bg]
-    (.__init__ (super ItemType self) char color-fg color-bg)
-    (set-self tid name)
+    (set-self tid name char)
+    (set-self-nn color-fg color-bg)
     (setv (get itypes tid) self)
     None)]])
 
@@ -215,8 +208,9 @@
   [extant []]
 
   [__init__ (fn [self &optional char color-fg color-bg pos]
-    (Drawable.__init__ self char color-fg color-bg)
     (MapObject.__init__ self pos)
+    (set-self char)
+    (set-self-nn color-fg color-bg)
     (.append Creature.extant self)
     None)]])
 
@@ -393,7 +387,7 @@
   (T.addstr str (get-color color-fg color-bg)))
 
 (defn echo-drawable [d]
-  (echo d.char (or d.color-fg FG-COLOR) (or d.color-bg BG-COLOR)))
+  (echo d.char d.color-fg d.color-bg))
 
 (defn ty->py [ty]
   (+ (- (// SCREEN-HEIGHT 2) ty) player.pos.y))
