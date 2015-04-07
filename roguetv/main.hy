@@ -53,10 +53,16 @@
 (def color-pairs {})
 (def G.last-new-message-number -1)
 
+(def G.endgame False)
+(def G.dungeon-level None)
+
 ; Times are in simulated seconds.
 (def G.current-time 0)
 (def G.time-limit None)
 (def G.last-action-duration 0)
+
+(def G.fov-map (tcod.map-new MAP-WIDTH MAP-HEIGHT))
+(def seen-map [])
 
 ;; * Utility
 
@@ -74,6 +80,9 @@
 (defn pick [l]
   (first (random.sample l 1)))
 
+(defn randpop [l]
+  (l.pop (random.randrange (len l))))
+
 (defn minsec [s]
   (.format "{}:{:02}" (// s 60) (% s 60)))
 
@@ -90,15 +99,49 @@
 ;; * Map
 
 (defclass Tile [Drawable] [
-  [blocks-movement True]])
+  [description None]
+  [blocks-movement False]
+
+  [use-tile (fn [self]
+    ; The player has used the command :use-tile on top of this
+    ; tile. Do whatever is necessary and return the time
+    ; taken.
+    ;
+    ; The default implementaton does nothing.
+    (msg "There's nothing special you can do at this tile.")
+    0)]])
 
 (defclass Floor [Tile] [
-  [char "."]
-  [blocks-movement False]])
+  [char "."]])
 
 (defclass Wall [Tile] [
+  [description "a wall"]
   [char "#"]
-  [color-bg FG-COLOR]])
+  [color-bg FG-COLOR]
+  [blocks-movement True]])
+
+(defclass Elevator [Tile] [])
+
+(defclass UpElevator [Elevator] [
+  [description "an elevator going up"]
+  [char "<"]
+
+  [use-tile (fn [self]
+    (msg "Taking the elevator up will end the game, but you get to keep what you have.")
+    (when (y-or-n "Take the elevator up?" :+require-uppercase)
+      (setv G.endgame :used-up-elevator))
+    0)]])
+
+(defclass DownElevator [Elevator] [
+  [description "an elevator going down"]
+  [char ">"]
+
+  [use-tile (fn [self]
+    (when (y-or-n "Take the elevator down?")
+      (+= G.dungeon-level 1)
+      (reset-level)
+      (recompute-fov))
+    0)]])
 
 (def gmap
   (amap (amap None (range MAP-HEIGHT)) (range MAP-WIDTH)))
@@ -113,12 +156,12 @@
   (and (<= 0 pos.x (dec MAP-WIDTH)) (<= 0 pos.y (dec MAP-HEIGHT))))
 
 (defn recompute-fov []
-  (kwc tcod.map-compute-fov fov-map
+  (kwc tcod.map-compute-fov G.fov-map
     player.pos.x player.pos.y
     :algo tcod.FOV-BASIC)
   (for [x (range MAP-WIDTH)]
     (for [y (range MAP-HEIGHT)]
-      (when (tcod.map-is-in-fov fov-map x y)
+      (when (tcod.map-is-in-fov G.fov-map x y)
         (setv (get seen-map x y) True)))))
 
 (defclass MapObject [object] [
@@ -149,6 +192,38 @@
     (on-map pos)
     (not (. (mget pos) blocks-movement))
     (not (.at mo-class pos))))
+
+(defn reset-level []
+  (setv dugout (kwc heidegger.digger.generate-map
+    :width MAP-WIDTH :height MAP-HEIGHT))
+
+  (setv free-floors [])
+  (for [x (range MAP-WIDTH)]
+    (for [y (range MAP-HEIGHT)]
+      (setv p (Pos x y))
+      (setv floor? (not (get dugout "map" x y)))
+      (when floor?
+        (.append free-floors p))
+      (mset p (if floor? (Floor) (Wall)))
+      (tcod.map-set-properties G.fov-map x y floor? floor?)))
+
+  (setv upelv-pos (Pos (/ MAP-WIDTH 2) (/ MAP-HEIGHT 2)))
+  (mset upelv-pos (UpElevator))
+  (.remove free-floors upelv-pos)
+  (mset (randpop free-floors) (DownElevator))
+
+  (setv (slice seen-map) (amap (* [False] MAP-HEIGHT) (range MAP-WIDTH)))
+  (.init-omap Item MAP-WIDTH MAP-HEIGHT)
+  (.init-omap Creature MAP-WIDTH MAP-HEIGHT)
+  ; Now that we're on a new level, the positions of old
+  ; MapObjects are invalid. But that's okay because there's no
+  ; way to refer to old MapObjects anymore, either (except for
+  ; ones with pos None, like the items in the player's
+  ; inventory).
+
+  (setv G.time-limit (+ G.current-time (* 5 60)))
+
+  (.move player upelv-pos))
 
 ;; * Item
 
@@ -219,6 +294,25 @@
 
 ;; * Input
 
+(defn y-or-n [prompt &optional [require-uppercase False]] (block
+  (msg "{} {}" prompt
+    (if require-uppercase "(Y/N; case-sensitive)" "(y/n)"))
+  (full-redraw)
+  (setv G.last-new-message-number (dec (len message-log)))
+  (while True
+    (setv key (T.getkey))
+    (unless require-uppercase
+      (setv key (.upper key)))
+    (when (= key "Y")
+      (ret True))
+    (when (= key "N")
+      (ret False)))))
+
+(defn hit-key-to-continue [keys]
+  (while True
+    (when (in (T.getkey) keys)
+      (break))))
+
 (defn players-turn []
 
   (while True
@@ -248,6 +342,8 @@
 
       [(= key ":")
         [:examine-ground]]
+      [(= key "t")
+        [:use-tile]]
 
       [(= key "i")
         [:inventory]]
@@ -279,6 +375,9 @@
     [(= cmd :examine-ground) (do
       (kwc describe-tile player.pos :+verbose)
       0)]
+
+    [(= cmd :use-tile)
+      (.use-tile (mget player.pos))]
 
     [(= cmd :inventory) (do
       (if inventory
@@ -361,11 +460,19 @@
     (apply .format format-args))))
 
 (defn describe-tile [pos &optional verbose]
+  (setv tile (mget pos))
   (cond
-    [(Item.at pos)
-      (msg "You see here {}." (. (Item.at pos) itype name))]
+    [(Item.at pos) (do
+      (msg "You see here {}." (. (Item.at pos) itype name))
+      (unless (instance? Floor tile)
+        ; This triggers even when 'verbose' is false because
+        ; there's an item covering this tile, so the tile type
+        ; may not be obvious.
+        (msg "There is also {} here." tile.description)))]
     [verbose
-      (msg "The floor is unremarkable.")]))
+      (if (instance? Floor tile)
+        (msg "The floor is unremarkable.")
+        (msg "There is {} here." tile.description))]))
 
 ;; * Display
 
@@ -411,10 +518,13 @@
 
 (defn draw-status-line []
   (T.addstr (- SCREEN-HEIGHT 1 MESSAGE-LINES) 0
-    (.rjust (minsec (max 0 (- (or G.time-limit 0) G.current-time)))
-      (len "10:00")))
-  (when G.last-action-duration
-    (T.addstr (.format " ({})" G.last-action-duration))))
+    (.format "{} {}  DL:{: 2}"
+      (.rjust (minsec (max 0 (- (or G.time-limit 0) G.current-time)))
+        (len "10:00"))
+      (if G.last-action-duration
+        (.format "({})" G.last-action-duration)
+        "   ")
+      G.dungeon-level)))
 
 (defn draw-bottom-message-log []
   (setv lines (concat
@@ -456,19 +566,8 @@
 
 ;; * Main loop
 
-(def dugout (kwc heidegger.digger.generate-map
-  :width MAP-WIDTH :height MAP-HEIGHT))
-(def fov-map (tcod.map-new MAP-WIDTH MAP-HEIGHT))
-(for [x (range MAP-WIDTH)]
-  (for [y (range MAP-HEIGHT)]
-    (mset (Pos x y) (if (get dugout "map" x y) (Wall) (Floor)))
-    (tcod.map-set-properties fov-map x y
-      (not (get dugout "map" x y))
-      (not (get dugout "map" x y)))))
-(def seen-map (amap (* [False] MAP-HEIGHT) (range MAP-WIDTH)))
-(.init-omap Item MAP-WIDTH MAP-HEIGHT)
-(.init-omap Creature MAP-WIDTH MAP-HEIGHT)
-(.move player (Pos (/ MAP-WIDTH 2) (/ MAP-HEIGHT 2)))
+(setv G.dungeon-level 1)
+(reset-level)
 
 (setv starting-items 15)
 (for [x (range -2 3)]
@@ -479,8 +578,6 @@
       (-= starting-items 1)
       (when (zero? starting-items)
         (break)))))
-
-(setv G.time-limit (* 2 60))
 
 (recompute-fov)
 
@@ -496,6 +593,8 @@
   (curses.curs-set 0) ; Make the cursor invisible.
   (T.bkgd (ord " ") (default-color)) ; Set the background color.
 
+  (describe-tile player.pos)
+
   (while True
     (full-redraw)
     (setv result (players-turn))
@@ -510,7 +609,14 @@
           (+= G.current-time G.last-action-duration)
           (when (and G.time-limit (>= G.current-time G.time-limit))
             (msg "Time's up!")
-            (setv G.time-limit None))))]
+            (setv G.time-limit None)
+            (setv G.endgame :out-of-time))))]
 
       [True
-        (raise (ValueError (.format "Illegal players-turn result: {}" result)))]))))
+        (raise (ValueError (.format "Illegal players-turn result: {}" result)))])
+
+    (when G.endgame
+      (msg "Game over. Press Escape to quit.")
+      (full-redraw)
+      (hit-key-to-continue [KEY-ESCAPE])
+      (break)))))
