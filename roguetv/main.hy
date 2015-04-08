@@ -137,10 +137,9 @@
   [char ">"]
 
   [use-tile (fn [self]
-    (when (y-or-n "Take the elevator down?")
-      (+= G.dungeon-level 1)
-      (reset-level)
-      (recompute-fov))
+    (+= G.dungeon-level 1)
+    (reset-level)
+    (recompute-fov)
     0)]])
 
 (def gmap
