@@ -22,6 +22,9 @@
 (def FG-COLOR :black)
 (def BG-COLOR :white)
 (def UNSEEN-COLOR :dark-gray)
+(def announcer-colors {
+  :tara :blue
+  :bob :red})
 
 (def NEW-MSG-HIGHLIGHT curses.A-BOLD)
 
@@ -110,7 +113,7 @@
     ; taken.
     ;
     ; The default implementaton does nothing.
-    (msg "There's nothing special you can do at this tile.")
+    (msgn "There's nothing special you can do at this tile.")
     0)]])
 
 (defclass Floor [Tile] [
@@ -129,7 +132,7 @@
   [char "<"]
 
   [use-tile (fn [self]
-    (msg "Tara: It looks like {p:name} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
+    (msg :tara "It looks like {p:name} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
     (when (y-or-n "Take the elevator up?" :+require-uppercase)
       (setv G.endgame :used-up-elevator))
     0)]])
@@ -142,7 +145,7 @@
     (+= G.dungeon-level 1)
     (reset-level)
     (recompute-fov)
-    (msg "Tara: And {p:he's} on to the next level.")
+    (msg :tara "And {p:he's} on to the next level.")
     0)]])
 
 (def gmap
@@ -314,7 +317,7 @@
 ;; * Input
 
 (defn y-or-n [prompt &optional [require-uppercase False]] (block
-  (msg "{} {}" prompt
+  (msgn "{} {}" prompt
     (if require-uppercase "(Y/N; case-sensitive)" "(y/n)"))
   (full-redraw)
   (setv G.last-new-message-number (dec (len message-log)))
@@ -401,25 +404,25 @@
     [(= cmd :inventory) (do
       (if inventory
         (kwc inventory-loop :!select "You are carrying:")
-        (msg "Your inventory is empty."))
+        (msgn "Your inventory is empty."))
       0)]
 
     [(= cmd :pick-up) (do
       (setv item (Item.at player.pos))
       (when (nil? item)
-        (msg "There's nothing here to pick up.")
+        (msgn "There's nothing here to pick up.")
         (ret 0))
       (when (= (len inventory) INVENTORY-LIMIT)
-        (msg "Your inventory is full. (You can carry up to {} items.)"
+        (msgn "Your inventory is full. (You can carry up to {} items.)"
           INVENTORY-LIMIT)
         (ret 0))
       (add-to-inventory item)
-      (msg "Taken:  {}" (item.invstr))
+      (msgn "Taken:  {}" (item.invstr))
       1)]
 
     [(= cmd :drop) (do
       (unless inventory
-        (msg "You don't have anything to drop.")
+        (msgn "You don't have anything to drop.")
         (ret 0))
       (setv i (inventory-loop "What do you want to drop?"))
       (when (none? i)
@@ -433,11 +436,11 @@
         ; …or at a random diagonal neighbor.
         (shuffle (amap (+ player.pos it) Pos.DIAGS)))))
       (unless clear-spot
-        (msg "There's no room to drop anything here.")
+        (msgn "There's no room to drop anything here.")
         (ret 0))
       (setv item (.pop inventory i))
       (.move item clear-spot)
-      (msg "Dropped:  {}" (item.invstr))
+      (msgn "Dropped:  {}" (item.invstr))
       1)]
 
     [True
@@ -458,7 +461,7 @@
         (if (in key il)
           (.index il key)
           (do
-            (msg "You don't have such an item.")
+            (msgn "You don't have such an item.")
             :quit))]
 
       [(in key [" " "\n" KEY-ESCAPE])
@@ -473,26 +476,29 @@
 ;; * Messages
 
 (def message-log [])
-(defn msg [&rest format-args]
+(defn msg [mtype &rest format-args]
   (.append message-log (,
     (len message-log)
+    mtype
     (apply .format format-args {"p" player}))))
+(defn msgn [&rest format-args]
+  (apply msg (+ (, None) format-args)))
 
 (defn describe-tile [pos &optional verbose]
   (setv tile (mget pos))
   (cond
     [(Item.at pos) (do
-      (msg "You see here {}." (. (Item.at pos) itype name))
+      (msgn "You see here {}." (. (Item.at pos) itype name))
       (unless (instance? Floor tile)
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type
         ; may not be obvious.
-        (msg "There is also {} here." tile.description)))]
+        (msgn "There is also {} here." tile.description)))]
     [verbose
       (if (instance? Floor tile)
-        (msg "Bob: Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
+        (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
           (if player.female "dowdy" "cull"))
-        (msg "There is {} here." tile.description))]))
+        (msgn "There is {} here." tile.description))]))
 
 ;; * Display
 
@@ -548,16 +554,21 @@
 
 (defn draw-bottom-message-log []
   (setv lines (concat
-    (lc [[n text] (slice message-log (- MESSAGE-LINES))]
-      (amap (, n it) (textwrap.wrap text SCREEN-WIDTH)))))
+    (lc [[mn mtype text] (slice message-log (- MESSAGE-LINES))]
+      (amap (, mn mtype it) (kwc textwrap.wrap :width SCREEN-WIDTH (cond
+        [(none? mtype)   text]
+        [(= mtype :tara) (+ "Tara: " text)]
+        [(= mtype :bob)  (+ "Bob: " text)]))))))
   (setv lines (slice lines (- MESSAGE-LINES)))
-  (for [i (range MESSAGE-LINES)]
-    (T.insstr (+ i (- SCREEN-HEIGHT MESSAGE-LINES)) 0
-      (if (< i (len lines)) (get lines i 1) "")
-      (and
-        (< i (len lines))
-        (> (get lines i 0) G.last-new-message-number)
-        NEW-MSG-HIGHLIGHT))))
+  (for [[i [mn mtype text]] (enumerate lines)]
+    (T.move (+ i (- SCREEN-HEIGHT MESSAGE-LINES)) 0)
+    (setv attr (and (> mn G.last-new-message-number)
+      NEW-MSG-HIGHLIGHT))
+    (for [[kw t] [[:tara "Tara: "] [:bob "Bob: "]]]
+      (when (and (= mtype kw) (.startswith text t))
+        (T.addstr t (| attr (get-color (get announcer-colors kw) BG-COLOR)))
+        (setv text (slice text (len t)))))
+    (T.insstr text attr)))
 
 (defn draw-inventory [prompt]
   (setv lines (+
@@ -628,8 +639,8 @@
         (when G.last-action-duration
           (+= G.current-time G.last-action-duration)
           (when (and G.time-limit (>= G.current-time G.time-limit))
-            (msg "Tara: Alas! {p.name} has run out of time.")
-            (msg (+ "Bob: " (pick roguetv.strings.bob-too-bad)))
+            (msg :tara "Alas! {p.name} has run out of time.")
+            (msg :bob (pick roguetv.strings.bob-too-bad))
             (setv G.time-limit None)
             (setv G.endgame :out-of-time))))]
 
@@ -637,7 +648,7 @@
         (raise (ValueError (.format "Illegal players-turn result: {}" result)))])
 
     (when G.endgame
-      (msg "Game over. Press Escape to quit.")
+      (msgn "Game over. Press Escape to quit.")
       (full-redraw)
       (hit-key-to-continue [KEY-ESCAPE])
       (break)))))
