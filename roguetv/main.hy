@@ -6,7 +6,9 @@
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [concat ret]])
+  [kodhy.util [concat ret]]
+  roguetv.english [english]
+  roguetv.strings [strings])
 
 ;; * Parameters
 
@@ -127,7 +129,7 @@
   [char "<"]
 
   [use-tile (fn [self]
-    (msg "Taking the elevator up will end the game, but you get to keep what you have.")
+    (msg "Tara: It looks like {p:name} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
     (when (y-or-n "Take the elevator up?" :+require-uppercase)
       (setv G.endgame :used-up-elevator))
     0)]])
@@ -140,6 +142,7 @@
     (+= G.dungeon-level 1)
     (reset-level)
     (recompute-fov)
+    (msg "Tara: And {p:he's} on to the next level.")
     0)]])
 
 (def gmap
@@ -281,14 +284,31 @@
 (defclass Creature [Drawable MapObject] [
   [extant []]
 
-  [__init__ (fn [self &optional char color-fg color-bg pos]
+  [__init__ (fn [self name char &optional [gender :neuter] [plural False] color-fg color-bg pos]
     (MapObject.__init__ self pos)
-    (set-self char)
+    (set-self name char gender plural)
     (set-self-nn color-fg color-bg)
+    (setv self.female (= gender :female))
     (.append Creature.extant self)
-    None)]])
+    None)]
+
+  [__format__ (fn [self formatstr]
+    (cond
+      [(= formatstr "name")
+        self.name]
+      [(in formatstr english.pronoun-bases)
+        (kwc english.pronoun formatstr
+          :gender self.gender
+          :plural self.plural)]
+      [(.startswith formatstr "v:")
+        (kwc english.verb-present (slice formatstr (len "v:"))
+          :gender self.gender
+          :plural self.plural)]))]])
 
 (def player (kwc Creature
+  :name "Josephine" :gender :female
+    ; Prefer :female for testing so it's easier to spot cases
+    ; where I mistakenly wrote, e.g., "he" instead of "{p:he}".
   :char "@" :color-bg :yellow))
 
 ;; * Input
@@ -456,7 +476,7 @@
 (defn msg [&rest format-args]
   (.append message-log (,
     (len message-log)
-    (apply .format format-args))))
+    (apply .format format-args {"p" player}))))
 
 (defn describe-tile [pos &optional verbose]
   (setv tile (mget pos))
@@ -470,7 +490,8 @@
         (msg "There is also {} here." tile.description)))]
     [verbose
       (if (instance? Floor tile)
-        (msg "The floor is unremarkable.")
+        (msg "Bob: Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
+          (if player.female "dowdy" "cull"))
         (msg "There is {} here." tile.description))]))
 
 ;; * Display
@@ -607,7 +628,8 @@
         (when G.last-action-duration
           (+= G.current-time G.last-action-duration)
           (when (and G.time-limit (>= G.current-time G.time-limit))
-            (msg "Time's up!")
+            (msg "Tara: Alas! {p.name} has run out of time.")
+            (msg (+ "Bob: " (pick roguetv.strings.bob-too-bad)))
             (setv G.time-limit None)
             (setv G.endgame :out-of-time))))]
 

@@ -4,7 +4,7 @@ Currently, it's in a very early stage of development, and there isn't much to do
 
 Dependencies include Hy_, Kodhy_, Heidegger_, and libtcod_. Currently, curses is also a requirement. When (or rather, if) Rogue TV reaches a releasable state, I'll provide one-stop bundles with all dependencies, one for Unix-likes and one for Windows.
 
-Start the game with ``hy roguetv/main.hy``.
+Start the game with ``hy run.hy``.
 
 License
 ============================================================
