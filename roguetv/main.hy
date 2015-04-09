@@ -413,7 +413,7 @@
         (msgn "There's nothing here to pick up.")
         (ret 0))
       (when (= (len inventory) INVENTORY-LIMIT)
-        (msgn "Your inventory is full. (You can carry up to {} items.)"
+        (msg :tara "{p:name} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
           INVENTORY-LIMIT)
         (ret 0))
       (add-to-inventory item)
@@ -436,7 +436,7 @@
         ; …or at a random diagonal neighbor.
         (shuffle (amap (+ player.pos it) Pos.DIAGS)))))
       (unless clear-spot
-        (msgn "There's no room to drop anything here.")
+        (msg :bob "There ain't room on the ground for that truck.")
         (ret 0))
       (setv item (.pop inventory i))
       (.move item clear-spot)

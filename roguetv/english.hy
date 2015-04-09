@@ -19,13 +19,18 @@
   (setv d (dict (amap
     (, (first it) (dict (zip cols it)))
     (rest table))))
-  ; Also allow using male pronouns as keys into 'd'.
-  (for [k (list (.keys d))]
-    (setv (get d (get d k :male)) (get d k)))
+  ; Also allow using masculine pronouns as keys into 'd'.
+  (for [v (list (.values d))]
+    (setv (get d (get v :male)) v))
   ; "His" is ambiguous. Handle it by making "his" always maps to
   ; "their" and providing "hers" for "theirs".
   (setv (get d "his") (get d "their"))
   (setv (get d "hers") (get d "theirs"))
+  ; Finally, create capitalized forms of everything.
+  (for [[k v] (list (.items d))]
+    (setv (get d (.capitalize k)) (dict (zip
+      (.keys v)
+      (amap (.capitalize it) (.values v))))))
   d)))
 
 (def genders (frozenset [:male :female :neuter :singular-they]))
