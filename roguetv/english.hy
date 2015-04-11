@@ -10,11 +10,15 @@
     (qw their          his     her     its     my     our       your     your       their)
     (qw theirs         his     hers    its     mine   ours      yours    yours      theirs)
     (qw themself       himself herself itself  myself ourselves yourself yourselves themselves)
-    (qw they’re        he’s    she’s   it’s    I’m    we’re     you’re   you’re     they’re)])
+    (qw they’re        he’s    she’s   it’s    I’m    we’re     you’re   you’re     they’re)
+    (qw they’ll        he’ll   she’ll  it’ll   I’ll   we’ll     you’ll   you’ll     they’ll)
+    (qw they’ve        he’s    she’s   it’s    I’ve   we’ve     you’ve   you’ve     they’ve)
+    (qw they’d         he’d    she’d   it_had  I’d    we’d      you’d   you’d       they’d)])
   ; We only used smart quotes here because "'" can't be in a Hy
-  ; identifier. Switch them back.
+  ; identifier. Simiarly, we used underscores in place of spaces.
+  ; Switch them back.
   (for [row (rest table)]
-    (setv (slice row) (amap (.replace it "’" "'") row)))
+    (setv (slice row) (amap (.replace (.replace it "’" "'") "_" " ") row)))
   ; Set 'd' to a dictionary mapping the :singular-they forms
   ; to dictionaries of all forms for that part of speech.
   (setv cols (first table))
@@ -28,6 +32,10 @@
   ; "their" and providing "hers" for "theirs".
   (setv (get d "his") (get d "their"))
   (setv (get d "hers") (get d "theirs"))
+  ; "He's" is also ambiguous. Handle it by making "he's" always
+  ; maps to "they're". This time, the feminine form doesn't help,
+  ; so you must use "they've" if you want "I've" etc.
+  (setv (get d "he's") (get d "they're"))
   ; Finally, create capitalized forms of everything.
   (for [[k v] (list (.items d))]
     (setv (get d (.capitalize k)) (dict (zip

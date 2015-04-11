@@ -18,7 +18,11 @@
     (a= pronoun "theirs" :person 1 :+plural         "ours")
     (a= pronoun "themself" :gender :singular-they   "themself")
     (a= pronoun "themself" :gender :female          "herself")
-    (a= pronoun "themself" :gender :female :+plural "themselves"))]
+    (a= pronoun "themself" :gender :female :+plural "themselves")
+    (a= pronoun "they're" :person 2                 "you're")
+    (a= pronoun "they've" :person 2                 "you've")
+    (a= pronoun "they'll" :gender :female           "she'll")
+    (a= pronoun "they'd"  :gender :female           "she'd"))]
 
   [test-pronoun-he-hers (fn [self]
     (a= pronoun "he" :gender :male                  "he")
@@ -28,7 +32,10 @@
     (a= pronoun "hers" :person 1 :+plural           "ours")
     (a= pronoun "himself" :gender :singular-they    "themself")
     (a= pronoun "himself" :gender :female           "herself")
-    (a= pronoun "himself" :gender :female :+plural  "themselves"))]
+    (a= pronoun "himself" :gender :female :+plural  "themselves")
+    (a= pronoun "he's"  :person 2                   "you're")
+    (a= pronoun "he'll" :gender :female             "she'll")
+    (a= pronoun "he'd" :gender :female              "she'd"))]
 
   [test-pronoun-cap (fn [self]
     (a= pronoun "They" :gender :female              "She")
