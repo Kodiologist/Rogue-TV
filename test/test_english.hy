@@ -2,7 +2,7 @@
 
 (import
   unittest
-  [roguetv.english [pronoun verb-present]])
+  [roguetv.english [pronoun verb]])
 
 (defmacro a= [&rest args]
   (setv [x v] [(butlast args) (get args -1)])
@@ -36,29 +36,37 @@
     (a= pronoun "His" :gender :singular-they        "Their")
     (a= pronoun "Hers" :gender :singular-they       "Theirs"))]
 
-  [test-verb-present-be (fn [self]
-    (a= verb-present "is" :gender :singular-they    "are")
-    (a= verb-present "is" :gender :male             "is")
-    (a= verb-present "is" :gender :male :+plural    "are")
-    (a= verb-present "is" :person 1                 "am"))]
+  [test-verb-be-present (fn [self]
+    (a= verb "is" :gender :singular-they    "are")
+    (a= verb "is" :gender :male             "is")
+    (a= verb "is" :gender :male :+plural    "are")
+    (a= verb "is" :person 1                 "am"))]
 
-  [test-verb-present-do (fn [self]
-    (a= verb-present "does" :gender :singular-they  "do")
-    (a= verb-present "does" :gender :male           "does")
-    (a= verb-present "does" :gender :male :+plural  "do")
-    (a= verb-present "does" :person 1               "do"))]
+  [test-verb-be-past (fn [self]
+    (a= verb "was" :gender :singular-they    "were")
+    (a= verb "was" :gender :male             "was")
+    (a= verb "was" :gender :male :+plural    "were")
+    (a= verb "was" :person 1                 "was"))]
 
-  [test-verb-present-go (fn [self]
-    (a= verb-present "goes" :gender :singular-they  "go")
-    (a= verb-present "goes" :gender :male           "goes")
-    (a= verb-present "goes" :gender :male :+plural  "go")
-    (a= verb-present "goes" :person 1               "go"))]
+  [test-verb-present-have (fn [self]
+    (a= verb "has" :gender :singular-they  "have")
+    (a= verb "has" :gender :male           "has")
+    (a= verb "has" :gender :male :+plural  "have")
+    (a= verb "has" :person 1               "have"))]
 
   [test-verb-present-swim (fn [self]
-    (a= verb-present "swims" :gender :singular-they "swim")
-    (a= verb-present "swims" :gender :male          "swims")
-    (a= verb-present "swims" :gender :male :+plural "swim")
-    (a= verb-present "swims" :person 1              "swim"))]])
+    (a= verb "swims" :gender :singular-they "swim")
+    (a= verb "swims" :gender :male          "swims")
+    (a= verb "swims" :gender :male :+plural "swim")
+    (a= verb "swims" :person 1              "swim"))]
+
+  [test-verb-other (fn [self]
+    (a= verb "buzzes" :+plural              "buzz")
+    (a= verb "catches" :+plural             "catch")
+    (a= verb "lurches" :+plural             "lurch")
+    (a= verb "embargoes" :+plural           "embargo")
+    (a= verb "does" :+plural                "do")
+    (a= verb "cries" :+plural               "cry"))]])
 
 (when (= __name__ "__main__")
   (setv suite (.loadTestsFromTestCase (unittest.TestLoader) C))

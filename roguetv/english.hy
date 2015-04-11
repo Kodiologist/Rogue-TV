@@ -1,4 +1,6 @@
 (require kodhy.macros)
+(import inflect)
+(def -inflect (inflect.engine))
 
 (def -pronoun-d ((fn []
   (setv table [
@@ -42,18 +44,15 @@
     (if plural [:p1 :p2 :p3] [:s1 :s2 gender])
     (dec person))))
 
-(defn verb-present [base &optional [gender :neuter] [person 3] [plural False]]
-; The 'base' should be in 3rd-person singular present-tense form
-; (e.g., "is", "does", "swims").
-  (when (= gender :singular-they)
-    (setv plural True))
+(defn verb [base &optional [gender :neuter] [person 3] [plural False]]
+; The 'base' should be in 3rd-person singular form
+; (e.g., "is", "was", "does", "did", "swims").
   (cond
-    [(and (= person 3) (not plural)) base]
-    [(= base "is") (cond
-      [plural "are"]
-      [(= person 2) "are"]
-      [(= person 1) "am"])]
-    [True (cond
-      [(= base "does") "do"]
-      [(= base "goes") "go"]
-      [True (slice base 0 (dec (len base)))])]))
+    [(and (= base "is") (= person 1) (not plural))
+      "am"]
+    [(and (= base "was") (= person 1) (not plural))
+      "was"]
+    [(and (= person 3) (!= gender :singular-they) (not plural))
+      base]
+    [True
+      (.plural-verb -inflect base)]))
