@@ -10,4 +10,9 @@
   "Tough darts."
   "Ain't that a bite!"
   "Miz!"
-  "Nebekh!"])
+  "Nebekh!"
+  "Très bummer."
+  "Sad trombone."
+  "Oh, I'm sorry!"
+  "The agony of defeat!"
+  "Shazbot!"])
