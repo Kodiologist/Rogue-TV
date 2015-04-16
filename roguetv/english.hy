@@ -1,4 +1,5 @@
 (require kodhy.macros)
+
 (import inflect)
 (def -inflect (inflect.engine))
 
@@ -15,7 +16,7 @@
     (qw they’ve        he’s    she’s   it’s    I’ve   we’ve     you’ve   you’ve     they’ve)
     (qw they’d         he’d    she’d   it_had  I’d    we’d      you’d   you’d       they’d)])
   ; We only used smart quotes here because "'" can't be in a Hy
-  ; identifier. Simiarly, we used underscores in place of spaces.
+  ; identifier. Similarly, we used underscores in place of spaces.
   ; Switch them back.
   (for [row (rest table)]
     (setv (slice row) (amap (.replace (.replace it "’" "'") "_" " ") row)))
