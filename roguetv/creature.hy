@@ -12,6 +12,7 @@
     (set-self name char gender plural)
     (set-self-nn color-fg color-bg)
     (setv self.female (= gender :female))
+    (setv self.clock-debt-ms 0)
     (.append Creature.extant self)
     None)]
 
@@ -26,4 +27,10 @@
       [(.startswith formatstr "v:")
         (kwc english.verb (slice formatstr (len "v:"))
           :gender self.gender
-          :plural self.plural)]))]])
+          :plural self.plural)]))]
+
+  [clock-factor 1000]
+  [take-time (fn [self duration]
+    ; Mark the creature as accumulating 'duration' seconds of
+    ; clock debt.
+    (+= self.clock-debt-ms (round (* self.clock-factor duration))))]])

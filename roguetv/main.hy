@@ -65,24 +65,23 @@
 
   (while True
     (full-redraw)
-    (setv result (do-normal-command (get-normal-command)))
-    (cond
 
-      [(= result :quit-game)
-        (break)]
+    (setv old-clock-debt G.player.clock-debt-ms)
+    (when (= (do-normal-command (get-normal-command)) :quit-game)
+      (break))
+    (setv G.last-action-duration (/
+      (- G.player.clock-debt-ms old-clock-debt)
+      Creature.clock-factor))
 
-      [(numeric? result) (do
-        (setv G.last-action-duration result)
-        (when G.last-action-duration
-          (+= G.current-time G.last-action-duration)
-          (when (and G.time-limit (>= G.current-time G.time-limit))
-            (msg :tara "Alas! {p.name} has run out of time.")
-            (msg :bob (pick strings.bob-too-bad))
-            (setv G.time-limit None)
-            (setv G.endgame :out-of-time))))]
-
-      [True
-        (raise (ValueError (.format "Illegal players-turn result: {}" result)))])
+    (when (>= G.player.clock-debt-ms Creature.clock-factor)
+      (setv skip (int (/ G.player.clock-debt-ms Creature.clock-factor)))
+      (+= G.current-time skip)
+      (-= G.player.clock-debt-ms (* skip Creature.clock-factor))
+      (when (and G.time-limit (>= G.current-time G.time-limit))
+        (msg :tara "Alas! {p.name} has run out of time.")
+        (msg :bob (pick strings.bob-too-bad))
+        (setv G.time-limit None)
+        (setv G.endgame :out-of-time)))
 
     (when G.endgame
       (msgn "Game over. Press Escape to quit.")

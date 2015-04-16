@@ -24,15 +24,14 @@
     [(= cmd :move)
       (let [[p-from G.player.pos] [p-to (+ p-from (first args))]]
         (unless (room-for? Creature p-to)
-          (ret 0))
+          (ret))
         (.move G.player p-to)
         (recompute-fov)
         (describe-tile G.player.pos)
-        (len-taxicab (first args)))]
+        (G.player.take-time (len-taxicab (first args))))]
 
     [(= cmd :examine-ground) (do
-      (kwc describe-tile G.player.pos :+verbose)
-      0)]
+      (kwc describe-tile G.player.pos :+verbose))]
 
     [(= cmd :use-tile)
       (.use-tile (mget G.player.pos))]
@@ -40,21 +39,20 @@
     [(= cmd :inventory) (do
       (if G.inventory
         (kwc inventory-loop :!select "You are carrying:")
-        (msgn "Your inventory is empty."))
-      0)]
+        (msgn "Your inventory is empty.")))]
 
     [(= cmd :pick-up) (do
       (setv item (Item.at G.player.pos))
       (when (nil? item)
         (msgn "There's nothing here to pick up.")
-        (ret 0))
+        (ret))
       (when (= (len G.inventory) G.inventory-limit)
         (msg :tara "{p:name} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
           G.inventory-limit)
-        (ret 0))
+        (ret))
       (add-to-inventory item)
       (msgn "Taken:  {}" (item.invstr))
-      1)]
+      (G.player.take-time 1))]
 
     [(= cmd :drop) (do
       (unless G.inventory
@@ -63,7 +61,7 @@
       (setv i (inventory-loop "What do you want to drop?"))
       (when (none? i)
         ; Action canceled.
-        (ret 0))
+        (ret))
       (setv clear-spot (afind-or (room-for? Item it) (+
         ; Try to drop at the player's feet…
         [G.player.pos]
@@ -73,11 +71,11 @@
         (shuffle (amap (+ G.player.pos it) Pos.DIAGS)))))
       (unless clear-spot
         (msg :bob "There ain't room on the ground for that truck.")
-        (ret 0))
+        (ret))
       (setv item (.pop G.inventory i))
       (.move item clear-spot)
       (msgn "Dropped:  {}" (item.invstr))
-      1)]
+      (G.player.take-time 1))]
 
     [True
-      0])))
+      (raise (ValueError (.format "Unknown command {}" cmd)))])))

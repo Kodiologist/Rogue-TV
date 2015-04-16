@@ -56,9 +56,11 @@
     (.format "{} {}  DL:{: 2}"
       (.rjust (minsec (max 0 (- (or G.time-limit 0) G.current-time)))
         (len "10:00"))
-      (if G.last-action-duration
-        (.format "({})" G.last-action-duration)
-        "   ")
+      (.ljust
+        (if G.last-action-duration
+         (.format "({})" (show-round G.last-action-duration 2))
+          "")
+        (len "(1.15)"))
       G.dungeon-level)))
 
 (defn draw-bottom-message-log []

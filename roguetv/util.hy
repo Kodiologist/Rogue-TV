@@ -16,6 +16,10 @@
 (defn minsec [s]
   (.format "{}:{:02}" (// s 60) (% s 60)))
 
+(defn show-round [number ndigits]
+  (setv x (round number ndigits))
+  (string (if (= x (int x)) (int x) x)))
+
 (defn len-taxicab [p]
 ; p should be a Pos.
   (+ (abs p.x) (abs p.y)))
