@@ -10,6 +10,7 @@
 (defclass Tile [Drawable MapObject] [
   [description None]
   [blocks-movement False]
+  [blocks-sight False]
 
   [use-tile (fn [self]
     ; The player has used the command :use-tile on top of this
@@ -18,7 +19,12 @@
     ;
     ; The default implementaton does nothing.
     (msgn "There's nothing special you can do at this tile.")
-    0)]])
+    0)]
+
+  [step-onto (fn [self cr]
+    ; A creature has tried to step onto this tile (and
+    ; blocks-movement is false). Return True if they can.
+    True)]])
 
 (defclass Floor [Tile] [
   [char "."]])
@@ -27,7 +33,8 @@
   [description "a wall"]
   [char "#"]
   [color-bg G.fg-color]
-  [blocks-movement True]])
+  [blocks-movement True]
+  [blocks-sight True]])
 
 (defclass Elevator [Tile] [])
 
@@ -52,8 +59,28 @@
     (msg :tara "And {p:he's} on to the next level.")
     0)]])
 
+(defclass Door [Tile] [
+  [description "a closed door"]
+  [char "+"]
+  [blocks-sight True]
+
+  [__init__ (fn [self &optional open-time]
+    (.__init__ (super Door self))
+    (set-self open-time)
+    None)]
+
+  [step-onto (fn [self cr]
+    (when (is cr G.player)
+      (msgn "You open the old door after a struggle."))
+    (cr.take-time self.open-time)
+    (mset self.pos (Floor))
+    (recompute-fov)
+    False)]])
+
 (defn mset [pos tile]
-  (kwc .move tile pos :+clobber))
+  (kwc .move tile pos :+clobber)
+  (tcod.map-set-properties G.fov-map pos.x pos.y
+    (not tile.blocks-sight) (not tile.blocks-movement)))
 
 (defn on-map [pos]
   (and (<= 0 pos.x (dec G.map-width)) (<= 0 pos.y (dec G.map-height))))

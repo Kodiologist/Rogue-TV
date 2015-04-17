@@ -4,6 +4,7 @@
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   heidegger.digger
+  [kodhy.util [concat]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.map [*]]
@@ -30,13 +31,17 @@
       (setv floor? (not (get dugout "map" x y)))
       (when floor?
         (.append free-floors p))
-      (mset p (if floor? (Floor) (Wall)))
-      (tcod.map-set-properties G.fov-map x y floor? floor?)))
+      (mset p (if floor? (Floor) (Wall)))))
 
   (setv upelv-pos (Pos (/ G.map-width 2) (/ G.map-height 2)))
   (mset upelv-pos (UpElevator))
   (.remove free-floors upelv-pos)
   (mset (randpop free-floors) (DownElevator))
+
+  (for [p (concat (amap it.doors (get dugout "rooms")))]
+    (when (and (instance? Floor (Tile.at p)) (1-in 5))
+      (mset p (kwc Door :open-time (pick [3 3.5 4 4.5 5])))
+      (.remove free-floors p)))
 
   (setv G.time-limit (+ G.current-time (* 5 60)))
 

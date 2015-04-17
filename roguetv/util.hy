@@ -2,6 +2,12 @@
   random
   [roguetv.globals :as G])
 
+(defn chance [x]
+  (<= (random.random) x))
+
+(defn 1-in [n]
+  (chance (/ 1 n)))
+
 (defn shuffle [l]
   (setv l (list l))
   (random.shuffle l)

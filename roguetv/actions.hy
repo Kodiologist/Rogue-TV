@@ -25,6 +25,8 @@
       (let [[p-from G.player.pos] [p-to (+ p-from (first args))]]
         (unless (room-for? Creature p-to)
           (ret))
+        (unless (.step-onto (Tile.at p-to) G.player)
+          (ret))
         (.move G.player p-to)
         (recompute-fov)
         (describe-tile G.player.pos)
