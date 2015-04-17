@@ -27,6 +27,8 @@
           (ret))
         (unless (.step-onto (Tile.at p-to) G.player)
           (ret))
+        (unless (.step-out-of (Tile.at p-from) G.player)
+          (ret))
         (.move G.player p-to)
         (recompute-fov)
         (describe-tile G.player.pos)

@@ -1,6 +1,7 @@
 (require kodhy.macros)
 
 (import
+  [random [randint]]
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   heidegger.digger
@@ -33,15 +34,29 @@
         (.append free-floors p))
       (mset p (if floor? (Floor) (Wall)))))
 
+  ; Add elevators.
   (setv upelv-pos (Pos (/ G.map-width 2) (/ G.map-height 2)))
   (mset upelv-pos (UpElevator))
   (.remove free-floors upelv-pos)
   (mset (randpop free-floors) (DownElevator))
 
+  ; Add doors.
   (for [p (concat (amap it.doors (get dugout "rooms")))]
     (when (and (instance? Floor (Tile.at p)) (1-in 5))
       (mset p (kwc Door :open-time (pick [3 3.5 4 4.5 5])))
       (.remove free-floors p)))
+
+  ; Add mud.
+  (for [pos free-floors]
+    (when (1-in 200)
+      (setv v (pick [Pos.NORTH Pos.SOUTH]))
+      (setv h (pick [Pos.WEST Pos.EAST]))
+      (for [dx (range (randint 1 5))]
+        (for [dy (range (randint 1 5))]
+          (setv p (+ pos (* dx h) (* dy v)))
+          (when (and (on-map p) (instance? Floor (Tile.at p)))
+            (mset p (kwc Mud :max-exit-time 5))
+            (.remove free-floors p))))))
 
   (setv G.time-limit (+ G.current-time (* 5 60)))
 

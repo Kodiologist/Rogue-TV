@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  [random [randint]]
   [libtcodpy :as tcod]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -23,7 +24,12 @@
 
   [step-onto (fn [self cr]
     ; A creature has tried to step onto this tile (and
-    ; blocks-movement is false). Return True if they can.
+    ; blocks-movement is false). Return True if it can.
+    True)]
+
+  [step-out-of (fn [self cr]
+    ; A creature has tried to step out of this tile. Return True
+    ; if it can.
     True)]])
 
 (defclass Floor [Tile] [
@@ -76,6 +82,19 @@
     (mset self.pos (Floor))
     (recompute-fov)
     False)]])
+
+(defclass Mud [Tile] [
+  [description "a pit full of mud"]
+  [char "}"]
+
+  [__init__ (fn [self &optional max-exit-time]
+    (.__init__ (super Mud self))
+    (set-self max-exit-time)
+    None)]
+
+  [step-out-of (fn [self cr]
+    (cr.take-time (randint 1 self.max-exit-time))
+    True)]])
 
 (defn mset [pos tile]
   (kwc .move tile pos :+clobber)
