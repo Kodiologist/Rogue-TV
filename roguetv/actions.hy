@@ -6,7 +6,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [inventory-loop]]
-  [roguetv.map [mget room-for? recompute-fov]]
+  [roguetv.map [Tile room-for? recompute-fov]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
   [roguetv.display [draw-inventory describe-tile]])
@@ -34,7 +34,7 @@
       (kwc describe-tile G.player.pos :+verbose))]
 
     [(= cmd :use-tile)
-      (.use-tile (mget G.player.pos))]
+      (.use-tile (Tile.at G.player.pos))]
 
     [(= cmd :inventory) (do
       (if G.inventory

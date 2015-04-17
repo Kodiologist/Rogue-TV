@@ -5,9 +5,9 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [y-or-n]]
-  [roguetv.types [Drawable]])
+  [roguetv.types [Drawable MapObject]])
 
-(defclass Tile [Drawable] [
+(defclass Tile [Drawable MapObject] [
   [description None]
   [blocks-movement False]
 
@@ -52,14 +52,8 @@
     (msg :tara "And {p:he's} on to the next level.")
     0)]])
 
-(def -gmap
-  (amap (amap None (range G.map-height)) (range G.map-width)))
-
-(defn mget [pos]
-  (get -gmap pos.x pos.y))
-
-(defn mset [pos v]
-  (setv (get -gmap pos.x pos.y) v))
+(defn mset [pos tile]
+  (kwc .move tile pos :+clobber))
 
 (defn on-map [pos]
   (and (<= 0 pos.x (dec G.map-width)) (<= 0 pos.y (dec G.map-height))))
@@ -76,5 +70,5 @@
 (defn room-for? [mo-class pos]
   (and
     (on-map pos)
-    (not (. (mget pos) blocks-movement))
+    (not (. (Tile.at pos) blocks-movement))
     (not (.at mo-class pos))))

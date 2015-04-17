@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject]]
-  [roguetv.map [mget Floor]]
+  [roguetv.map [Tile Floor]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]])
 
@@ -48,7 +48,7 @@
         (echo-drawable (let [[p (Pos px py)]] (or
           (Creature.at p)
           (whenn (Item.at p) it.itype)
-          (mget p))))
+          (Tile.at p))))
         (echo " " G.fg-color G.unseen-color)))))
 
 (defn draw-status-line []
@@ -107,7 +107,7 @@
   (G.T.refresh))
 
 (defn describe-tile [pos &optional verbose]
-  (setv tile (mget pos))
+  (setv tile (Tile.at pos))
   (cond
     [(Item.at pos) (do
       (msgn "You see here {}." (. (Item.at pos) itype name))

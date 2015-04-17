@@ -20,11 +20,22 @@
     (.move self pos)
     None)]
 
-  [move (fn [self p-to]
-    ; Set p-to to None to remove the object from the map.
+  [move (fn [self p-to &optional [clobber False]]
+    ; Set 'p-to' to None to remove the object from the map.
+    ;
+    ; If 'p-to' is not None, 'clobber' is true, and there's
+    ; something already at 'p-to', remove it. Otherwise, moving
+    ; onto a Pos where there's already something else is an
+    ; error.
     (when self.pos
       (setv (get self.omap self.pos.x self.pos.y) None))
     (when p-to
+      (whenn (get self.omap p-to.x p-to.y)
+        (if clobber
+          (it.move None)
+          (raise (ValueError (.format
+            "tried to move {} to {} where there was already {}"
+            self p-to it)))))
       (setv (get self.omap p-to.x p-to.y) self))
     (setv self.pos p-to))]
 

@@ -11,6 +11,15 @@
   [roguetv.creature [Creature]])
 
 (defn reset-level []
+  (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
+  (for [t [Tile Item Creature]]
+    (.init-omap t G.map-width G.map-height))
+  ; Now that we're on a new level, the positions of old
+  ; MapObjects are invalid. But that's okay because there's no
+  ; way to refer to old MapObjects anymore, either (except for
+  ; ones with pos None, like the items in the player's
+  ; inventory).
+
   (setv dugout (kwc heidegger.digger.generate-map
     :width G.map-width :height G.map-height))
 
@@ -28,15 +37,6 @@
   (mset upelv-pos (UpElevator))
   (.remove free-floors upelv-pos)
   (mset (randpop free-floors) (DownElevator))
-
-  (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
-  (.init-omap Item G.map-width G.map-height)
-  (.init-omap Creature G.map-width G.map-height)
-  ; Now that we're on a new level, the positions of old
-  ; MapObjects are invalid. But that's okay because there's no
-  ; way to refer to old MapObjects anymore, either (except for
-  ; ones with pos None, like the items in the player's
-  ; inventory).
 
   (setv G.time-limit (+ G.current-time (* 5 60)))
 
