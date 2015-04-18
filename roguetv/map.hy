@@ -96,6 +96,22 @@
     (cr.take-time (randint 1 self.max-exit-time))
     True)]])
 
+(defclass Web [Tile] [
+  [description "a spiderweb"]
+  [char "^"]
+
+  [__init__ (fn [self &optional tear-time]
+    (.__init__ (super Web self))
+    (set-self tear-time)
+    None)]
+
+  [step-out-of (fn [self cr]
+    (when (is cr G.player)
+      (msgn "You tear through the web."))
+    (cr.take-time self.tear-time)
+    (mset self.pos (Floor))
+    True)]])
+
 (defn mset [pos tile]
   (kwc .move tile pos :+clobber)
   (tcod.map-set-properties G.fov-map pos.x pos.y

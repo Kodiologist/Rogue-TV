@@ -46,16 +46,19 @@
       (mset p (kwc Door :open-time (pick [3 3.5 4 4.5 5])))
       (.remove free-floors p)))
 
-  ; Add mud.
+  ; Add mud and webs.
   (for [pos free-floors]
     (when (1-in 200)
+      (setv mk-tile (if (1-in 3)
+        (fn [] (kwc Mud :max-exit-time 5))
+        (fn [] (kwc Web :tear-time (pick [1 2 3 4])))))
       (setv v (pick [Pos.NORTH Pos.SOUTH]))
       (setv h (pick [Pos.WEST Pos.EAST]))
       (for [dx (range (randint 1 5))]
         (for [dy (range (randint 1 5))]
           (setv p (+ pos (* dx h) (* dy v)))
           (when (and (on-map p) (instance? Floor (Tile.at p)))
-            (mset p (kwc Mud :max-exit-time 5))
+            (mset p (mk-tile))
             (.remove free-floors p))))))
 
   (setv G.time-limit (+ G.current-time (* 5 60)))
