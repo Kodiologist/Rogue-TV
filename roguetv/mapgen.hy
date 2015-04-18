@@ -63,4 +63,6 @@
 
   (setv G.time-limit (+ G.current-time (* 5 60)))
 
-  (.move G.player upelv-pos))
+  (.move G.player upelv-pos)
+
+  (recompute-fov))

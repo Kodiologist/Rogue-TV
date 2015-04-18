@@ -86,7 +86,6 @@
   [use-tile (fn [self]
     (+= G.dungeon-level 1)
     (rtv mapgen.reset-level)
-    (recompute-fov)
     (msg :tara "And {p:he's} on to the next level.")
     0)]])
 

@@ -47,8 +47,6 @@
       (when (zero? starting-items)
         (break)))))
 
-(recompute-fov)
-
 (unless (in "ESCDELAY" os.environ)
   (setv (get os.environ "ESCDELAY") "10"))
     ; This ensures curses will respond to the escape key quickly

@@ -61,7 +61,10 @@
       [(= key ",")
         [:pick-up]]
       [(= key "d")
-        [:drop]]))
+        [:drop]]
+
+      [(= key "R")
+        [:reset-level]]))
 
     (when inp
       (ret inp)))))

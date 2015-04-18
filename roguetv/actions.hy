@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require kodhy.macros roguetv.macros)
 
 (import
   [heidegger.pos [Pos]]
@@ -10,6 +10,11 @@
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
   [roguetv.display [draw-inventory describe-tile]])
+
+(defmacro when-debugging [&rest body]
+  `(if G.debug
+    (do ~@body)
+    (msgn "That command requires debug mode.")))
 
 (defn do-normal-command [inp]
 
@@ -80,6 +85,9 @@
       (.move item clear-spot)
       (msgn "Dropped:  {}" (item.invstr))
       (G.player.take-time 1))]
+
+    [(= cmd :reset-level) (when-debugging
+      (rtv mapgen.reset-level))]
 
     [True
       (raise (ValueError (.format "Unknown command {}" cmd)))])))

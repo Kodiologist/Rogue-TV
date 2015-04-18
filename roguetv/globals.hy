@@ -4,6 +4,8 @@
 
 ;; * Parameters
 
+(def debug True)
+
 (def map-width 80)
 (def map-height 40)
 
