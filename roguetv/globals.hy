@@ -30,9 +30,11 @@
   :light-gray 7
   :dark-gray 8
   :green 2
+  :dark-green 22
   :blue 12
   :red 9
-  :yellow 3})
+  :yellow 226
+  :brown 94})
 
 ;; * Declarations
 

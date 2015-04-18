@@ -65,7 +65,9 @@
   [blocks-movement True]
   [blocks-sight True]])
 
-(defclass Elevator [Tile] [])
+(defclass Elevator [Tile] [
+  [color-fg :white]
+  [color-bg :dark-green]])
 
 (defclass UpElevator [Elevator] [
   [description "an elevator going up"]
@@ -91,6 +93,7 @@
 (defclass Door [Tile] [
   [description "a closed door"]
   [char "+"]
+  [color-fg :brown]
   [blocks-sight True]
 
   [__init__ (fn [self &optional open-time]
@@ -109,6 +112,8 @@
 (defclass Mud [Tile] [
   [description "a pit full of mud"]
   [char "}"]
+  [color-fg :white]
+  [color-bg :brown]
 
   [__init__ (fn [self &optional max-exit-time]
     (.__init__ (super Mud self))
@@ -121,7 +126,8 @@
 
 (defclass Web [Tile] [
   [description "a spiderweb"]
-  [char "^"]
+  [char "%"]
+  [color-fg :blue]
 
   [__init__ (fn [self &optional tear-time]
     (.__init__ (super Web self))
