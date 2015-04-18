@@ -32,12 +32,13 @@
           (ret))
         (unless (.step-onto (Tile.at p-to) G.player)
           (ret))
-        (unless (.step-out-of (Tile.at p-from) G.player)
+        (unless (.step-out-of (Tile.at p-from) G.player p-to)
           (ret))
+        (G.player.take-time (len-taxicab (first args)))
         (.move G.player p-to)
         (recompute-fov)
         (describe-tile G.player.pos)
-        (G.player.take-time (len-taxicab (first args))))]
+        (.after-step-onto (Tile.at p-to) G.player p-from))]
 
     [(= cmd :examine-ground) (do
       (kwc describe-tile G.player.pos :+verbose))]
@@ -59,9 +60,9 @@
         (msg :tara "{p:name} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
           G.inventory-limit)
         (ret))
+      (G.player.take-time 1)
       (add-to-inventory item)
-      (msgn "Taken:  {}" (item.invstr))
-      (G.player.take-time 1))]
+      (msgn "Taken:  {}" (item.invstr)))]
 
     [(= cmd :drop) (do
       (unless G.inventory
@@ -81,10 +82,10 @@
       (unless clear-spot
         (msg :bob "There ain't room on the ground for that truck.")
         (ret))
+      (G.player.take-time 1)
       (setv item (.pop G.inventory i))
       (.move item clear-spot)
-      (msgn "Dropped:  {}" (item.invstr))
-      (G.player.take-time 1))]
+      (msgn "Dropped:  {}" (item.invstr)))]
 
     [(= cmd :reset-level) (when-debugging
       (rtv mapgen.reset-level))]

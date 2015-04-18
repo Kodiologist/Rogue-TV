@@ -27,7 +27,12 @@
     ; blocks-movement is false). Return True if it can.
     True)]
 
-  [step-out-of (fn [self cr]
+  [after-step-onto (fn [self cr p-from]
+    ; A creature has just finished stepping onto this tile.
+    ; The return value is ignored.
+    None)]
+
+  [step-out-of (fn [self cr p-to]
     ; A creature has tried to step out of this tile. Return True
     ; if it can.
     True)]])
@@ -119,7 +124,7 @@
     (set-self max-exit-time)
     None)]
 
-  [step-out-of (fn [self cr]
+  [step-out-of (fn [self cr p-to]
     (cr.take-time (randint 1 self.max-exit-time))
     True)]])
 
@@ -133,9 +138,32 @@
     (set-self tear-time)
     None)]
 
-  [step-out-of (fn [self cr]
+  [step-out-of (fn [self cr p-to]
     (when (is cr G.player)
       (msgn "You tear through the web."))
     (cr.take-time self.tear-time)
     (mset self.pos (Floor))
+    True)]])
+
+(defclass Ice [Tile] [
+  [description "a patch of ice"]
+  [char ":"]
+  [color-fg :white]
+  [color-bg :pale-azure]
+
+  [__init__ (fn [self &optional max-slip-time]
+    (.__init__ (super Ice self))
+    (set-self max-slip-time)
+    None)]
+
+  [after-step-onto (fn [self cr p-from]
+    ; Set up the creature to slip.
+    (setv cr.ice-slip-towards (- self.pos p-from))
+    (setv cr.ice-slip-time (randint 1 self.max-slip-time)))]
+
+  [step-out-of (fn [self cr p-to]
+    ; If the creature moves in the same direction it moved to
+    ; get here, it doesn't slip.
+    (when (= (- p-to self.pos) cr.ice-slip-towards)
+      (cr.reset-ice-slipping))
     True)]])

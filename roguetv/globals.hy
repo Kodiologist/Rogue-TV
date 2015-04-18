@@ -35,6 +35,7 @@
   :dark-green 22
   :blue 21
   :dark-blue 18
+  :pale-azure 117
   :yellow 226
   :brown 94})
 
