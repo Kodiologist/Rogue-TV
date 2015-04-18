@@ -1,28 +1,37 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  [kodhy.util [keyword->str shift]]
   [roguetv.globals :as G]
   [roguetv.types [Drawable MapObject]])
 
-(defclass ItemType [Drawable] [
+(defclass Item [Drawable MapObject] [
+  [tid None]
+  [name None]
 
-  [__init__ (fn [self tid name char &optional color-fg color-bg]
-    (set-self tid name char)
-    (set-self-nn color-fg color-bg)
-    (setv (get G.itypes tid) self)
-    None)]])
-
-(defclass Item [MapObject] [
-
-  [__init__ (fn [self itype &optional pos invlet]
-    (.__init__ (super Item self) pos)
-    (set-self itype invlet)
+  [__init__ (fn [self &optional pos invlet]
+    (MapObject.__init__ self pos)
+    (set-self invlet)
     None)]
 
   [invstr (fn [self]
     (.format "{} - {}"
       self.invlet
-      self.itype.name))]])
+      self.name))]])
+
+(defn def-itemtype [tid name &rest body]
+  (when (in tid G.itypes)
+    (raise (ValueError (.format "redeclared item type: {}" tid))))
+  (defclass C [Item] [])
+  (setv (get G.itypes tid) C)
+  (setv C.tid tid)
+  (setv C.name name)
+  (setv body (list body))
+  (while body
+    (setattr C
+      (.replace (keyword->str (shift body)) "-" "_")
+      (shift body)))
+  C)
 
 (defn add-to-inventory [item]
   (.move item None)

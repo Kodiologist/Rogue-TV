@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require kodhy.macros roguetv.macros)
 
 (import
   os
@@ -9,7 +9,7 @@
   [roguetv.util [*]]
   [roguetv.input [hit-key-to-continue get-normal-command]]
   [roguetv.map [recompute-fov room-for?]]
-  [roguetv.item [ItemType Item]]
+  [roguetv.item [Item def-itemtype]]
   [roguetv.creature [Creature]]
   [roguetv.mapgen [reset-level]]
   [roguetv.display [full-redraw default-color describe-tile]]
@@ -24,25 +24,25 @@
 (setv G.dungeon-level 1)
 (reset-level)
 
-(kwc ItemType
-  :tid "toaster" :name "a toaster"
-  :char ")" :color-fg :dark-green)
-(kwc ItemType
-  :tid "galoshes" :name "a pair of galoshes"
-  :char "[" :color-fg :brown)
-(kwc ItemType
-  :tid "ottoman" :name "an ottoman"
-  :char "(" :color-fg :red)
-(kwc ItemType
-  :tid "food-processor" :name "a food processor"
-  :char "!" :color-fg :dark-blue)
+(def-itemtype "toaster" "a toaster"
+  :char ")"
+  :color-fg :dark-green)
+(def-itemtype "galoshes" "a pair of galoshes"
+  :char "["
+  :color-fg :brown)
+(def-itemtype "ottoman" "an ottoman"
+  :char "("
+  :color-fg :red)
+(def-itemtype "food-processor" "a food processor"
+  :char "!"
+  :color-fg :dark-blue)
 
 (setv starting-items 15)
 (for [x (range -2 3)]
   (for [y (range -2 3)]
     (setv p (+ G.player.pos (Pos x y)))
     (when (room-for? Item p)
-      (kwc Item :itype (pick (.values G.itypes)) :pos p)
+      (kwc (pick (.values G.itypes)) :pos p)
       (-= starting-items 1)
       (when (zero? starting-items)
         (break)))))

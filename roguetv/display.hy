@@ -47,7 +47,7 @@
           (get G.seen-map px py))
         (echo-drawable (let [[p (Pos px py)]] (or
           (Creature.at p)
-          (whenn (Item.at p) it.itype)
+          (Item.at p)
           (Tile.at p))))
         (echo " " G.fg-color G.unseen-color)))))
 
@@ -85,7 +85,7 @@
   (setv lines (+
     [[None prompt]]
     (amap
-      [it (.format "  {} � {}" it.invlet it.itype.name)]
+      [it (.format "  {} � {}" it.invlet it.name)]
         ; The character � will be replaced with the item's symbol.
       G.inventory)
     (* [[None "      ---"]] (- G.inventory-limit (len G.inventory)))))
@@ -96,7 +96,7 @@
     (setv parts (.split text "�" 1))
     (G.T.addstr (first parts))
     (when (> (len parts) 1)
-      (echo-drawable item.itype)
+      (echo-drawable item)
       (G.T.addstr (second parts)))))
 
 (defn full-redraw []
@@ -110,7 +110,7 @@
   (setv tile (Tile.at pos))
   (cond
     [(Item.at pos) (do
-      (msgn "You see here {}." (. (Item.at pos) itype name))
+      (msgn "You see here {}." (. (Item.at pos) name))
       (unless (instance? Floor tile)
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type
