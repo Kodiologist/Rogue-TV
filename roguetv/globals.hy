@@ -29,12 +29,12 @@
 (def color-numbers {
   :black 16
   :white 15
-  :light-gray 7
-  :dark-gray 8
-  :green 2
+  :dark-gray 244
+  :red 196
+  :green 46
   :dark-green 22
-  :blue 12
-  :red 9
+  :blue 21
+  :dark-blue 18
   :yellow 226
   :brown 94})
 

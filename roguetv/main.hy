@@ -26,7 +26,7 @@
 
 (kwc ItemType
   :tid "toaster" :name "a toaster"
-  :char ")" :color-fg :green)
+  :char ")" :color-fg :dark-green)
 (kwc ItemType
   :tid "galoshes" :name "a pair of galoshes"
   :char "[" :color-fg :brown)
@@ -35,7 +35,7 @@
   :char "(" :color-fg :red)
 (kwc ItemType
   :tid "food-processor" :name "a food processor"
-  :char "!" :color-fg :blue)
+  :char "!" :color-fg :dark-blue)
 
 (setv starting-items 15)
 (for [x (range -2 3)]

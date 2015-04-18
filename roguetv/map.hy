@@ -126,7 +126,7 @@
 (defclass Web [Tile] [
   [description "a spiderweb"]
   [char "%"]
-  [color-fg :blue]
+  [color-fg :dark-blue]
 
   [__init__ (fn [self &optional tear-time]
     (.__init__ (super Web self))
