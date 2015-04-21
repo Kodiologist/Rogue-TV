@@ -13,14 +13,13 @@
   [blocks-movement False]
   [blocks-sight False]
 
-  [use-tile (fn [self]
-    ; The player has used the command :use-tile on top of this
-    ; tile. Do whatever is necessary and return the time
-    ; taken.
+  [use-tile (fn [self cr]
+    ; A creature has tried to do something with this tile. (For
+    ; the player, that would be using the command :use-tile.)
     ;
     ; The default implementaton does nothing.
-    (msgn "There's nothing special you can do at this tile.")
-    0)]
+    (when (is cr G.player)
+      (msgn "There's nothing special you can do at this tile.")))]
 
   [step-onto (fn [self cr]
     ; A creature has tried to step onto this tile (and
@@ -78,21 +77,21 @@
   [description "an elevator going up"]
   [char "<"]
 
-  [use-tile (fn [self]
-    (msg :tara "It looks like {p:name} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
-    (when (y-or-n "Take the elevator up?" :+require-uppercase)
-      (setv G.endgame :used-up-elevator))
-    0)]])
+  [use-tile (fn [self cr]
+    (when (is cr G.player)
+      (msg :tara "It looks like {p:name} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
+      (when (y-or-n "Take the elevator up?" :+require-uppercase)
+        (setv G.endgame :used-up-elevator))))]])
 
 (defclass DownElevator [Elevator] [
   [description "an elevator going down"]
   [char ">"]
 
-  [use-tile (fn [self]
-    (+= G.dungeon-level 1)
-    (rtv mapgen.reset-level)
-    (msg :tara "And {p:he's} on to the next level.")
-    0)]])
+  [use-tile (fn [self cr]
+    (when (is cr G.player)
+      (+= G.dungeon-level 1)
+      (rtv mapgen.reset-level)
+      (msg :tara "And {p:he's} on to the next level.")))]])
 
 (defclass Door [Tile] [
   [description "a closed door"]

@@ -44,7 +44,7 @@
       (kwc describe-tile G.player.pos :+verbose))]
 
     [(= cmd :use-tile)
-      (.use-tile (Tile.at G.player.pos))]
+      (.use-tile (Tile.at G.player.pos) G.player)]
 
     [(= cmd :inventory) (do
       (if G.inventory
