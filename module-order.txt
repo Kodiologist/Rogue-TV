@@ -15,6 +15,7 @@ roguetv.input
 roguetv.types
 roguetv.map
 roguetv.item
+roguetv.item.generic
 roguetv.creature
 roguetv.mapgen
 roguetv.display

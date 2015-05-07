@@ -8,14 +8,20 @@
 ; modules are allowed to import from which others.
 
 (require kodhy.macros)
-(import re)
+(import re os.path)
 
 (setv modules (with [[o (open "module-order.txt")]]
   (filt it (.split (o.read) "\n"))))
 
 (for [module (filt (.startswith it "roguetv.") modules)]
-  (setv fname (+ (.replace (.replace module "." "/") "-" "_") ".hy"))
-  (setv text (with [[o (open fname)]] (o.read)))
+
+  (setv text (do
+    (setv fname (.replace (.replace module "." "/") "-" "_"))
+    (when (and (os.path.exists fname) (os.path.isdir fname))
+      (continue))
+    (+= fname ".hy")
+    (with [[o (open fname)]] (o.read))))
+
   (whenn (re.search r"\(import\n((?:  .+\n)+)" text)
     (setv imports-from
       (filt (in it modules)
