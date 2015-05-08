@@ -98,7 +98,7 @@
         ; Action canceled.
         (ret))
       (setv item (get G.inventory i))
-      (msgn "Applied:  {}" (item.invstr)))]
+      (.applied item G.player))]
 
     [(= cmd :reset-level) (when-debugging
       (rtv mapgen.reset-level))]

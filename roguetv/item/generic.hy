@@ -4,6 +4,7 @@
   [kodhy.util [keyword->str shift]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
+  [roguetv.util [*]]
   [roguetv.types [Drawable MapObject]])
 
 (defclass Item [Drawable MapObject] [
@@ -23,28 +24,44 @@
     (setv self.appearance iapp)
     (setv self.color-fg iapp.color-fg)))]
 
-  [display-name (fn [self]
+  [apparent-name (fn [self]
     (if (and self.appearance (not self.appearance.known))
-      self.appearance.name.indefinite-singular
-      self.name.indefinite-singular))]
+      self.appearance.name
+      self.name))]
+
+  [display-name (fn [self]
+    (. (.apparent-name self) indefinite-singular))]
 
   [invstr (fn [self]
     (.format "{} - {}"
       self.invlet
-      (self.display-name)))]])
+      (self.display-name)))]
 
-(defn def-itemtype [inherit tid name &rest body]
+  [applied (fn [self cr]
+    ; This is triggered by, e.g., the :apply-item command.
+    (when (is cr G.player)
+      (msgn "You can't do anything special with {.definite_singular}."
+        (self.apparent-name))))]])
+
+(defn def-itemtype [inherit tid &rest body]
+
   (when (in tid G.itypes)
     (raise (ValueError (.format "redeclared item type: {}" tid))))
+
   (defclass C [inherit] [])
   (setv (get G.itypes tid) C)
   (setv C.tid tid)
-  (setv C.name name)
+
   (setv body (list body))
   (while body
     (setattr C
       (.replace (keyword->str (shift body)) "-" "_")
       (shift body)))
+
+  (when (none? C.name)
+    (setv C.name C.tid))
+  (setv C.name (NounPhrase C.name))
+
   C)
 
 (defclass ItemAppearance [object] [

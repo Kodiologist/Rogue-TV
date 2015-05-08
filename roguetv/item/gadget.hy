@@ -47,15 +47,16 @@
     :name (NounPhrase (+ name " gadget"))
     :color-fg color)))))
 
-(defn def-gadget [tid name]
-  (def-itemtype Gadget tid name
-    :char "/"))
-
 (defn randomize-appearances []
   (setv unused-appearances (.values appearances))
   (for [itype (filt (issubclass it Gadget) (.values G.itypes))]
     (.set-appearance itype (randpop unused-appearances))))
 
-(def-gadget "hookshot" (NounPhrase "hookshot"))
-(def-gadget "panic-button" (NounPhrase "panic button"))
-(def-gadget "chainsaw" (NounPhrase "chainsaw"))
+(defn def-gadget [tid &rest rest]
+  (apply def-itemtype (+
+    (, Gadget tid :char "/")
+    rest)))
+
+(def-gadget "hookshot")
+(def-gadget "panic-button" :name "panic button")
+(def-gadget "chainsaw")

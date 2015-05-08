@@ -1,6 +1,9 @@
 (require kodhy.macros roguetv.macros)
 
-(import inflect)
+(import
+  [kodhy.util [ret]]
+  inflect)
+
 (def -inflect (inflect.engine))
 
 (def -pronoun-d ((fn []
@@ -68,7 +71,19 @@
 
 (defclass NounPhrase [object] [
 
-  [__init__ (fn [self stem &optional plural indefinite-singular indefinite-plural [always-plural False]]
+  [__init__ (fn [self stem &optional
+      plural
+      indefinite-singular indefinite-plural
+      [always-plural False]
+      [proper False]] (block
+
+    (when (instance? NounPhrase stem)
+      ; Just clone.
+      (setv self.__dict__ stem.__dict__)
+      (ret))
+
+    (when proper
+      (setv indefinite-singular stem))
     (unless always-plural
       (when (none? indefinite-singular)
         (setv indefinite-singular (.a -inflect stem)))
@@ -76,5 +91,7 @@
         (setv plural (.plural-noun -inflect stem))))
     (when (none? indefinite-plural)
       (setv indefinite-plural (if always-plural stem (.plural-noun -inflect stem))))
-    (set-self stem plural indefinite-singular indefinite-plural always-plural)
-    None)]])
+    (setv definite-singular (+ (if proper "" "the ") stem))
+
+    (set-self stem plural indefinite-singular indefinite-plural always-plural proper definite-singular)
+    None))]])
