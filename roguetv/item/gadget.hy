@@ -3,7 +3,7 @@
 (import
   [random [randrange]]
   [heidegger.pos [Pos]]
-  [kodhy.util [cat ret]]
+  [kodhy.util [cat ret retf]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -27,22 +27,27 @@
         (.format " ({})" self.charges))))]
 
   [applied (fn [self cr] (block
-    ; Use up a charge and some time.
+    ; Do we have a charge to spare?
     (when (= self.charges 0)
       (when (is cr G.player)
         (msg :bob "That oojah's all chatty, kemosabe."))
       (ret))
-    (-= self.charges 1)
-    (cr.take-time self.apply-time)
     ; Identify the item type.
     (unless self.appearance.known
       (setv self.appearance.known True)
       (msgn "You have:  {}" (self.invstr)))
     ; Now you get the gadget effect.
-    (self.gadget-effect cr)))]
+    (unless (self.gadget-effect cr)
+      (ret))
+    ; Use up a charge and some time.
+    (-= self.charges 1)
+    (cr.take-time self.apply-time)))]
 
   [gadget-effect (fn [self cr]
-    (msgn "Nothing happens."))]])
+    ; Return a boolean indicating whether the gadget was actually
+    ; used.
+    (msgn "Nothing happens.")
+    True)]])
 
 (def appearances {
   "crazy"           :blue
@@ -83,17 +88,24 @@
     (.set-appearance itype (randpop unused-appearances))))
 
 (def-itemtype Gadget "panic-button" :name "panic button"
-  :gadget-effect (fn [self cr]
+  :teleport-tries 100
+  :gadget-effect (fn [self cr] (block :gadget
     ; Find a place to teleport to.
-    (while True
-      (setv p-to (Pos (randrange G.map-width) (randrange G.map-height)))
-      (when (and (room-for? (type cr) p-to) (instance? Floor (Tile.at p-to)))
-        (break)))
+    (block
+      (for [_ (range self.teleport-tries)]
+        (setv p-to (Pos (randrange G.map-width) (randrange G.map-height)))
+        (when (and (room-for? (type cr) p-to) (instance? Floor (Tile.at p-to)))
+          (ret)))
+      ; We failed to find a legal square.
+      (when (is cr G.player)
+        (msgn "You feel cramped."))
+      (retf :gadget True))
     ; Now teleport there.
     (.move cr p-to)
     (when (is cr G.player)
       (recompute-fov)
-      (msg :tara "{p:He's} teleported to another part of the level."))))
+      (msg :tara "{p:He's} teleported to another part of the level."))
+    True)))
 
 (def-itemtype Gadget "hookshot")
 (def-itemtype Gadget "chainsaw")
