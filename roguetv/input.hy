@@ -31,7 +31,7 @@
     (setv inp (cond
 
       [(= key G.key-escape)
-        [:quit-game]]
+        :quit-game]
 
       [(in key ["KEY_UP" "8"])
         [:move Pos.NORTH]]
@@ -52,19 +52,19 @@
         [:move Pos.SE]]
 
       [(= key ":")
-        [:examine-ground]]
+        :examine-ground]
       [(= key "t")
-        [:use-tile]]
+        :use-tile]
 
       [(= key "i")
-        [:inventory]]
+        :inventory]
       [(= key ",")
-        [:pick-up]]
+        :pick-up]
       [(= key "d")
-        [:drop]]
+        :drop]
 
       [(= key "R")
-        [:reset-level]]))
+        :reset-level]))
 
     (when inp
       (ret inp)))))

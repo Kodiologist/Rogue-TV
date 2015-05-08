@@ -20,21 +20,23 @@
 
   (setv G.last-new-message-number (dec (len G.message-log)))
 
-  (setv [cmd args] [(first inp) (slice inp 1)])
+  (setv cmd (if (coll? inp) (first inp) inp))
+  (setv arg (when (coll? inp) (second inp)))
+
   (block (cond
 
     [(= cmd :quit-game)
       :quit-game]
 
     [(= cmd :move)
-      (let [[p-from G.player.pos] [p-to (+ p-from (first args))]]
+      (let [[p-from G.player.pos] [p-to (+ p-from arg)]]
         (unless (room-for? Creature p-to)
           (ret))
         (unless (.step-onto (Tile.at p-to) G.player)
           (ret))
         (unless (.step-out-of (Tile.at p-from) G.player p-to)
           (ret))
-        (G.player.take-time (len-taxicab (first args)))
+        (G.player.take-time (len-taxicab arg))
         (.move G.player p-to)
         (recompute-fov)
         (describe-tile G.player.pos)
