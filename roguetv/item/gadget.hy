@@ -3,7 +3,7 @@
 (import
   [random [randrange]]
   [heidegger.pos [Pos]]
-  [kodhy.util [ret]]
+  [kodhy.util [cat ret]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -19,6 +19,12 @@
     (apply Item.__init__ [self] rest)
     (setv self.charges (if (none? charges) self.max-charges charges))
     None)]
+
+  [display-name (fn [self]
+    (cat
+      (.display-name (super Gadget self))
+      (and self.appearance.known
+        (.format " ({})" self.charges))))]
 
   [applied (fn [self cr] (block
     ; Use up a charge and some time.
