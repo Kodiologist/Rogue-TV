@@ -89,8 +89,19 @@
       (.move item clear-spot)
       (msgn "Dropped:  {}" (item.invstr)))]
 
+    [(= cmd :apply-item) (do
+      (unless G.inventory
+        (msgn "You aren't carrying any items to apply.")
+        (ret 0))
+      (setv i (inventory-loop "What item do you want to apply?"))
+      (when (none? i)
+        ; Action canceled.
+        (ret))
+      (setv item (get G.inventory i))
+      (msgn "Applied:  {}" (item.invstr)))]
+
     [(= cmd :reset-level) (when-debugging
       (rtv mapgen.reset-level))]
 
     [True
-      (raise (ValueError (.format "Unknown command {}" cmd)))])))
+      (raise (ValueError (.format "Unknown command {!r}" cmd)))])))

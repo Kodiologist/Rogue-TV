@@ -62,6 +62,8 @@
         :pick-up]
       [(= key "d")
         :drop]
+      [(= key "a")
+        :apply-item]
 
       [(= key "R")
         :reset-level]))
