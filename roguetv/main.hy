@@ -10,10 +10,13 @@
   [roguetv.input [hit-key-to-continue get-normal-command]]
   [roguetv.map [recompute-fov room-for?]]
   [roguetv.item [Item def-itemtype]]
+  roguetv.item.gadget
   [roguetv.creature [Creature]]
   [roguetv.mapgen [reset-level]]
   [roguetv.display [full-redraw default-color describe-tile]]
   [roguetv.actions [do-normal-command]])
+
+(roguetv.item.gadget.randomize-appearances)
 
 (setv G.player (kwc Creature
   :name "Josephine" :gender :female
@@ -23,19 +26,6 @@
 
 (setv G.dungeon-level 1)
 (reset-level)
-
-(def-itemtype "toaster" "a toaster"
-  :char ")"
-  :color-fg :dark-green)
-(def-itemtype "galoshes" "a pair of galoshes"
-  :char "["
-  :color-fg :brown)
-(def-itemtype "ottoman" "an ottoman"
-  :char "("
-  :color-fg :red)
-(def-itemtype "food-processor" "a food processor"
-  :char "!"
-  :color-fg :dark-blue)
 
 (setv starting-items 15)
 (for [x (range -2 3)]

@@ -85,7 +85,7 @@
   (setv lines (+
     [[None prompt]]
     (amap
-      [it (.format "  {} � {}" it.invlet it.name)]
+      [it (.format "  {} � {}" it.invlet (it.display-name))]
         ; The character � will be replaced with the item's symbol.
       G.inventory)
     (* [[None "      ---"]] (- G.inventory-limit (len G.inventory)))))
@@ -110,7 +110,7 @@
   (setv tile (Tile.at pos))
   (cond
     [(Item.at pos) (do
-      (msgn "You see here {}." (. (Item.at pos) name))
+      (msgn "You see here {}." (.display-name (Item.at pos)))
       (unless (instance? Floor tile)
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type

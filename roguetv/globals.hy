@@ -66,3 +66,6 @@
 
 (def inventory [])
 (def itypes {})
+
+; Item appearances and ItemAppearance known states must also
+; be saved.

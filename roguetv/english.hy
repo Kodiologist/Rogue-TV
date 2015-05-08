@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require kodhy.macros roguetv.macros)
 
 (import inflect)
 (def -inflect (inflect.engine))
@@ -65,3 +65,16 @@
       base]
     [True
       (.plural-verb -inflect base)]))
+
+(defclass NounPhrase [object] [
+
+  [__init__ (fn [self stem &optional plural indefinite-singular indefinite-plural [always-plural False]]
+    (unless always-plural
+      (when (none? indefinite-singular)
+        (setv indefinite-singular (.a -inflect stem)))
+      (when (none? plural)
+        (setv plural (.plural-noun -inflect stem))))
+    (when (none? indefinite-plural)
+      (setv indefinite-plural (if always-plural stem (.plural-noun -inflect stem))))
+    (set-self stem plural indefinite-singular indefinite-plural always-plural)
+    None)]])

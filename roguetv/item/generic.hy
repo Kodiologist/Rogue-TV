@@ -2,27 +2,41 @@
 
 (import
   [kodhy.util [keyword->str shift]]
+  [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.types [Drawable MapObject]])
 
 (defclass Item [Drawable MapObject] [
   [tid None]
+    ; A string.
   [name None]
+    ; A NounPhrase.
+  [appearance None]
+    ; An ItemAppearance.
 
   [__init__ (fn [self &optional pos invlet]
     (MapObject.__init__ self pos)
     (set-self invlet)
     None)]
 
+  [set-appearance (classmethod (fn [self iapp]
+    (setv self.appearance iapp)
+    (setv self.color-fg iapp.color-fg)))]
+
+  [display-name (fn [self]
+    (if (and self.appearance (not self.appearance.known))
+      self.appearance.name.indefinite-singular
+      self.name.indefinite-singular))]
+
   [invstr (fn [self]
     (.format "{} - {}"
       self.invlet
-      self.name))]])
+      (self.display-name)))]])
 
-(defn def-itemtype [tid name &rest body]
+(defn def-itemtype [inherit tid name &rest body]
   (when (in tid G.itypes)
     (raise (ValueError (.format "redeclared item type: {}" tid))))
-  (defclass C [Item] [])
+  (defclass C [inherit] [])
   (setv (get G.itypes tid) C)
   (setv C.tid tid)
   (setv C.name name)
@@ -32,6 +46,15 @@
       (.replace (keyword->str (shift body)) "-" "_")
       (shift body)))
   C)
+
+(defclass ItemAppearance [object] [
+
+  [__init__ (fn [self name color-fg]
+    (set-self name color-fg)
+    (setv self.known False)
+      ; .known is true when the player has learned the type of
+      ; item that goes with this appearance.
+    None)]])
 
 (defn add-to-inventory [item]
   (.move item None)
