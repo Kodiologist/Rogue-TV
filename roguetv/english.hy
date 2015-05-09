@@ -95,3 +95,15 @@
 
     (set-self stem plural indefinite-singular indefinite-plural always-plural proper definite-singular)
     None))]])
+
+(defclass NounPhraseNamed [object] [
+  [name None]
+
+  [__format__ (fn [self formatstr]
+    (cond
+      [(= formatstr "")
+        self.name.stem]
+      [(= formatstr "the")
+        self.name.definite-singular]
+      [(= formatstr "The")
+        (.capitalize self.name.definite-singular)]))]])

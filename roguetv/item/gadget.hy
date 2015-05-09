@@ -11,7 +11,7 @@
   [roguetv.item.generic [Item ItemAppearance def-itemtype]])
 
 (defclass Gadget [Item] [
-  [max-charges 3]
+  [max-charges 10]
   [apply-time 1]
   [char "/"]
 
@@ -107,5 +107,38 @@
       (msg :tara "{p:He's} teleported to another part of the level."))
     True)))
 
-(def-itemtype Gadget "hookshot")
+(def-itemtype Gadget "hookshot"
+  :hookshot-dist 4
+  :hookshot-travel-speed 2
+  :gadget-effect (fn [self cr] (block :gadget
+
+    (setv d Pos.NORTH)
+
+    ; Find our destination square.
+    (setv ahead (+ cr.pos d))
+    (setv path (ray ahead d self.hookshot-dist))
+    (block
+      (for [p path]
+        (when (. (Tile.at p) blocks-movement)
+          (ret))
+        (whenn (.at cr p)
+          (when (is cr G.player)
+            (msg :tara "{p:name}'s {} bounces off {}."
+              self it))
+          (retf :gadget True)))
+      (msgn "Your {} can only reach {} squares ahead."
+        self self.hookshot-dist)
+      (retf :gadget False))
+    (when (= p ahead)
+      (msg :tara "It looks like {p:name}'s {} isn't very useful at that range."
+        self)
+      (retf :gadget False))
+    (setv p-to (- p d))
+
+    ; And away we go.
+    (.take-time cr (/ (len-taxicab (- p-to cr.pos)) self.hookshot-travel-speed))
+    (.move cr p-to)
+    (msgn "{:The} pulls you ahead." self)
+    True)))
+
 (def-itemtype Gadget "chainsaw")

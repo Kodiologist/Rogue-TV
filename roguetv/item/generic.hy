@@ -2,16 +2,14 @@
 
 (import
   [kodhy.util [keyword->str shift]]
-  [roguetv.english [NounPhrase]]
+  [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject]])
 
-(defclass Item [Drawable MapObject] [
+(defclass Item [Drawable MapObject NounPhraseNamed] [
   [tid None]
     ; A string.
-  [name None]
-    ; A NounPhrase.
   [appearance None]
     ; An ItemAppearance.
 
@@ -64,7 +62,7 @@
 
   C)
 
-(defclass ItemAppearance [object] [
+(defclass ItemAppearance [NounPhraseNamed] [
 
   [__init__ (fn [self name color-fg]
     (set-self name color-fg)
