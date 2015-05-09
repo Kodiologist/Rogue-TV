@@ -30,9 +30,9 @@
 
     [(= cmd :move)
       (let [[p-from G.player.pos] [p-to (+ p-from arg)]]
-        (unless (room-for? Creature p-to)
+        (unless (.bump-into (Tile.at p-to) G.player)
           (ret))
-        (unless (.step-onto (Tile.at p-to) G.player)
+        (unless (room-for? Creature p-to)
           (ret))
         (unless (.step-out-of (Tile.at p-from) G.player p-to)
           (ret))

@@ -21,14 +21,14 @@
     (when (is cr G.player)
       (msgn "There's nothing special you can do at this tile.")))]
 
-  [step-onto (fn [self cr]
-    ; A creature has tried to step onto this tile (and
-    ; blocks-movement is false). Return True if it can.
+  [bump-into (fn [self cr]
+    ; A creature has tried to step onto this tile. Return
+    ; False to halt further processing of the step (in particular,
+    ; the creature is not moved), and True to continue.
     True)]
 
   [after-step-onto (fn [self cr p-from]
     ; A creature has just finished stepping onto this tile.
-    ; The return value is ignored.
     None)]
 
   [step-out-of (fn [self cr p-to]
@@ -97,6 +97,7 @@
   [description "a closed door"]
   [char "+"]
   [color-fg :brown]
+  [blocks-movement True]
   [blocks-sight True]
 
   [__init__ (fn [self &optional open-time]
@@ -104,7 +105,7 @@
     (set-self open-time)
     None)]
 
-  [step-onto (fn [self cr]
+  [bump-into (fn [self cr]
     (when (is cr G.player)
       (msgn "You open the old door after a struggle."))
     (cr.take-time self.open-time)
