@@ -92,7 +92,7 @@
       (unless G.inventory
         (msg "You aren't carrying any items to apply.")
         (ret 0))
-      (setv i (inventory-loop "What item do you want to apply?"))
+      (setv i (inventory-loop "What do you want to apply?"))
       (when (none? i)
         ; Action canceled.
         (ret))
