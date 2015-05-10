@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor room-for? recompute-fov]]
+  [roguetv.map [Tile Floor Door room-for? recompute-fov mset]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]])
 
 (defclass Gadget [Item] [
@@ -146,4 +146,16 @@
     (.move cr p-to)
     (msg "{:The} pulls you ahead." self))))
 
-(def-itemtype Gadget "chainsaw")
+(def-itemtype Gadget "chainsaw"
+  :gadget-effect (fn [self cr] (block
+
+    (setv d (or (input-direction) (ret)))
+    (setv p (+ cr.pos d))
+    (setv t (Tile.at p))
+
+    (if (instance? Door t)
+      (do
+        (.use-time-and-charge self cr)
+        (msgp cr "Bzzt! The door is no more.")
+        (mset p (Floor)))
+      (msgp cr "Your {} won't help with that." self)))))
