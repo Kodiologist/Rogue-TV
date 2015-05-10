@@ -37,20 +37,17 @@
 
 (defn mset [pos tile]
   (kwc .move tile pos :+clobber)
+  (when (or
+      (!= (tcod.map-is-transparent G.fov-map pos.x pos.y)
+        (not tile.blocks-sight))
+      (!= tcod.map-is-walkable  G.fov-map pos.x pos.y)
+        (not tile.blocks-movement))
+    (soil-fov))
   (tcod.map-set-properties G.fov-map pos.x pos.y
     (not tile.blocks-sight) (not tile.blocks-movement)))
 
 (defn on-map [pos]
   (and (<= 0 pos.x (dec G.map-width)) (<= 0 pos.y (dec G.map-height))))
-
-(defn recompute-fov []
-  (kwc tcod.map-compute-fov G.fov-map
-    G.player.pos.x G.player.pos.y
-    :algo tcod.FOV-BASIC)
-  (for [x (range G.map-width)]
-    (for [y (range G.map-height)]
-      (when (tcod.map-is-in-fov G.fov-map x y)
-        (setv (get G.seen-map x y) True)))))
 
 (defn room-for? [mo-class pos]
   (and
@@ -108,7 +105,6 @@
     (msgp "You open the old door after a struggle.")
     (cr.take-time self.open-time)
     (mset self.pos (Floor))
-    (recompute-fov)
     False)]])
 
 (defclass Mud [Tile] [

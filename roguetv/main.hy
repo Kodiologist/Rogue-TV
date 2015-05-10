@@ -8,21 +8,20 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [hit-key-to-continue get-normal-command]]
-  [roguetv.map [recompute-fov room-for?]]
+  [roguetv.map [room-for?]]
   [roguetv.item [Item def-itemtype]]
   roguetv.item.gadget
-  [roguetv.creature [Creature]]
+  [roguetv.creature [Creature Player]]
   [roguetv.mapgen [reset-level]]
   [roguetv.display [full-redraw default-color describe-tile]]
   [roguetv.actions [do-normal-command]])
 
 (roguetv.item.gadget.randomize-appearances)
 
-(setv G.player (kwc Creature
-  :name "Josephine" :gender :female
+(setv G.player (kwc Player
+  :name "Josephine" :gender :female))
     ; Prefer :female for testing so it's easier to spot cases
     ; where I mistakenly wrote, e.g., "he" instead of "{p:he}".
-  :char "@" :color-bg :yellow))
 
 (setv G.dungeon-level 1)
 (reset-level)

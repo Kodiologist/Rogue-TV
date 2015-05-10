@@ -8,11 +8,11 @@
 
 (defclass Creature [Drawable MapObject] [
   [extant []]
+  [char "C"]
 
-  [__init__ (fn [self name char &optional [gender :neuter] [plural False] color-fg color-bg pos]
+  [__init__ (fn [self name &optional [gender :neuter] [plural False] pos]
     (MapObject.__init__ self pos)
-    (set-self name char gender plural)
-    (set-self-nn color-fg color-bg)
+    (set-self name gender plural)
     (setv self.female (= gender :female))
     (setv self.clock-debt-ms 0)
     (self.reset-ice-slipping)
@@ -45,7 +45,14 @@
       (when self.ice-slip-time
         ; The creature takes some extra time slipping.
         (setv slip-time self.ice-slip-time)
-        (when (is self G.player)
-          (msg "You take a moment to steady yourself on the ice."))
+        (msgp self "You take a moment to steady yourself on the ice.")
         (self.reset-ice-slipping)
         (.take-time self slip-time))))]])
+
+(defclass Player [Creature] [
+  [char "@"]
+  [color-bg :yellow]
+
+  [move (fn [self &rest args]
+    (apply .move (+ (, (super Player self)) args))
+    (soil-fov))]])

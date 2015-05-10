@@ -53,3 +53,6 @@
 (defn msgp [cr &rest args]
   (when (player? cr)
     (apply msg args)))
+
+(defn soil-fov []
+  (setv G.fov-dirty? True))

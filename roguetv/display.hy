@@ -3,6 +3,7 @@
 (import
   textwrap
   curses
+  [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   [kodhy.util [concat]]
   [roguetv.globals :as G]
@@ -11,6 +12,15 @@
   [roguetv.map [Tile Floor]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]])
+
+(defn recompute-fov []
+  (kwc tcod.map-compute-fov G.fov-map
+    G.player.pos.x G.player.pos.y
+    :algo tcod.FOV-BASIC)
+  (for [x (range G.map-width)]
+    (for [y (range G.map-height)]
+      (when (tcod.map-is-in-fov G.fov-map x y)
+        (setv (get G.seen-map x y) True)))))
 
 (defn get-color [fg bg]
   (curses.color-pair (try
@@ -37,6 +47,9 @@
   (+ (- tx (// G.screen-width 2)) G.player.pos.x))
 
 (defn draw-map []
+  (when G.fov-dirty?
+    (recompute-fov)
+    (setv G.fov-dirty? False))
   (G.T.move 0 0)
   (for [ty (range (- G.screen-height G.bottom-border))]
     (setv py (ty->py ty))

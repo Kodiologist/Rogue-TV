@@ -62,6 +62,7 @@
 (def last-action-duration 0)
 
 (def fov-map (tcod.map-new map-width map-height))
+(def fov-dirty? True)
 (def seen-map [])
 
 (def inventory [])

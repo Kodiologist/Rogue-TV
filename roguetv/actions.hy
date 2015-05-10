@@ -6,7 +6,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [inventory-loop]]
-  [roguetv.map [Tile room-for? recompute-fov]]
+  [roguetv.map [Tile room-for?]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
   [roguetv.display [draw-inventory describe-tile]])
@@ -38,7 +38,6 @@
           (ret))
         (G.player.take-time (len-taxicab arg))
         (.move G.player p-to)
-        (recompute-fov)
         (describe-tile G.player.pos)
         (.after-step-onto (Tile.at p-to) G.player p-from))]
 

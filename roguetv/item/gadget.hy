@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door room-for? recompute-fov mset]]
+  [roguetv.map [Tile Floor Door room-for? mset]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]])
 
 (defclass Gadget [Item] [
@@ -109,7 +109,6 @@
     (.use-time-and-charge self cr)
     (.move cr p-to)
     (when (player? cr)
-      (recompute-fov)
       (msg :tara "{p:He's} teleported to another part of the level.")))))
 
 (def-itemtype Gadget "hookshot"
