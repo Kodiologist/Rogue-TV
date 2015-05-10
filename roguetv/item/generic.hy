@@ -37,9 +37,8 @@
 
   [applied (fn [self cr]
     ; This is triggered by, e.g., the :apply-item command.
-    (when (is cr G.player)
-      (msg "You can't do anything special with {.definite_singular}."
-        (self.apparent-name))))]])
+    (msgp cr "You can't do anything special with {.definite_singular}."
+      (self.apparent-name)))]])
 
 (defn def-itemtype [inherit tid &rest body]
 

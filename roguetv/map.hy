@@ -18,8 +18,7 @@
     ; the player, that would be using the command :use-tile.)
     ;
     ; The default implementaton does nothing.
-    (when (is cr G.player)
-      (msg "There's nothing special you can do at this tile.")))]
+    (msgp cr "There's nothing special you can do at this tile."))]
 
   [bump-into (fn [self cr]
     ; A creature has tried to step onto this tile. Return
@@ -78,7 +77,7 @@
   [char "<"]
 
   [use-tile (fn [self cr]
-    (when (is cr G.player)
+    (when (player? cr)
       (msg :tara "It looks like {p:name} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
       (when (y-or-n "Take the elevator up?" :+require-uppercase)
         (setv G.endgame :used-up-elevator))))]])
@@ -88,7 +87,7 @@
   [char ">"]
 
   [use-tile (fn [self cr]
-    (when (is cr G.player)
+    (when (player? cr)
       (+= G.dungeon-level 1)
       (rtv mapgen.reset-level)
       (msg :tara "And {p:he's} on to the next level.")))]])
@@ -106,8 +105,7 @@
     None)]
 
   [bump-into (fn [self cr]
-    (when (is cr G.player)
-      (msg "You open the old door after a struggle."))
+    (msgp "You open the old door after a struggle.")
     (cr.take-time self.open-time)
     (mset self.pos (Floor))
     (recompute-fov)
@@ -139,8 +137,7 @@
     None)]
 
   [step-out-of (fn [self cr p-to]
-    (when (is cr G.player)
-      (msg "You tear through the web."))
+    (msgp cr "You tear through the web.")
     (cr.take-time self.tear-time)
     (mset self.pos (Floor))
     True)]])

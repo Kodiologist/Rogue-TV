@@ -38,6 +38,9 @@
     (.append l (+ (get l -1) direction)))
   l)
 
+(defn player? [cr]
+  (is cr G.player))
+
 (defn msg [&rest args]
   (setv args (list args))
   (setv mtype (when (keyword? (first args))
@@ -46,3 +49,7 @@
     (len G.message-log)
     mtype
     (apply .format args {"p" G.player}))))
+
+(defn msgp [cr &rest args]
+  (when (player? cr)
+    (apply msg args)))

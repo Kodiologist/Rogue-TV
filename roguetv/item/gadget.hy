@@ -30,8 +30,7 @@
   [applied (fn [self cr] (block
     ; Do we have a charge to spare?
     (when (= self.charges 0)
-      (when (is cr G.player)
-        (msg :bob "That oojah's all chatty, kemosabe."))
+      (msgp cr :bob "That oojah's all chatty, kemosabe.")
       (ret))
     ; Identify the item type.
     (unless self.appearance.known
@@ -102,13 +101,12 @@
           (ret)))
       ; We failed to find a legal square.
       (.use-time-and-charge self cr)
-      (when (is cr G.player)
-        (msg "You feel cramped."))
+      (msgp cr "You feel cramped.")
       (retf :gadget))
     ; Now teleport there.
     (.use-time-and-charge self cr)
     (.move cr p-to)
-    (when (is cr G.player)
+    (when (player? cr)
       (recompute-fov)
       (msg :tara "{p:He's} teleported to another part of the level.")))))
 
@@ -128,9 +126,8 @@
           (ret))
         (whenn (.at cr p)
           (.use-time-and-charge self cr)
-          (when (is cr G.player)
-            (msg :tara "{p:name}'s {} bounces off {}."
-              self it))
+          (msgp cr :tara "{p:name}'s {} bounces off {}."
+            self it)
           (retf :gadget)))
       (msg "Your {} can only reach objects up to {} squares away."
         self self.hookshot-dist)
