@@ -93,6 +93,7 @@
 (def-itemtype Gadget "panic-button" :name "panic button"
   :teleport-tries 100
   :gadget-effect (fn [self cr] (block :gadget
+
     ; Find a place to teleport to.
     (block
       (for [_ (range self.teleport-tries)]
@@ -103,6 +104,7 @@
       (.use-time-and-charge self cr)
       (msgp cr "You feel cramped.")
       (retf :gadget))
+
     ; Now teleport there.
     (.use-time-and-charge self cr)
     (.move cr p-to)
