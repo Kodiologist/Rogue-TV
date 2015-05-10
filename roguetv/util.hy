@@ -38,11 +38,11 @@
     (.append l (+ (get l -1) direction)))
   l)
 
-(defn msg [mtype &rest format-args]
+(defn msg [&rest args]
+  (setv args (list args))
+  (setv mtype (when (keyword? (first args))
+    (.pop args 0)))
   (.append G.message-log (,
     (len G.message-log)
     mtype
-    (apply .format format-args {"p" G.player}))))
-
-(defn msgn [&rest format-args]
-  (apply msg (+ (, None) format-args)))
+    (apply .format args {"p" G.player}))))

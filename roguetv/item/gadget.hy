@@ -36,7 +36,7 @@
     ; Identify the item type.
     (unless self.appearance.known
       (setv self.appearance.known True)
-      (msgn "You have:  {}" (self.invstr)))
+      (msg "You have:  {}" (self.invstr)))
     ; Now you get the gadget effect.
     (self.gadget-effect cr)))]
 
@@ -46,7 +46,7 @@
     ; of a direction prompt), be sure to call .use-time-and-charge
     ; before otherwise affecting the game world.
     (.use-time-and-charge self cr)
-    (msgn "Nothing happens."))]
+    (msg "Nothing happens."))]
 
   [use-time-and-charge (fn [self cr]
     ; Use up a charge and some time.
@@ -103,7 +103,7 @@
       ; We failed to find a legal square.
       (.use-time-and-charge self cr)
       (when (is cr G.player)
-        (msgn "You feel cramped."))
+        (msg "You feel cramped."))
       (retf :gadget))
     ; Now teleport there.
     (.use-time-and-charge self cr)
@@ -132,7 +132,7 @@
             (msg :tara "{p:name}'s {} bounces off {}."
               self it))
           (retf :gadget)))
-      (msgn "Your {} can only reach objects up to {} squares away."
+      (msg "Your {} can only reach objects up to {} squares away."
         self self.hookshot-dist)
       (retf :gadget))
     (when (= p ahead)
@@ -145,6 +145,6 @@
     (.use-time-and-charge self cr)
     (.take-time cr (/ (len-taxicab (- p-to cr.pos)) self.hookshot-travel-speed))
     (.move cr p-to)
-    (msgn "{:The} pulls you ahead." self))))
+    (msg "{:The} pulls you ahead." self))))
 
 (def-itemtype Gadget "chainsaw")

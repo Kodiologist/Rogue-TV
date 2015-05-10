@@ -19,7 +19,7 @@
     ;
     ; The default implementaton does nothing.
     (when (is cr G.player)
-      (msgn "There's nothing special you can do at this tile.")))]
+      (msg "There's nothing special you can do at this tile.")))]
 
   [bump-into (fn [self cr]
     ; A creature has tried to step onto this tile. Return
@@ -107,7 +107,7 @@
 
   [bump-into (fn [self cr]
     (when (is cr G.player)
-      (msgn "You open the old door after a struggle."))
+      (msg "You open the old door after a struggle."))
     (cr.take-time self.open-time)
     (mset self.pos (Floor))
     (recompute-fov)
@@ -140,7 +140,7 @@
 
   [step-out-of (fn [self cr p-to]
     (when (is cr G.player)
-      (msgn "You tear through the web."))
+      (msg "You tear through the web."))
     (cr.take-time self.tear-time)
     (mset self.pos (Floor))
     True)]])

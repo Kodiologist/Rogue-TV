@@ -14,7 +14,7 @@
 (defmacro when-debugging [&rest body]
   `(if G.debug
     (do ~@body)
-    (msgn "That command requires debug mode.")))
+    (msg "That command requires debug mode.")))
 
 (defn do-normal-command [inp]
 
@@ -51,12 +51,12 @@
     [(= cmd :inventory) (do
       (if G.inventory
         (kwc inventory-loop :!select "You are carrying:")
-        (msgn "Your inventory is empty.")))]
+        (msg "Your inventory is empty.")))]
 
     [(= cmd :pick-up) (do
       (setv item (Item.at G.player.pos))
       (when (nil? item)
-        (msgn "There's nothing here to pick up.")
+        (msg "There's nothing here to pick up.")
         (ret))
       (when (= (len G.inventory) G.inventory-limit)
         (msg :tara "{p:name} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
@@ -64,11 +64,11 @@
         (ret))
       (G.player.take-time 1)
       (add-to-inventory item)
-      (msgn "Taken:  {}" (item.invstr)))]
+      (msg "Taken:  {}" (item.invstr)))]
 
     [(= cmd :drop) (do
       (unless G.inventory
-        (msgn "You don't have anything to drop.")
+        (msg "You don't have anything to drop.")
         (ret 0))
       (setv i (inventory-loop "What do you want to drop?"))
       (when (none? i)
@@ -87,11 +87,11 @@
       (G.player.take-time 1)
       (setv item (.pop G.inventory i))
       (.move item clear-spot)
-      (msgn "Dropped:  {}" (item.invstr)))]
+      (msg "Dropped:  {}" (item.invstr)))]
 
     [(= cmd :apply-item) (do
       (unless G.inventory
-        (msgn "You aren't carrying any items to apply.")
+        (msg "You aren't carrying any items to apply.")
         (ret 0))
       (setv i (inventory-loop "What item do you want to apply?"))
       (when (none? i)

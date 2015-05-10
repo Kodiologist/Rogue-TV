@@ -72,7 +72,7 @@
         (setv G.endgame :out-of-time)))
 
     (when G.endgame
-      (msgn "Game over. Press Escape to quit.")
+      (msg "Game over. Press Escape to quit.")
       (full-redraw)
       (hit-key-to-continue [G.key-escape])
       (break)))))

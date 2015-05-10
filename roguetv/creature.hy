@@ -46,6 +46,6 @@
         ; The creature takes some extra time slipping.
         (setv slip-time self.ice-slip-time)
         (when (is self G.player)
-          (msgn "You take a moment to steady yourself on the ice."))
+          (msg "You take a moment to steady yourself on the ice."))
         (self.reset-ice-slipping)
         (.take-time self slip-time))))]])

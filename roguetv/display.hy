@@ -110,14 +110,14 @@
   (setv tile (Tile.at pos))
   (cond
     [(Item.at pos) (do
-      (msgn "You see here {}." (.display-name (Item.at pos)))
+      (msg "You see here {}." (.display-name (Item.at pos)))
       (unless (instance? Floor tile)
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type
         ; may not be obvious.
-        (msgn "There is also {} here." tile.description)))]
+        (msg "There is also {} here." tile.description)))]
     [verbose
       (if (instance? Floor tile)
         (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
           (if G.player.female "dowdy" "cull"))
-        (msgn "There is {} here." tile.description))]))
+        (msg "There is {} here." tile.description))]))

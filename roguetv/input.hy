@@ -9,7 +9,7 @@
 (setv cancel-keys [" " "\n" G.key-escape])
 
 (defn y-or-n [prompt &optional [require-uppercase False]] (block
-  (msgn "{} {}" prompt
+  (msg "{} {}" prompt
     (if require-uppercase "(Y/N; case-sensitive)" "(y/n)"));
   (rtv display.full-redraw)
   (setv G.last-new-message-number (dec (len G.message-log)))
@@ -48,7 +48,7 @@
   "3" Pos.SE})
 
 (defn input-direction [] (block
-  (msgn "In what direction?")
+  (msg "In what direction?")
   (rtv display.full-redraw)
   (setv G.last-new-message-number (dec (len G.message-log)))
   (while True
@@ -104,7 +104,7 @@
         (if (in key il)
           (.index il key)
           (do
-            (msgn "You don't have such an item.")
+            (msg "You don't have such an item.")
             :quit))]
 
       [(in key cancel-keys)
