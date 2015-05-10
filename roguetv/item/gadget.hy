@@ -7,6 +7,7 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
+  [roguetv.input [input-direction]]
   [roguetv.map [Tile Floor room-for? recompute-fov]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]])
 
@@ -112,11 +113,11 @@
       (msg :tara "{p:He's} teleported to another part of the level.")))))
 
 (def-itemtype Gadget "hookshot"
-  :hookshot-dist 4
+  :hookshot-dist 8
   :hookshot-travel-speed 2
   :gadget-effect (fn [self cr] (block :gadget
 
-    (setv d Pos.NORTH)
+    (setv d (or (input-direction) (ret)))
 
     ; Find our destination square.
     (setv ahead (+ cr.pos d))
@@ -131,7 +132,7 @@
             (msg :tara "{p:name}'s {} bounces off {}."
               self it))
           (retf :gadget)))
-      (msgn "Your {} can only reach {} squares ahead."
+      (msgn "Your {} can only reach objects up to {} squares away."
         self self.hookshot-dist)
       (retf :gadget))
     (when (= p ahead)
