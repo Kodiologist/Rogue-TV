@@ -1,7 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [kodhy.util [ret]]
+  [kodhy.util [ret ucfirst]]
   inflect)
 
 (def -inflect (inflect.engine))
@@ -42,9 +42,9 @@
   (setv (get d "he's") (get d "they're"))
   ; Finally, create capitalized forms of everything.
   (for [[k v] (list (.items d))]
-    (setv (get d (.capitalize k)) (dict (zip
+    (setv (get d (ucfirst k)) (dict (zip
       (.keys v)
-      (amap (.capitalize it) (.values v))))))
+      (amap (ucfirst it) (.values v))))))
   d)))
 
 (def genders (frozenset [:male :female :neuter :singular-they]))
@@ -106,4 +106,4 @@
       [(= formatstr "the")
         self.name.definite-singular]
       [(= formatstr "The")
-        (.capitalize self.name.definite-singular)]))]])
+        (ucfirst self.name.definite-singular)]))]])

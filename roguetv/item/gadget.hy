@@ -120,7 +120,7 @@
 
     ; Find our destination square.
     (setv ahead (+ cr.pos d))
-    (setv path (ray ahead d self.hookshot-dist))
+    (setv path (ray-taxicab ahead d self.hookshot-dist))
     (block
       (for [p path]
         (when (. (Tile.at p) blocks-movement)
@@ -158,3 +158,14 @@
         (msgp cr "Bzzt! The door is no more.")
         (mset p (Floor)))
       (msgp cr "Your {} won't help with that." self)))))
+
+(def-itemtype Gadget "GPS device"
+  :gps-range 10
+  :gadget-effect (fn [self cr]
+
+    (when (player? cr)
+      (.use-time-and-charge self cr)
+      (for [p (disc-taxicab cr.pos self.gps-range)]
+        (setv (get G.seen-map p.x p.y) True))
+      (soil-fov)
+      (msg "{:The} reveals part of the dungeon around you." self))))
