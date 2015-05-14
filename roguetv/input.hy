@@ -83,6 +83,8 @@
       [(= key "a")
         :apply-item]
 
+      [(= key "W")
+        :make-wall]
       [(= key "R")
         :reset-level]))
 

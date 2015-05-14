@@ -6,7 +6,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [inventory-loop]]
-  [roguetv.map [Tile room-for?]]
+  [roguetv.map [Tile Wall room-for? mset]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
   [roguetv.display [draw-inventory describe-tile]])
@@ -98,6 +98,9 @@
         (ret))
       (setv item (get G.inventory i))
       (.applied item G.player))]
+
+    [(= cmd :make-wall) (when-debugging
+      (mset G.player.pos (Wall)))]
 
     [(= cmd :reset-level) (when-debugging
       (rtv mapgen.reset-level))]
