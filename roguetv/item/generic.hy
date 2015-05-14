@@ -53,6 +53,7 @@
   (defclass C [inherit] [])
   (setv (get G.itypes tid) C)
   (setv C.tid tid)
+  (setv C.__name__ (str (+ "itype:" tid)))
 
   (setv body (list body))
   (while body
