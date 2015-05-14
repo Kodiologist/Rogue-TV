@@ -55,6 +55,27 @@
     (not (. (Tile.at pos) blocks-movement))
     (not (.at mo-class pos))))
 
+(defn ray-taxicab [
+    start     ; Pos
+    direction ; Pos
+    length]   ; int
+  (setv l [start])
+  (for [_ (range (dec (if (in direction Pos.DIAGS) (// length 2) length)))]
+    (setv p (+ (get l -1) direction))
+    (unless (on-map p)
+      (break))
+    (.append l p))
+  l)
+
+(defn disc-taxicab [
+    center  ; Pos
+    radius] ; int
+  (list-comp (+ center (Pos dx dy))
+    [
+      dx (seq (- radius) radius)
+      dy (seq (- (abs dx) radius) (- radius (abs dx)))]
+    (on-map (+ center (Pos dx dy)))))
+
 (defclass Floor [Tile] [
   [char "."]])
 

@@ -32,22 +32,6 @@
 ; p should be a Pos.
   (+ (abs p.x) (abs p.y)))
 
-(defn ray-taxicab [
-    start     ; Pos
-    direction ; Pos
-    length]   ; int
-  (setv l [start])
-  (for [_ (range (dec (if (in direction Pos.DIAGS) (// length 2) length)))]
-    (.append l (+ (get l -1) direction)))
-  l)
-
-(defn disc-taxicab [
-    center  ; Pos
-    radius] ; int
-  (list-comp (+ center (Pos dx dy)) [
-    dx (seq (- radius) radius)
-    dy (seq (- (abs dx) radius) (- radius (abs dx)))]))
-
 (defn player? [cr]
   (is cr G.player))
 

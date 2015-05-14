@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door room-for? mset]]
+  [roguetv.map [Tile Floor Door room-for? mset ray-taxicab disc-taxicab]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]])
 
 (defclass Gadget [Item] [
