@@ -111,6 +111,26 @@
     (when (player? cr)
       (msg :tara "{p:He's} teleported to another part of the level.")))))
 
+(def-itemtype Gadget "warpback" :name "warpback machine"
+  ; Has an extra instance attribute .warpback-pos.
+  :on-reset-level (fn [self]
+    (setv self.warpback-pos None))
+
+  :gadget-effect (fn [self cr]
+
+    (if (getattr self "warpback_pos" None)
+      (do
+        (.use-time-and-charge self cr)
+        (if (room-for? (type cr) self.warpback-pos)
+          (do
+            (msgp cr "You reappear at {:the}'s registered location." self)
+            (.move cr self.warpback-pos)
+            (setv self.warpback-pos None))
+          (msgp cr "{:The} beeps at you accusingly." self)))
+      (do
+        (setv self.warpback-pos cr.pos)
+        (msgp cr "{:The} registers your current position." self)))))
+
 (def-itemtype Gadget "hookshot"
   :hookshot-dist 8
   :hookshot-travel-speed 2

@@ -38,7 +38,12 @@
   [applied (fn [self cr]
     ; This is triggered by, e.g., the :apply-item command.
     (msgp cr "You can't do anything special with {.definite_singular}."
-      (self.apparent-name)))]])
+      (self.apparent-name)))]
+
+  [on-reset-level (fn [self]
+    ; This is triggered when the level is reset for each item
+    ; in the player's inventory.
+    None)]])
 
 (defn def-itemtype [inherit tid &rest body]
 
