@@ -159,7 +159,7 @@
         (mset p (Floor)))
       (msgp cr "Your {} won't help with that." self)))))
 
-(def-itemtype Gadget "GPS device"
+(def-itemtype Gadget "gps" :name "GPS device"
   :gps-range 10
   :gadget-effect (fn [self cr]
 
