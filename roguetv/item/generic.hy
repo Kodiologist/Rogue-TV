@@ -50,22 +50,18 @@
   (when (in tid G.itypes)
     (raise (ValueError (.format "redeclared item type: {}" tid))))
 
-  (defclass C [inherit] [])
-  (setv (get G.itypes tid) C)
-  (setv C.tid tid)
-  (setv C.__name__ (str (+ "itype:" tid)))
+  (setv c (type (str (+ "itype:" tid)) (, inherit) (dict (amap
+    (let [[k (get body (* 2 it))] [v (get body (inc (* 2 it)))]]
+      (, (.replace (keyword->str k) "-" "_") v))
+    (range (// (len body) 2))))))
+  (setv (get G.itypes tid) c)
 
-  (setv body (list body))
-  (while body
-    (setattr C
-      (.replace (keyword->str (shift body)) "-" "_")
-      (shift body)))
+  (setv c.tid tid)
+  (when (none? c.name)
+    (setv c.name c.tid))
+  (setv c.name (NounPhrase c.name))
 
-  (when (none? C.name)
-    (setv C.name C.tid))
-  (setv C.name (NounPhrase C.name))
-
-  C)
+  c)
 
 (defclass ItemAppearance [NounPhraseNamed] [
 
