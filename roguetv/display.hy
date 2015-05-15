@@ -94,6 +94,13 @@
         (setv text (slice text (len t)))))
     (G.T.insstr text attr)))
 
+(defn full-redraw []
+  (G.T.erase)
+  (draw-status-line)
+  (draw-bottom-message-log)
+  (draw-map)
+  (G.T.refresh))
+
 (defn draw-inventory [prompt]
   (setv lines (+
     [[None prompt]]
@@ -111,13 +118,6 @@
     (when (> (len parts) 1)
       (echo-drawable item)
       (G.T.addstr (second parts)))))
-
-(defn full-redraw []
-  (G.T.erase)
-  (draw-status-line)
-  (draw-bottom-message-log)
-  (draw-map)
-  (G.T.refresh))
 
 (defn describe-tile [pos &optional verbose]
   (setv tile (Tile.at pos))
