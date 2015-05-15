@@ -112,6 +112,8 @@
       (msg :tara "{p:He's} teleported to another part of the level.")))))
 
 (def-itemtype Gadget "warpback" :name "warpback machine"
+  :__doc__ "It's pretty groovy."
+
   ; Has an extra instance attribute .warpback-pos.
   :on-reset-level (fn [self]
     (setv self.warpback-pos None))

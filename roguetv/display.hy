@@ -101,6 +101,14 @@
   (draw-map)
   (G.T.refresh))
 
+(defn draw-text-screen [text]
+  (G.T.erase)
+  (for [[i line] (enumerate (slice
+      (kwc textwrap.wrap text :width G.screen-width)
+      0 (dec G.screen-height)))]
+    (G.T.move i 0)
+    (G.T.insstr line)))
+
 (defn draw-inventory [prompt]
   (setv lines (+
     [[None prompt]]

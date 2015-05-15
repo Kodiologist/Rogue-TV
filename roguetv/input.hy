@@ -91,6 +91,17 @@
     (when inp
       (ret inp)))))
 
+(defn text-screen [text]
+
+  (rtv display.draw-text-screen text)
+  (G.T.refresh)
+
+  (while True
+    (when (in (G.T.getkey) cancel-keys)
+      (break)))
+
+  (rtv display.full-redraw))
+
 (defn inventory-loop [prompt &optional [select True]]
 
   (rtv display.draw-inventory prompt)

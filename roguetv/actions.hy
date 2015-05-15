@@ -5,7 +5,7 @@
   [kodhy.util [ret]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [inventory-loop]]
+  [roguetv.input [text-screen inventory-loop]]
   [roguetv.map [Tile Wall room-for? mset]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
@@ -47,10 +47,15 @@
     [(= cmd :use-tile)
       (.use-tile (Tile.at G.player.pos) G.player)]
 
-    [(= cmd :inventory) (do
-      (if G.inventory
-        (kwc inventory-loop :!select "You are carrying:")
-        (msg "Your inventory is empty.")))]
+    [(= cmd :inventory) (block
+      (unless G.inventory
+        (msg "Your inventory is empty.")
+        (ret))
+      (setv i (inventory-loop "You are carrying: (press a key to examine)"))
+      (when (none? i)
+        ; No item chosen to examine.
+        (ret))
+      (text-screen (. (get G.inventory i) __doc__)))]
 
     [(= cmd :pick-up) (do
       (setv item (Item.at G.player.pos))
