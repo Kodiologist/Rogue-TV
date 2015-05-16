@@ -13,6 +13,11 @@
   [appearance None]
     ; An ItemAppearance.
 
+  [info-unidentified "[Missing un-ID text]"]
+  [info-flavor "[Missing flavor text]"]
+  [info-apply None]
+  [info-carry None]
+
   [__init__ (fn [self &optional pos invlet]
     (MapObject.__init__ self pos)
     (set-self invlet)
@@ -21,6 +26,17 @@
   [set-appearance (classmethod (fn [self iapp]
     (setv self.appearance iapp)
     (setv self.color-fg iapp.color-fg)))]
+
+  [information (fn [self]
+    (setv s (.format "\n  {}\n\n{}"
+      (self.display-name)
+      (if (and self.appearance (not self.appearance.known))
+        self.info-unidentified
+        (.join "\n\n" (+
+          [self.info-flavor]
+          (if self.info-apply [(+ "Effect when applied: " self.info-apply)] [])
+          (if self.info-carry [(+ "Effect when carried: " self.info-carry)] []))))))
+    (apply .format [s] (. (type self) __dict__)))]
 
   [apparent-name (fn [self]
     (if (and self.appearance (not self.appearance.known))

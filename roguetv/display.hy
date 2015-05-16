@@ -103,10 +103,13 @@
 
 (defn draw-text-screen [text]
   (G.T.erase)
+  (setv w (- G.screen-width G.text-screen-left-margin))
   (for [[i line] (enumerate (slice
-      (kwc textwrap.wrap text :width G.screen-width)
+      (concat (amap
+        (if it (kwc textwrap.wrap it :width w) [""])
+        (.split text "\n")))
       0 (dec G.screen-height)))]
-    (G.T.move i 0)
+    (G.T.move i G.text-screen-left-margin)
     (G.T.insstr line)))
 
 (defn draw-inventory [prompt]

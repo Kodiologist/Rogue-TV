@@ -16,6 +16,8 @@
   [apply-time 1]
   [char "/"]
 
+  [info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges."]
+
   [__init__ (fn [self &optional charges &kwargs rest]
     (apply Item.__init__ [self] rest)
     (setv self.charges (if (none? charges) self.max-charges charges))
@@ -91,14 +93,20 @@
     (.set-appearance itype (randpop unused-appearances))))
 
 (def-itemtype Gadget "panic-button" :name "panic button"
+  :info-flavor "Press it if you expect to be particularly lucky in the future, or if you are particularly unlucky in the present."
   :teleport-tries 100
+
+  :info-apply "Teleports you to a random square elsewhere on the current dungeon level."
   :gadget-effect (fn [self cr] (block :gadget
 
     ; Find a place to teleport to.
     (block
       (for [_ (range self.teleport-tries)]
         (setv p-to (Pos (randrange G.map-width) (randrange G.map-height)))
-        (when (and (room-for? (type cr) p-to) (instance? Floor (Tile.at p-to)))
+        (when (and
+            (!= p-to cr.pos)
+            (room-for? (type cr) p-to)
+            (instance? Floor (Tile.at p-to)))
           (ret)))
       ; We failed to find a legal square.
       (.use-time-and-charge self cr)
@@ -112,12 +120,13 @@
       (msg :tara "{p:He's} teleported to another part of the level.")))))
 
 (def-itemtype Gadget "warpback" :name "warpback machine"
-  :__doc__ "It's pretty groovy."
-
   ; Has an extra instance attribute .warpback-pos.
+  :info-flavor "It's deja vu all over again."
+
   :on-reset-level (fn [self]
     (setv self.warpback-pos None))
 
+  :info-apply "Use it once to register a warpback point (for you, sir, no charge). Use it again to teleport back to the warpback point. This will clear the warpback point, as will going to another dungeon level."
   :gadget-effect (fn [self cr]
 
     (if (getattr self "warpback_pos" None)
@@ -134,8 +143,11 @@
         (msgp cr "{:The} registers your current position." self)))))
 
 (def-itemtype Gadget "hookshot"
+  :info-flavor "Arfer's law of game design: any video game is improved by the addition of a grappling hook."
   :hookshot-dist 8
   :hookshot-travel-speed 2
+
+  :info-apply "Fire it at a solid obstacle up to {hookshot_dist} squares away to get yourself over there. Travel by hookshot is twice as fast as travel by foot, and you'll pass over unpleasant terrain along the way. Creatures will block the hookshot."
   :gadget-effect (fn [self cr] (block :gadget
 
     (setv d (or (input-direction) (ret)))
@@ -168,6 +180,9 @@
     (msg "{:The} pulls you ahead." self))))
 
 (def-itemtype Gadget "chainsaw"
+  :info-flavor "Just what you need to kickstart a lucrative career in lumberjacking after winning gobs of dosh on Rogue TV. Or you could sell it for an additional gob of dosh. Whatever; I don't judge."
+
+  :info-apply "Instantly destroys an adjacent door."
   :gadget-effect (fn [self cr] (block
 
     (setv d (or (input-direction) (ret)))
@@ -182,7 +197,10 @@
       (msgp cr "Your {} won't help with that." self)))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
+  :info-flavor "They say it's unwise to use a GPS device as your only means of navigation in an unfamiliar area, but it's not as if you have lots of better options in a dungeon."
   :gps-range 10
+
+  :info-apply "Reveals the map in a radius of {gps_range} squares around you."
   :gadget-effect (fn [self cr]
 
     (when (player? cr)

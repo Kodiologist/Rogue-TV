@@ -55,7 +55,7 @@
       (when (none? i)
         ; No item chosen to examine.
         (ret))
-      (text-screen (. (get G.inventory i) __doc__)))]
+      (text-screen (.information (get G.inventory i))))]
 
     [(= cmd :pick-up) (do
       (setv item (Item.at G.player.pos))

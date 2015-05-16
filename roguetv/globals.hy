@@ -12,6 +12,7 @@
 (def inventory-limit 10)
 
 (def message-lines 3)
+(def text-screen-left-margin 1)
 
 (def fg-color :black)
 (def bg-color :white)
