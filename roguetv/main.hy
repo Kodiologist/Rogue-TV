@@ -21,9 +21,10 @@
 
   (roguetv.item.gadget.randomize-appearances)
 
-  (setv G.player (Player :female))
-      ; Prefer :female for testing so it's easier to spot cases
-      ; where I mistakenly wrote, e.g., "he" instead of "{p:he}".
+  (setv G.player (Player))
+  (setv Player.gender :female)
+    ; Prefer :female for testing so it's easier to spot cases
+    ; where I mistakenly wrote, e.g., "he" instead of "{p:he}".
   (setv Player.name (NounPhrase "contestant"))
           ;(kwc NounPhrase "Josephine" :+proper))
 

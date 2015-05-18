@@ -107,3 +107,18 @@
         self.name.definite-singular]
       [(= formatstr "The")
         (ucfirst self.name.definite-singular)]))]])
+
+(defclass TakesPronouns [NounPhraseNamed] [
+  [gender :neuter]
+  [plural False]
+
+  [__format__ (fn [self formatstr]
+    (or (NounPhraseNamed.__format__ self formatstr) (cond
+      [(in formatstr pronoun-bases)
+        (kwc pronoun formatstr
+          :gender self.gender
+          :plural self.plural)]
+      [(.startswith formatstr "v:")
+        (kwc verb (slice formatstr (len "v:"))
+          :gender self.gender
+          :plural self.plural)])))]])
