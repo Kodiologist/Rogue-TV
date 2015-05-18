@@ -55,3 +55,13 @@
   [move (fn [self &rest args]
     (apply .move (+ (, (super Player self)) args))
     (soil-fov))]])
+
+(defclass Cat [Creature] [
+  [name (english.NounPhrase "cat")]
+  [char "f"]
+  [color-fg :dark-orange]])
+
+(defclass Dog [Creature] [
+  [name (english.NounPhrase "dog")]
+  [char "d"]
+  [color-fg :brown]])

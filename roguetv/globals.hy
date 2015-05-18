@@ -38,6 +38,8 @@
   :dark-blue 18
   :pale-azure 117
   :yellow 226
+  :orange 208
+  :dark-orange 166
   :brown 94})
 
 ;; * Declarations
