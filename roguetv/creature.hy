@@ -38,8 +38,8 @@
   [char "@"]
   [color-bg :yellow]
 
-  [move (fn [self &rest args]
-    (apply .move (+ (, (super Player self)) args))
+  [move (fn [self p-to &optional [clobber False]]
+    (.move (super Player self) p-to clobber)
     (soil-fov))]])
 
 (defclass Cat [Creature] [

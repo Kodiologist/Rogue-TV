@@ -42,6 +42,8 @@
   :dark-orange 166
   :brown 94})
 
+(setv push-past-monster-time 1)
+
 ;; * Declarations
 
 (def bottom-border (+ message-lines 1))
