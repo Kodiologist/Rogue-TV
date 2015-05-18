@@ -6,13 +6,14 @@
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject]])
 
-(defclass Creature [Drawable MapObject] [
+(defclass Creature [Drawable MapObject english.NounPhraseNamed] [
   [extant []]
   [char "C"]
+  [plural False]
 
-  [__init__ (fn [self name &optional [gender :neuter] [plural False] pos]
+  [__init__ (fn [self &optional [gender :neuter] pos]
     (MapObject.__init__ self pos)
-    (set-self name gender plural)
+    (set-self gender)
     (setv self.female (= gender :female))
     (setv self.clock-debt-ms 0)
     (self.reset-ice-slipping)
@@ -20,9 +21,7 @@
     None)]
 
   [__format__ (fn [self formatstr]
-    (cond
-      [(= formatstr "name")
-        self.name]
+    (or (english.NounPhraseNamed.__format__ self formatstr) (cond
       [(in formatstr english.pronoun-bases)
         (kwc english.pronoun formatstr
           :gender self.gender
@@ -30,7 +29,7 @@
       [(.startswith formatstr "v:")
         (kwc english.verb (slice formatstr (len "v:"))
           :gender self.gender
-          :plural self.plural)]))]
+          :plural self.plural)])))]
 
   [reset-ice-slipping (fn [self]
     (setv self.ice-slip-time 0)

@@ -63,7 +63,7 @@
         (msg "There's nothing here to pick up.")
         (ret))
       (when (= (len G.inventory) G.inventory-limit)
-        (msg :tara "{p:name} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
+        (msg :tara "{p:The} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
           G.inventory-limit)
         (ret))
       (G.player.take-time 1)

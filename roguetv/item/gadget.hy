@@ -161,14 +161,14 @@
           (ret))
         (whenn (.at cr p)
           (.use-time-and-charge self cr)
-          (msgp cr :tara "{p:name}'s {} bounces off {}."
+          (msgp cr :tara "{p:The}'s {} bounces off {:the}."
             self it)
           (retf :gadget)))
       (msg "Your {} can only reach objects up to {} squares away."
         self self.hookshot-dist)
       (retf :gadget))
     (when (= p ahead)
-      (msg :tara "It looks like {p:name}'s {} isn't very useful at that range."
+      (msg :tara "It looks like {p:the}'s {} isn't very useful at that range."
         self)
       (retf :gadget))
     (setv p-to (- p d))

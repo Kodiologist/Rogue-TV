@@ -4,6 +4,7 @@
   os
   curses
   [heidegger.pos [Pos]]
+  [roguetv.english [NounPhrase]]
   [roguetv.strings :as strings]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -20,10 +21,11 @@
 
   (roguetv.item.gadget.randomize-appearances)
 
-  (setv G.player (kwc Player
-    :name "Josephine" :gender :female))
+  (setv G.player (Player :female))
       ; Prefer :female for testing so it's easier to spot cases
       ; where I mistakenly wrote, e.g., "he" instead of "{p:he}".
+  (setv Player.name (NounPhrase "contestant"))
+          ;(kwc NounPhrase "Josephine" :+proper))
 
   (setv G.dungeon-level 1)
   (reset-level))
@@ -59,7 +61,7 @@
         (+= G.current-time skip)
         (-= G.player.clock-debt-ms (* skip Creature.clock-factor))
         (when (and G.time-limit (>= G.current-time G.time-limit))
-          (msg :tara "Alas! {p.name} has run out of time.")
+          (msg :tara "Alas! {p:The} has run out of time.")
           (msg :bob (pick strings.bob-too-bad))
           (setv G.time-limit None)
           (setv G.endgame :out-of-time)))

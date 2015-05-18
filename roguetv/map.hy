@@ -96,7 +96,7 @@
 
   [use-tile (fn [self cr]
     (when (player? cr)
-      (msg :tara "It looks like {p:name} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
+      (msg :tara "It looks like {p:the} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
       (when (y-or-n "Take the elevator up?" :+require-uppercase)
         (setv G.endgame :used-up-elevator))))]])
 
