@@ -31,9 +31,8 @@
     None)]
 
   [step-out-of (fn [self cr p-to]
-    ; A creature has tried to step out of this tile. Return True
-    ; if it can.
-    True)]])
+    ; A creature is stepping out of this tile.
+    None)]])
 
 (defn mset [pos tile]
   (kwc .move tile pos :+clobber)
@@ -140,8 +139,7 @@
     None)]
 
   [step-out-of (fn [self cr p-to]
-    (cr.take-time (randint 1 self.max-exit-time))
-    True)]])
+    (cr.take-time (randint 1 self.max-exit-time)))]])
 
 (defclass Web [Tile] [
   [description "a spiderweb"]
@@ -156,8 +154,7 @@
   [step-out-of (fn [self cr p-to]
     (msgp cr "You tear through the web.")
     (cr.take-time self.tear-time)
-    (mset self.pos (Floor))
-    True)]])
+    (mset self.pos (Floor)))]])
 
 (defclass Ice [Tile] [
   [description "a patch of ice"]
@@ -179,5 +176,4 @@
     ; If the creature moves in the same direction it moved to
     ; get here, it doesn't slip.
     (when (= (- p-to self.pos) cr.ice-slip-towards)
-      (cr.reset-ice-slipping))
-    True)]])
+      (cr.reset-ice-slipping)))]])
