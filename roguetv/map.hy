@@ -123,7 +123,7 @@
     None)]
 
   [bump-into (fn [self cr]
-    (msgp "You open the old door after a struggle.")
+    (msgp cr "You open the old door after a struggle.")
     (cr.take-time self.open-time)
     (mset self.pos (Floor))
     False)]])
