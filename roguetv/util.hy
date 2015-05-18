@@ -1,7 +1,7 @@
 (import
   random
-  [kodhy.util [seq]]
   [heidegger.pos [Pos]]
+  [kodhy.util [seq]]
   [roguetv.globals :as G])
 
 (defn chance [x]

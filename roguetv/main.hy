@@ -4,8 +4,8 @@
   os
   curses
   [heidegger.pos [Pos]]
-  [roguetv.english [NounPhrase]]
   [roguetv.strings :as strings]
+  [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [hit-key-to-continue get-normal-command]]
