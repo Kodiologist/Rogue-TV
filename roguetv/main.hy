@@ -57,15 +57,19 @@
         (- G.player.clock-debt-ms old-clock-debt)
         Creature.clock-factor))
 
-      (when (>= G.player.clock-debt-ms Creature.clock-factor)
-        (setv skip (int (/ G.player.clock-debt-ms Creature.clock-factor)))
-        (+= G.current-time skip)
-        (-= G.player.clock-debt-ms (* skip Creature.clock-factor))
+      (while (>= G.player.clock-debt-ms Creature.clock-factor)
+        (for [cr Creature.extant]
+          (while (< cr.clock-debt-ms Creature.clock-factor)
+            (cr.act)))
+        (+= G.current-time 1)
         (when (and G.time-limit (>= G.current-time G.time-limit))
           (msg :tara "Alas! {p:The} has run out of time.")
           (msg :bob (pick strings.bob-too-bad))
           (setv G.time-limit None)
-          (setv G.endgame :out-of-time)))
+          (setv G.endgame :out-of-time))
+        (for [cr Creature.extant]
+          (-= cr.clock-debt-ms Creature.clock-factor)
+          (assert (>= cr.clock-debt-ms 0))))
 
       (when G.endgame
         (msg "Game over. Press Escape to quit.")
