@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  [heidegger.pos [Pos]]
   [kodhy.util [ret]]
   [roguetv.english [TakesPronouns NounPhrase]]
   [roguetv.globals :as G]
@@ -50,7 +51,20 @@
     (.move (super Player self) p-to clobber)
     (soil-fov))]])
 
-(import [heidegger.pos [Pos]])
+(defn clear-neighbors [pos]
+  (filt (room-for? Creature it)
+    (amap (+ pos it) Pos.DIR8)))
+
+(defn wander [cr] (block
+  ; Try to step in a random direction. Return a boolean indicating
+  ; whether we succeeded.
+  (setv neighbors (clear-neighbors cr.pos))
+  (unless neighbors
+    (ret False))
+  (setv p-to (pick neighbors))
+  (.take-time cr (len-taxicab (- p-to cr.pos)))
+  (.move cr p-to)
+  True))
 
 (defclass Cat [Creature] [
   [name (NounPhrase "cat")]
@@ -62,21 +76,31 @@
   [act (fn [self] (block
     ; Usually just sit there. Occasionally, wander in a random
     ; direction.
-    (when (chance self.move-chance)
-      (setv neighbors (filt
-        (room-for? Creature it)
-        (amap (+ self.pos it) Pos.DIR8)))
-      (when neighbors
-        (setv p-to (pick neighbors))
-        (.take-time self (len-taxicab (- p-to self.pos)))
-        (.move self p-to)
-        (ret)))
-    (.take-time self 1)))]])
+    (unless (and (chance self.move-chance) (wander self))
+      (.take-time self 1))))]])
 
 (defclass Dog [Creature] [
   [name (NounPhrase "dog")]
   [char "d"]
   [color-fg :brown]
 
+  [detect-player-range 8]
+
   [act (fn [self]
-    (.take-time self 1))]])
+    (if (<= (len-taxicab (- self.pos G.player.pos)) self.detect-player-range)
+      ; If the player is close, try to chase after them, not very
+      ; intelligently.
+      (do
+        (setv neighbors (kwc sorted
+          (shuffle (clear-neighbors self.pos))
+          :key (λ (len-taxicab (- it G.player.pos)))))
+        (if (and neighbors (<
+            (len-taxicab (- (first neighbors) G.player.pos))
+            (len-taxicab (- self.pos G.player.pos))))
+          (do
+            (setv p-to (first neighbors))
+            (.take-time self (len-taxicab (- self.pos p-to)))
+            (.move self p-to))
+          (.take-time self 1)))
+      ; Otherwise, wander.
+      (or (wander self) (.take-time self 1))))]])
