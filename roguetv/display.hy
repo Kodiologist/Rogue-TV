@@ -143,5 +143,5 @@
     [verbose
       (if (instance? Floor tile)
         (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
-          (if G.player.female "dowdy" "cull"))
+          (if (G.player.female) "dowdy" "cull"))
         (msg "There is {} here." tile.description))]))

@@ -121,4 +121,7 @@
       [(.startswith formatstr "v:")
         (kwc verb (slice formatstr (len "v:"))
           :gender self.gender
-          :plural self.plural)])))]])
+          :plural self.plural)])))]
+
+  [female (fn [self]
+    (= self.gender :female))]])
