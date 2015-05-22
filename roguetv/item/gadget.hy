@@ -209,3 +209,6 @@
         (setv (get G.seen-map p.x p.y) True))
       (soil-fov)
       (msg "{:The} reveals part of the dungeon around you." self))))
+
+(assert (>= (len appearances)
+  (len (filt (instance? Gadget it) (.values G.itypes)))))
