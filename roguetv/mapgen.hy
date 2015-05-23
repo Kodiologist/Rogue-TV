@@ -16,6 +16,7 @@
   (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
+  (setv Creature.extant [G.player])
   ; Now that we're on a new level, the positions of old
   ; MapObjects are invalid. But that's okay because there's no
   ; way to refer to old MapObjects anymore, either (except for
