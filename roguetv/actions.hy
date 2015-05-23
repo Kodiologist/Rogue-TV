@@ -6,7 +6,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [text-screen inventory-loop]]
-  [roguetv.map [Tile Wall on-map mset room-for?]]
+  [roguetv.map [Tile Wall mset room-for?]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
   [roguetv.display [draw-inventory describe-tile]])
@@ -29,23 +29,7 @@
       :quit-game]
 
     [(= cmd :move)
-      (let [[p-from G.player.pos] [p-to (+ p-from arg)]]
-        (unless (and
-            (on-map p-to)
-            (.bump-into (Tile.at p-to) G.player)
-            (not (. (Tile.at p-to) blocks-movement)))
-          (ret))
-        (setv cr (Creature.at p-to))
-        (when cr
-          (G.player.take-time G.push-past-monster-time)
-          (msg "You push past {:the}." cr))
-        (.step-out-of (Tile.at p-from) G.player p-to)
-        (G.player.take-time (len-taxi arg))
-        (kwc .move G.player p-to :+clobber)
-        (when cr
-          (.move cr p-from))
-        (describe-tile G.player.pos)
-        (.after-step-onto (Tile.at p-to) G.player p-from))]
+      (.walk-to G.player (+ G.player.pos arg))]
 
     [(= cmd :examine-ground) (do
       (kwc describe-tile G.player.pos :+verbose))]

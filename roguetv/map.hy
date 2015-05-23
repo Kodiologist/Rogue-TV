@@ -126,11 +126,13 @@
     (set-self open-time)
     None)]
 
-  [bump-into (fn [self cr]
+  [bump-into (fn [self cr] (block
+    (unless cr.can-open-doors
+      (ret True))
     (msgp cr "You open the old door after a struggle.")
     (cr.take-time self.open-time)
     (mset self.pos (Floor))
-    False)]])
+    False))]])
 
 (defclass Mud [Tile] [
   [description "a pit full of mud"]
