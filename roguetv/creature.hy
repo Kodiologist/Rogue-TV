@@ -38,11 +38,14 @@
         (self.reset-ice-slipping)
         (.take-time self slip-time))))]
 
+  [wait (fn [self]
+    (.take-time self 1))]
+
   [act (fn [self]
     ; It's this creature's turn to act. Go wild, calling
     ; .take-time as needed.
     (msg "[No .act implemented for {}]" self)
-    (.take-time self 1))]])
+    (.wait self))]])
 
 (defclass Player [Creature] [
   [char "@"]
@@ -89,7 +92,7 @@
     ; Usually just sit there. Occasionally, wander in a random
     ; direction.
     (unless (and (chance self.move-chance) (wander self))
-      (.take-time self 1))))]])
+      (.wait self))))]])
 
 (defclass Dog [Creature] [
   [name (NounPhrase "dog")]
@@ -107,7 +110,7 @@
         ; We're adjacent.
         ; If we're orthogonally adjacent, just stay here.
         (when (= (len-taxi d) 1)
-          (.take-time self 1)
+          (.wait self)
           (ret))
         ; Otherwise, we're diagonally adjacent. If possible, move
         ; to be orthogonally adjacent. (In taxicab geometry,
@@ -119,7 +122,7 @@
             (.move self p-to)
             (ret)))
         ; Otherwise, chill out.
-        (.take-time self 1)
+        (.wait self)
         (ret))
       ; If we have a path to the player, use it.
       (setv path (find-path self.pos G.player.pos self.detect-player-range))
@@ -128,4 +131,4 @@
         (.move self (first path))
         (ret)))
     ; Otherwise, wander.
-    (or (wander self) (.take-time self 1))))]])
+    (or (wander self) (.wait self))))]])
