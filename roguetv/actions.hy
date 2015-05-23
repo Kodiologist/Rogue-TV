@@ -40,7 +40,7 @@
           (G.player.take-time G.push-past-monster-time)
           (msg "You push past {:the}." cr))
         (.step-out-of (Tile.at p-from) G.player p-to)
-        (G.player.take-time (len-taxicab arg))
+        (G.player.take-time (len-taxi arg))
         (kwc .move G.player p-to :+clobber)
         (when cr
           (.move cr p-from))

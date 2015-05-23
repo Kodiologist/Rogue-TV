@@ -54,7 +54,7 @@
     (not (. (Tile.at pos) blocks-movement))
     (not (.at mo-class pos))))
 
-(defn ray-taxicab [
+(defn ray-taxi [
     start     ; Pos
     direction ; Pos
     length]   ; int
@@ -69,7 +69,7 @@
     (.append l p))
   l)
 
-(defn disc-taxicab [
+(defn disc-taxi [
     center  ; Pos
     radius] ; int
   ; Produces a list of Pos. In taxicab geometry, a disc is a square

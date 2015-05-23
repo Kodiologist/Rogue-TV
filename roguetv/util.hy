@@ -29,13 +29,13 @@
   (setv x (round number ndigits))
   (string (if (= x (int x)) (int x) x)))
 
-(defn len-taxicab [p]
+(defn len-taxi [p]
   ; The length of a vector according to the taxicab norm (1-norm).
   ; So Pos.ORTHS have length 1 and Pos.DIAGS have length 2.
   ; In Rogue TV, taxicab geometry is the rule.
   (+ (abs p.x) (abs p.y)))
-(defn dist-taxicab [p1 p2]
-  (len-taxicab (- p1 p2)))
+(defn dist-taxi [p1 p2]
+  (len-taxi (- p1 p2)))
 
 (defn len-euclid [p]
   ; The length of a vector according to the Euclidean norm (2-norm).

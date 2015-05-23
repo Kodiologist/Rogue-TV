@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door room-for? mset ray-taxicab disc-taxicab]]
+  [roguetv.map [Tile Floor Door room-for? mset ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]])
 
 (defclass Gadget [Item] [
@@ -154,7 +154,7 @@
 
     ; Find our destination square.
     (setv ahead (+ cr.pos d))
-    (setv path (ray-taxicab ahead d self.hookshot-dist))
+    (setv path (ray-taxi ahead d self.hookshot-dist))
     (block
       (for [p path]
         (when (. (Tile.at p) blocks-movement)
@@ -175,7 +175,7 @@
 
     ; And away we go.
     (.use-time-and-charge self cr)
-    (.take-time cr (/ (len-taxicab (- p-to cr.pos)) self.hookshot-travel-speed))
+    (.take-time cr (/ (len-taxi (- p-to cr.pos)) self.hookshot-travel-speed))
     (.move cr p-to)
     (msg "{:The} pulls you ahead." self))))
 
@@ -205,7 +205,7 @@
 
     (when (player? cr)
       (.use-time-and-charge self cr)
-      (for [p (disc-taxicab cr.pos self.gps-range)]
+      (for [p (disc-taxi cr.pos self.gps-range)]
         (setv (get G.seen-map p.x p.y) True))
       (soil-fov)
       (msg "{:The} reveals part of the dungeon around you." self))))

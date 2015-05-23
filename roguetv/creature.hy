@@ -63,7 +63,7 @@
   (unless neighbors
     (ret False))
   (setv p-to (pick neighbors))
-  (.take-time cr (len-taxicab (- p-to cr.pos)))
+  (.take-time cr (len-taxi (- p-to cr.pos)))
   (.move cr p-to)
   True))
 
@@ -75,7 +75,7 @@
       ; This is the heuristic. Because the 2-norm ≤ the 1-norm,
       ; Euclidean distance is an admissible heuristic for taxicab
       ; geometry.
-    :cost dist-taxicab))
+    :cost dist-taxi))
   (slice (second (searcher p-from p-to max-cost)) 1))
 
 (defclass Cat [Creature] [
@@ -102,11 +102,11 @@
     ; If the player is close, try to chase after them, not very
     ; intelligently.
     (setv d (- G.player.pos self.pos))
-    (when (<= (len-taxicab d) self.detect-player-range)
+    (when (<= (len-taxi d) self.detect-player-range)
       (when (= (len-cheb d) 1)
         ; We're adjacent.
         ; If we're orthogonally adjacent, just stay here.
-        (when (= (len-taxicab d) 1)
+        (when (= (len-taxi d) 1)
           (.take-time self 1)
           (ret))
         ; Otherwise, we're diagonally adjacent. If possible, move
@@ -115,7 +115,7 @@
         (for [part (shuffle [(Pos d.x 0) (Pos 0 d.y)])]
           (setv p-to (+ part self.pos))
           (when (room-for? Creature p-to)
-            (.take-time self (dist-taxicab self.pos p-to))
+            (.take-time self (dist-taxi self.pos p-to))
             (.move self p-to)
             (ret)))
         ; Otherwise, chill out.
@@ -124,7 +124,7 @@
       ; If we have a path to the player, use it.
       (setv path (find-path self.pos G.player.pos self.detect-player-range))
       (when (len path)
-        (.take-time self (dist-taxicab self.pos (first path)))
+        (.take-time self (dist-taxi self.pos (first path)))
         (.move self (first path))
         (ret)))
     ; Otherwise, wander.
