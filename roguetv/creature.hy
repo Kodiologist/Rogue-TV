@@ -110,7 +110,8 @@
           (.take-time self 1)
           (ret))
         ; Otherwise, we're diagonally adjacent. If possible, move
-        ; to be orthogonally adjacent.
+        ; to be orthogonally adjacent. (In taxicab geometry,
+        ; orthogonal is closer than diagonal.)
         (for [part (shuffle [(Pos d.x 0) (Pos 0 d.y)])]
           (setv p-to (+ part self.pos))
           (when (room-for? Creature p-to)

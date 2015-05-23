@@ -58,6 +58,9 @@
     start     ; Pos
     direction ; Pos
     length]   ; int
+  ; Produces a list of Pos. `direction` should be in Pos.DIR8.
+  ; If `direction` is orthogonal, you get `length` elements.
+  ; Otherwise, you get `length`/2 elements (rounded down).
   (setv l [start])
   (for [_ (range (dec (if (in direction Pos.DIAGS) (// length 2) length)))]
     (setv p (+ (get l -1) direction))
@@ -69,6 +72,8 @@
 (defn disc-taxicab [
     center  ; Pos
     radius] ; int
+  ; Produces a list of Pos. In taxicab geometry, a disc is a square
+  ; sitting on one of its vertices.
   (list-comp (+ center (Pos dx dy))
     [
       dx (seq (- radius) radius)
