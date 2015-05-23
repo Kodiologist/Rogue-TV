@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  pypaths.astar
   [heidegger.pos [Pos]]
   [kodhy.util [ret]]
   [roguetv.english [TakesPronouns NounPhrase]]
@@ -66,6 +67,17 @@
   (.move cr p-to)
   True))
 
+(defn find-path [p-from p-to &optional [max-cost (int 1e6)]]
+  (setv searcher (kwc pypaths.astar.pathfinder
+    :neighbors (fn [p] (+ (clear-neighbors p)
+      (if (adjacent? p p-to) [p-to] [])))
+    :distance dist-euclid
+      ; This is the heuristic. Because the 2-norm ≤ the 1-norm,
+      ; Euclidean distance is an admissible heuristic for taxicab
+      ; geometry.
+    :cost dist-taxicab))
+  (slice (second (searcher p-from p-to max-cost)) 1))
+
 (defclass Cat [Creature] [
   [name (NounPhrase "cat")]
   [char "f"]
@@ -84,23 +96,35 @@
   [char "d"]
   [color-fg :brown]
 
-  [detect-player-range 8]
+  [detect-player-range 12]
 
-  [act (fn [self]
-    (if (<= (len-taxicab (- self.pos G.player.pos)) self.detect-player-range)
-      ; If the player is close, try to chase after them, not very
-      ; intelligently.
-      (do
-        (setv neighbors (kwc sorted
-          (shuffle (clear-neighbors self.pos))
-          :key (λ (len-taxicab (- it G.player.pos)))))
-        (if (and neighbors (<
-            (len-taxicab (- (first neighbors) G.player.pos))
-            (len-taxicab (- self.pos G.player.pos))))
-          (do
-            (setv p-to (first neighbors))
-            (.take-time self (len-taxicab (- self.pos p-to)))
-            (.move self p-to))
-          (.take-time self 1)))
-      ; Otherwise, wander.
-      (or (wander self) (.take-time self 1))))]])
+  [act (fn [self] (block
+    ; If the player is close, try to chase after them, not very
+    ; intelligently.
+    (setv d (- G.player.pos self.pos))
+    (when (<= (len-taxicab d) self.detect-player-range)
+      (when (= (len-cheb d) 1)
+        ; We're adjacent.
+        ; If we're orthogonally adjacent, just stay here.
+        (when (= (len-taxicab d) 1)
+          (.take-time self 1)
+          (ret))
+        ; Otherwise, we're diagonally adjacent. If possible, move
+        ; to be orthogonally adjacent.
+        (for [part (shuffle [(Pos d.x 0) (Pos 0 d.y)])]
+          (setv p-to (+ part self.pos))
+          (when (room-for? Creature p-to)
+            (.take-time self (dist-taxicab self.pos p-to))
+            (.move self p-to)
+            (ret)))
+        ; Otherwise, chill out.
+        (.take-time self 1)
+        (ret))
+      ; If we have a path to the player, use it.
+      (setv path (find-path self.pos G.player.pos self.detect-player-range))
+      (when (len path)
+        (.take-time self (dist-taxicab self.pos (first path)))
+        (.move self (first path))
+        (ret)))
+    ; Otherwise, wander.
+    (or (wander self) (.take-time self 1))))]])

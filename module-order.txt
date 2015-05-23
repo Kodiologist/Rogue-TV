@@ -1,5 +1,6 @@
 inflect
 libtcod
+pypaths
 
 heidegger.pos
 heidegger.digger

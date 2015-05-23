@@ -1,4 +1,5 @@
 (import
+  [math [sqrt]]
   random
   [heidegger.pos [Pos]]
   [kodhy.util [seq]]
@@ -29,8 +30,27 @@
   (string (if (= x (int x)) (int x) x)))
 
 (defn len-taxicab [p]
-; p should be a Pos.
+  ; p should be a Pos.
   (+ (abs p.x) (abs p.y)))
+
+(defn dist-taxicab [p1 p2]
+  (len-taxicab (- p1 p2)))
+
+(defn len-euclid [p]
+  (sqrt (+ (** p.x 2) (** p.y 2))))
+
+(defn dist-euclid [p1 p2]
+  (len-euclid (- p1 p2)))
+
+(defn len-cheb [p]
+  ; Chebyshev metric
+  (max (abs p.x) (abs p.y)))
+
+(defn dist-cheb [p1 p2]
+  (len-cheb (- p1 p2)))
+
+(defn adjacent? [p1 p2]
+  (= (dist-cheb p1 p2) 1))
 
 (defn player? [cr]
   (is cr G.player))
