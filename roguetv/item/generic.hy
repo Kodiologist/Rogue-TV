@@ -51,9 +51,9 @@
       self.invlet
       (self.display-name)))]
 
-  [applied (fn [self cr]
-    ; This is triggered by, e.g., the :apply-item command.
-    (msgp cr "You can't do anything special with {.definite_singular}."
+  [applied (fn [self]
+    ; This is triggered when the player uses the :apply-item command.
+    (msg "You can't do anything special with {.definite_singular}."
       (self.apparent-name)))]
 
   [on-reset-level (fn [self]

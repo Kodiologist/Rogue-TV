@@ -92,7 +92,7 @@
         ; Action canceled.
         (ret))
       (setv item (get G.inventory i))
-      (.applied item G.player))]
+      (.applied item))]
 
     [(= cmd :make-wall) (when-debugging
       (mset G.player.pos (Wall)))]
