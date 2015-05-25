@@ -12,6 +12,9 @@
   [description None]
   [blocks-movement False]
   [blocks-sight False]
+  [unpleasant False]
+    ; `unpleasant` is a flag meaning that monsters tend not to
+    ; want to be in this kind of tile.
 
   [use-tile (fn [self cr]
     ; A creature has tried to do something with this tile. (For
@@ -140,6 +143,8 @@
   [color-fg :white]
   [color-bg :brown]
 
+  [unpleasant True]
+
   [__init__ (fn [self &optional max-exit-time]
     (.__init__ (super Mud self))
     (set-self max-exit-time)
@@ -152,6 +157,8 @@
   [description "a spiderweb"]
   [char "%"]
   [color-fg :dark-blue]
+
+  [unpleasant True]
 
   [__init__ (fn [self &optional tear-time]
     (.__init__ (super Web self))
@@ -168,6 +175,8 @@
   [char ":"]
   [color-fg :white]
   [color-bg :pale-azure]
+
+  [unpleasant True]
 
   [__init__ (fn [self &optional max-slip-time]
     (.__init__ (super Ice self))

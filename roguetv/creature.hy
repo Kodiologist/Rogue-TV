@@ -96,10 +96,10 @@
   (filt (room-for? Creature it)
     (amap (+ pos it) Pos.DIR8)))
 
-(defn wander [cr] (block
+(defn wander [cr &optional [okay? (λ True)]] (block
   ; Try to step in a random direction. Return a boolean indicating
   ; whether we succeeded.
-  (setv neighbors (clear-neighbors cr.pos))
+  (setv neighbors (filt (okay? it) (clear-neighbors cr.pos)))
   (unless neighbors
     (ret False))
   (setv p-to (pick neighbors))
@@ -126,8 +126,12 @@
 
   [act (fn [self] (block
     ; Usually just sit there. Occasionally, wander in a random
-    ; direction.
-    (unless (and (chance self.move-chance) (wander self))
+    ; direction. Avoid unpleasant tiles.
+    (unless (and
+        (or (. (Tile.at self.pos) unpleasant)
+          (chance self.move-chance))
+        (or (wander self (λ (not (. (Tile.at it) unpleasant))))
+          (wander self)))
       (.wait self))))]])
 
 (defclass Dog [Monster] [
