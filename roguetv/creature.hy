@@ -83,7 +83,15 @@
 
   [move (fn [self p-to &optional [clobber False]]
     (.move (super Player self) p-to clobber)
-    (soil-fov))]])
+    (soil-fov))]
+
+  [act (fn [self]
+    (rtv display.full-redraw)
+    (setv old-clock-debt G.player.clock-debt-ms)
+    (rtv actions.do-normal-command (rtv input.get-normal-command))
+    (setv G.last-action-duration (/
+      (- G.player.clock-debt-ms old-clock-debt)
+      Creature.clock-factor)))]])
 
 (defclass Monster [Creature] [
   ; A class for all non-player creatures.

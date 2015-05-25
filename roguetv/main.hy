@@ -31,7 +31,7 @@
   (setv G.dungeon-level 1)
   (reset-level))
 
-(defn main-loop []
+(defn main-loop [] (block :main-loop
 
   (unless (in "ESCDELAY" os.environ)
     (setv (get os.environ "ESCDELAY") "10"))
@@ -48,31 +48,23 @@
     (describe-tile G.player.pos)
 
     (while True
-      (full-redraw)
 
-      (setv old-clock-debt G.player.clock-debt-ms)
-      (when (= (do-normal-command (get-normal-command)) :quit-game)
-        (break))
-      (setv G.last-action-duration (/
-        (- G.player.clock-debt-ms old-clock-debt)
-        Creature.clock-factor))
+      (for [cr Creature.extant]
+        (while (< cr.clock-debt-ms Creature.clock-factor)
+          (cr.act)))
+      (+= G.current-time 1)
+      (for [cr Creature.extant]
+        (-= cr.clock-debt-ms Creature.clock-factor)
+        (assert (>= cr.clock-debt-ms 0)))
 
-      (while (>= G.player.clock-debt-ms Creature.clock-factor)
-        (for [cr Creature.extant]
-          (while (< cr.clock-debt-ms Creature.clock-factor)
-            (cr.act)))
-        (+= G.current-time 1)
-        (when (and G.time-limit (>= G.current-time G.time-limit))
-          (msg :tara "Alas! {p:The} has run out of time.")
-          (msg :bob (pick strings.bob-too-bad))
-          (setv G.time-limit None)
-          (setv G.endgame :out-of-time))
-        (for [cr Creature.extant]
-          (-= cr.clock-debt-ms Creature.clock-factor)
-          (assert (>= cr.clock-debt-ms 0))))
+      (when (and G.time-limit (>= G.current-time G.time-limit))
+        (msg :tara "Alas! {p:The} has run out of time.")
+        (msg :bob (pick strings.bob-too-bad))
+        (setv G.time-limit None)
+        (setv G.endgame :out-of-time))
 
       (when G.endgame
         (msg "Game over. Press Escape to quit.")
         (full-redraw)
         (hit-key-to-continue [G.key-escape])
-        (break))))))
+        (break)))))))

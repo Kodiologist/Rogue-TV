@@ -2,7 +2,7 @@
 
 (import
   [heidegger.pos [Pos]]
-  [kodhy.util [ret]]
+  [kodhy.util [ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [text-screen inventory-loop]]
@@ -26,7 +26,7 @@
   (block (cond
 
     [(= cmd :quit-game)
-      :quit-game]
+      (retf :main-loop)]
 
     [(= cmd :move)
       (.walk-to G.player (+ G.player.pos arg))]
