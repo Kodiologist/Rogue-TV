@@ -124,7 +124,7 @@
   [blocks-movement True]
   [blocks-sight True]
 
-  [__init__ (fn [self &optional open-time]
+  [__init__ (fn [self open-time]
     (.__init__ (super Door self))
     (set-self open-time)
     None)]
@@ -145,7 +145,7 @@
 
   [unpleasant True]
 
-  [__init__ (fn [self &optional max-exit-time]
+  [__init__ (fn [self max-exit-time]
     (.__init__ (super Mud self))
     (set-self max-exit-time)
     None)]
@@ -160,7 +160,7 @@
 
   [unpleasant True]
 
-  [__init__ (fn [self &optional tear-time]
+  [__init__ (fn [self tear-time]
     (.__init__ (super Web self))
     (set-self tear-time)
     None)]
@@ -178,7 +178,7 @@
 
   [unpleasant True]
 
-  [__init__ (fn [self &optional max-slip-time]
+  [__init__ (fn [self max-slip-time]
     (.__init__ (super Ice self))
     (set-self max-slip-time)
     None)]
