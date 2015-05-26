@@ -9,7 +9,8 @@
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
   [roguetv.map [Tile Floor Door room-for? mset ray-taxi disc-taxi]]
-  [roguetv.item.generic [Item ItemAppearance def-itemtype]])
+  [roguetv.item.generic [Item ItemAppearance def-itemtype]]
+  [roguetv.creature [Creature]])
 
 (defclass Gadget [Item] [
   [max-charges 10]
@@ -158,7 +159,7 @@
       (for [p path]
         (when (. (Tile.at p) blocks-movement)
           (ret))
-        (whenn (.at G.player p)
+        (whenn (Creature.at p)
           (.use-time-and-charge self)
           (msg :tara "{p:The}'s {} bounces off {:the}."
             self it)

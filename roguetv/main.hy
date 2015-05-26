@@ -8,14 +8,14 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [hit-key-to-continue get-normal-command]]
+  [roguetv.input [hit-key-to-continue]]
   [roguetv.map [room-for?]]
   [roguetv.item [Item def-itemtype]]
+  [roguetv.creature [Creature]]
   roguetv.item.gadget
-  [roguetv.creature [Creature Player]]
   [roguetv.mapgen [reset-level]]
   [roguetv.display [full-redraw default-color describe-tile]]
-  [roguetv.actions [do-normal-command]])
+  [roguetv.creature.player [Player]])
 
 (defn new-game []
 
