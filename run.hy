@@ -2,7 +2,8 @@
 
 (roguetv.main.new-game)
 
-(try (import roguetv-init)
-  (catch [_ ImportError]))
+(import os.path)
+(when (or (os.path.exists "roguetv_init.hy") (os.path.exists "roguetv_init.py"))
+  (import roguetv-init))
 
 (roguetv.main.main-loop)
