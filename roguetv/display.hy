@@ -23,6 +23,8 @@
         (setv (get G.seen-map x y) True)))))
 
 (defn get-color [fg bg]
+  (when (none? bg)
+    (setv bg (G.pick-bg-color fg)))
   (curses.color-pair (try
     (get G.color-pairs (, fg bg))
     (catch [_ KeyError]

@@ -56,33 +56,33 @@
     (-= self.charges 1))]])
 
 (def appearances {
-  "crazy"           :blue
-  "cryptic"         :blue
-  "mysterious"      :blue
-  "enigmatic"       :blue
-  "Art Deco"        :blue
-  "clockwork"       :blue
-  "futuristic"      :blue
-  "alien"           :blue
-  "modern"          :blue
+  "crazy"           :green
+  "cryptic"         :dark-green
+  "mysterious"      :purple
+  "enigmatic"       :red
+  "Art Deco"        :orange
+  "clockwork"       :yellow
+  "futuristic"      :purple
+  "alien"           :green
+  "modern"          :black
   "shiny"           :blue
-  "rusty"           :red
-  "antique"         :blue
-  "vintage"         :blue
+  "rusty"           :orange
+  "antique"         :dark-red
+  "vintage"         :dark-blue
   "ivory"           :white
   "wooden"          :brown
   "brass"           :yellow
   "silvery"         :dark-gray
   "stainless-steel" :dark-gray
-  "matte"           :blue
-  "flimsy"          :blue
-  "rugged"          :blue
-  "plastic"         :blue
-  "tiny"            :blue
-  "boxy"            :blue
+  "matte"           :black
+  "flimsy"          :dark-orange
+  "rugged"          :brown
+  "plastic"         :red
+  "tiny"            :white
+  "boxy"            :black
   "sleek"           :blue
-  "bulky"           :blue
-  "crude"           :blue})
+  "bulky"           :dark-green
+  "crude"           :brown})
 (setv appearances (dict (lc [[name color] (.items appearances)]
   (, name (kwc ItemAppearance
     :name (NounPhrase (+ name " gadget"))

@@ -6,7 +6,7 @@
 (defclass Drawable [object] [
   [char None]
   [color-fg G.fg-color]
-  [color-bg G.bg-color]])
+  [color-bg None]])
 
 (defclass MapObject [object] [
 

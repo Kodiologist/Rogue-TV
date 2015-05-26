@@ -16,6 +16,10 @@
 
 (def fg-color :black)
 (def bg-color :white)
+(def pick-bg-color (fn [fg]
+  (if (in fg [bg-color :yellow])
+    :dark-gray
+    bg-color)))
 (def unseen-color :dark-gray)
 (def off-map-color :very-dark-gray)
 (def announcer-colors {
@@ -34,11 +38,13 @@
   :dark-gray 244
   :very-dark-gray 235
   :red 196
+  :dark-red 88
   :green 46
   :dark-green 22
   :blue 21
   :dark-blue 18
   :pale-azure 117
+  :purple 90
   :yellow 226
   :orange 208
   :dark-orange 166
