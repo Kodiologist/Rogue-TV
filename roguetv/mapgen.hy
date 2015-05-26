@@ -23,14 +23,17 @@
   ; ones with pos None, like the items in the player's
   ; inventory).
 
+  ; We have heidegger.digger generate a slightly larger map
+  ; because it always leaves an outermost border of wall square,
+  ; which in our case would be redundant with the map border.
   (setv dugout (kwc heidegger.digger.generate-map
-    :width G.map-width :height G.map-height))
-
+    :width (+ G.map-width 2) :height (+ G.map-height 2)))
+  
   (setv free-floors [])
   (for [x (range G.map-width)]
     (for [y (range G.map-height)]
       (setv p (Pos x y))
-      (setv floor? (not (get dugout "map" x y)))
+      (setv floor? (not (get dugout "map" (inc x) (inc y))))
       (when floor?
         (.append free-floors p))
       (mset p (if floor? (Floor) (Wall)))))
@@ -42,7 +45,7 @@
   (mset (randpop free-floors) (DownElevator))
 
   ; Add doors.
-  (for [p (concat (amap it.doors (get dugout "rooms")))]
+  (for [p (concat (amap (amap (- it (Pos 1 1)) it.doors) (get dugout "rooms")))]
     (when (and (instance? Floor (Tile.at p)) (1-in 5))
       (mset p (kwc Door :open-time (pick [3 3.5 4 4.5 5])))
       (.remove free-floors p)))

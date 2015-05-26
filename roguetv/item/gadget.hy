@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door room-for? mset ray-taxi disc-taxi]]
+  [roguetv.map [Tile Floor Door on-map room-for? mset ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]])
 
@@ -154,9 +154,12 @@
 
     ; Find our destination square.
     (setv ahead (+ G.player.pos d))
-    (setv path (ray-taxi ahead d self.hookshot-dist))
+    (setv path (kwc ray-taxi ahead d self.hookshot-dist
+      :+include-off-map))
     (block
       (for [p path]
+        (unless (on-map p)
+          (ret))
         (when (. (Tile.at p) blocks-movement)
           (ret))
         (whenn (Creature.at p)
@@ -167,11 +170,11 @@
       (msg "Your {} can only reach objects up to {} squares away."
         self self.hookshot-dist)
       (retf :gadget))
-    (when (= p ahead)
+    (setv p-to (- p d))
+    (when (= p-to G.player.pos)
       (msg :tara "It looks like {p:the}'s {} isn't very useful at that range."
         self)
       (retf :gadget))
-    (setv p-to (- p d))
 
     ; And away we go.
     (.use-time-and-charge self)
@@ -187,7 +190,7 @@
 
     (setv d (or (input-direction) (ret)))
     (setv p (+ G.player.pos d))
-    (setv t (Tile.at p))
+    (setv t (when (on-map p) (Tile.at p)))
 
     (if (instance? Door t)
       (do

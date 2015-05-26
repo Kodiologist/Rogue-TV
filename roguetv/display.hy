@@ -55,14 +55,19 @@
     (setv py (ty->py ty))
     (for [tx (range G.screen-width)]
       (setv px (tx->px tx))
-      (if
-        (and (<= 0 px (dec G.map-width)) (<= 0 py (dec G.map-height))
-          (get G.seen-map px py))
-        (echo-drawable (let [[p (Pos px py)]] (or
-          (Creature.at p)
-          (Item.at p)
-          (Tile.at p))))
-        (echo " " G.fg-color G.unseen-color)))))
+      (cond
+        [(not (and (<= 0 px (dec G.map-width)) (<= 0 py (dec G.map-height))))
+          ; Off the map.
+          (echo " " G.fg-color G.off-map-color)]
+        [(get G.seen-map px py)
+          ; Seen by the player.
+          (echo-drawable (let [[p (Pos px py)]] (or
+            (Creature.at p)
+            (Item.at p)
+            (Tile.at p))))]
+        [True
+          ; Unseen.
+          (echo " " G.fg-color G.unseen-color)]))))
 
 (defn draw-status-line []
   (G.T.addstr (- G.screen-height 1 G.message-lines) 0

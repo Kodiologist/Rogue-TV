@@ -60,14 +60,16 @@
 (defn ray-taxi [
     start     ; Pos
     direction ; Pos
-    length]   ; int
+    length    ; int
+    &optional
+    [include-off-map False]]
   ; Produces a list of Pos. `direction` should be in Pos.DIR8.
   ; If `direction` is orthogonal, you get `length` elements.
-  ; Otherwise, you get `length`/2 elements (rounded down).
+  ; Otherwise, you get `length` // 2 elements.
   (setv l [start])
   (for [_ (range (dec (if (in direction Pos.DIAGS) (// length 2) length)))]
     (setv p (+ (get l -1) direction))
-    (unless (on-map p)
+    (unless (or include-off-map (on-map p))
       (break))
     (.append l p))
   l)
@@ -115,7 +117,8 @@
     (when (player? cr)
       (+= G.dungeon-level 1)
       (rtv mapgen.reset-level)
-      (msg :tara "And {p:he's} on to the next level.")))]])
+      (msg :tara "And {p:he's} on to the next level. This one spans {} by {} squares."
+        G.map-width G.map-height)))]])
 
 (defclass Door [Tile] [
   [description "a closed door"]

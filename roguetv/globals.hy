@@ -17,6 +17,7 @@
 (def fg-color :black)
 (def bg-color :white)
 (def unseen-color :dark-gray)
+(def off-map-color :very-dark-gray)
 (def announcer-colors {
   :tara :blue
   :bob :red})
@@ -31,6 +32,7 @@
   :black 16
   :white 15
   :dark-gray 244
+  :very-dark-gray 235
   :red 196
   :green 46
   :dark-green 22
