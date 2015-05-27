@@ -43,10 +43,10 @@
 (defn echo-drawable [d]
   (echo d.char d.color-fg d.color-bg))
 
-(defn ty->py [ty]
-  (+ (- (// G.screen-height 2) ty) G.player.pos.y))
 (defn tx->px [tx]
   (+ (- tx (// G.screen-width 2)) G.player.pos.x))
+(defn ty->py [ty]
+  (+ (- (// G.screen-height 2) ty) G.player.pos.y))
 
 (defn draw-map []
   (when G.fov-dirty?
