@@ -43,10 +43,56 @@
 (defn echo-drawable [d]
   (echo d.char d.color-fg d.color-bg))
 
+; The functions `tx->px` and `ty->py` map terminal coordinates to
+; Pos (map coordinates). They center the view on the player
+; except when the player is near the edge of the map, in which
+; case they only scroll `G.map-border-width` units off the map,
+; so as not to waste screen real estate.
 (defn tx->px [tx]
-  (+ (- tx (// G.screen-width 2)) G.player.pos.x))
+  (setv left (- G.player.pos.x (// G.screen-width 2)))
+  (setv right (+ G.player.pos.x (// G.screen-width 2)))
+  (cond
+    [(>= G.screen-width (+ G.map-width (* 2 G.map-border-width)))
+      (+ tx (- (// G.map-width 2) (// G.screen-width 2)))]
+    [(< left (- G.map-border-width))
+      (- tx G.map-border-width)]
+    [(>= right (+ G.map-border-width G.map-width))
+      (+ tx G.map-border-width G.map-width (- G.screen-width))]
+    [True
+      (+ (- tx (// G.screen-width 2)) G.player.pos.x)]))
 (defn ty->py [ty]
-  (+ (- (// G.screen-height 2) ty) G.player.pos.y))
+  (setv bottom (- G.player.pos.y (// G.screen-height 2)))
+  (setv top (+ G.player.pos.y (// G.screen-height 2)))
+  (cond
+    [(>= G.screen-height (+ G.map-height (* 2 G.map-border-width) G.bottom-border))
+      (- (+ (// G.map-height 2) (// (- G.screen-height G.bottom-border) 2)) ty)]
+    [(< bottom (- (+ G.map-border-width G.bottom-border)))
+      (- G.screen-height 1 G.map-border-width G.bottom-border ty)]
+    [(>= top (+ G.map-border-width G.map-height))
+      (- (+ G.map-height G.map-border-width) 1 ty)]
+    [True
+      (+ (- (// G.screen-height 2) ty) G.player.pos.y)]))
+
+;(defn tx->px [tx]
+;  (setv M-left (- MARGE))
+;  (setv M-right (+ MARGE G.map-width))
+;  (setv left (- G.player.pos.x (// G.screen-width 2)))
+;  (setv right (+ G.player.pos.x (// G.screen-width 2)))
+;  (setv bump (cond
+;    [(< left  M-left)  (- M-left  left)]
+;    [(> right M-right) (- M-right right)]
+;    [True              0]))
+;  (+ bump (- tx (// G.screen-width 2)) G.player.pos.x))
+;(defn ty->py [ty]
+;  (setv M-bottom (- (+ MARGE G.bottom-border)))
+;  (setv M-top (+ MARGE G.map-height))
+;  (setv bottom (- G.player.pos.y (// G.screen-height 2)))
+;  (setv top (+ G.player.pos.y (// G.screen-height 2)))
+;  (setv bump (cond
+;    [(< bottom M-bottom) (- M-bottom bottom)]
+;    [(> top    M-top)    (- M-top    top)]
+;    [True                0]))
+;  (+ bump (- (// G.screen-height 2) ty) G.player.pos.y))
 
 (defn draw-map []
   (when G.fov-dirty?
