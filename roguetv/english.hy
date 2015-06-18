@@ -103,6 +103,10 @@
     (cond
       [(= formatstr "")
         self.name.stem]
+      [(= formatstr "a")
+        self.name.indefinite-singular]
+      [(= formatstr "A")
+        (ucfirst self.name.indefinite-singular)]
       [(= formatstr "the")
         self.name.definite-singular]
       [(= formatstr "The")

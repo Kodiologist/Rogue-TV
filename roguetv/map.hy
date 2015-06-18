@@ -86,6 +86,7 @@
     (on-map (+ center (Pos dx dy)))))
 
 (defclass Floor [Tile] [
+  [description "ordinary floor"]
   [char "."]])
 
 (defclass Wall [Tile] [

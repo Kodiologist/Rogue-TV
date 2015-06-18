@@ -77,7 +77,7 @@
     [True
       (+ (- (// G.screen-height 2) ty) focus-py)]))
 
-(defn draw-map [focus show-cursor ty-min ty-max]
+(defn draw-map [focus ty-min ty-max]
   (when G.fov-dirty?
     (recompute-fov)
     (setv G.fov-dirty? False))
@@ -101,11 +101,7 @@
         [True
           ; Unseen.
           (echo " " G.fg-color G.unseen-color)])))
-  (if show-cursor
-    (do
-      (curses.curs-set 1)
-      (apply G.T.move focus-t-coords))
-    (curses.curs-set 0)))
+  focus-t-coords)
 
 (defn draw-status-line []
   (G.T.addstr (- G.screen-height 1 G.message-lines) 0
@@ -139,16 +135,20 @@
 
 (defn full-redraw [&optional focus]
   (G.T.erase)
-  (when (= G.screen-mode :normal)
-    (draw-status-line)
-    (draw-bottom-message-log))
-  (kwc draw-map
+  (setv focus-t-coords (kwc draw-map
     :focus (or focus G.player.pos)
-    :show-cursor (= G.screen-mode :look)
     :ty-min 0
     :ty-max (if (= G.screen-mode :normal)
       (dec (- G.screen-height G.bottom-border))
-      (dec G.screen-height)))
+      (dec G.screen-height))))
+  (when (= G.screen-mode :normal)
+    (draw-status-line)
+    (draw-bottom-message-log)
+    (curses.curs-set 0))
+  (when (= G.screen-mode :look)
+    (draw-look-legend focus)
+    (curses.curs-set 1)
+    (apply G.T.move focus-t-coords))
   (G.T.refresh))
 
 (defn draw-text-screen [text]
@@ -178,6 +178,30 @@
     (G.T.addstr (first parts))
     (when (> (len parts) 1)
       (echo-drawable item)
+      (G.T.addstr (second parts)))))
+
+(defn draw-look-legend [p]
+  ; In look mode, show a legend describing the creature, item,
+  ; and tile under the cursor.
+  (setv dunno (unless (get G.seen-map p.x p.y) (, None "    ? unseen")))
+  (setv lines [
+    [None "At cursor: (press a key to examine)"]
+    ; � characters will be replaced with map symbols.
+    (or dunno (whenn (Creature.at p)
+      (, it (.format "  c � {:a}" it))))
+    (or dunno (whenn (Item.at p)
+      (, it (.format "  o � {}" (it.display-name)))))
+    (or dunno
+      (, (Tile.at p) (.format "  t � {}" (. (Tile.at p) description))))])
+  (setv lines (amap (or it (, None "      ---")) lines))
+  (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
+  (for [[n [drawable text]] (enumerate lines)]
+    (G.T.move n 0)
+    (setv text (slice (.ljust text width) 0 width))
+    (setv parts (.split text "�" 1))
+    (G.T.addstr (first parts))
+    (when (> (len parts) 1)
+      (echo-drawable drawable)
       (G.T.addstr (second parts)))))
 
 (defn describe-tile [pos &optional verbose]
