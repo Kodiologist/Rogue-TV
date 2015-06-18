@@ -65,6 +65,8 @@
 (def message-log [])
 (def last-new-message-number -1)
 
+(def screen-mode None)
+
 (def player None)
 
 (def endgame False)

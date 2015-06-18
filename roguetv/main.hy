@@ -45,6 +45,8 @@
     (curses.curs-set 0) ; Make the cursor invisible.
     (G.T.bkgd (ord " ") (default-color)) ; Set the background color.
 
+    (setv G.screen-mode :normal)
+
     (msg :tara "The game begins on a level with {} by {} squares. Good luck, {p}."
       G.map-width G.map-height)
     (describe-tile G.player.pos)

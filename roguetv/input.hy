@@ -69,6 +69,9 @@
       [(in key direction-keys)
         [:move (get direction-keys key)]]
 
+      [(= key ";")
+        :look-mode]
+
       [(= key ":")
         :examine-ground]
       [(= key "t")
@@ -128,3 +131,19 @@
 
   (when (and (numeric? inp) (< inp (len G.inventory)))
     inp))
+
+(defn look-mode [initial-pos]
+  (setv prev-screen-mode G.screen-mode)
+  (setv G.screen-mode :look)
+  (setv focus G.player.pos)
+  (while True
+    (rtv display.full-redraw focus)
+    (setv key (G.T.getkey))
+    (when (in key cancel-keys)
+      (break))
+    (when (in key direction-keys)
+      (setv new-focus (+ focus (get direction-keys key)))
+      (unless (rtv map.on-map new-focus)
+        (continue))
+      (setv focus new-focus)))
+  (setv G.screen-mode prev-screen-mode))

@@ -5,7 +5,7 @@
   [kodhy.util [ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [text-screen inventory-loop]]
+  [roguetv.input [text-screen inventory-loop look-mode]]
   [roguetv.map [Tile Wall mset room-for?]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
@@ -30,6 +30,9 @@
 
     [(= cmd :move)
       (.walk-to G.player (+ G.player.pos arg))]
+
+    [(= cmd :look-mode)
+      (look-mode G.player.pos)]
 
     [(= cmd :examine-ground) (do
       (kwc describe-tile G.player.pos :+verbose))]

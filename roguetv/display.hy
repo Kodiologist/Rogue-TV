@@ -38,19 +38,23 @@
   (get-color G.fg-color G.bg-color))
 
 (defn echo [str color-fg color-bg]
-  (G.T.addstr str (get-color color-fg color-bg)))
+  (try
+    (G.T.addstr str (get-color color-fg color-bg))
+    (catch [_ curses.error] None)))
+      ; http://bugs.python.org/issue8243
 
 (defn echo-drawable [d]
   (echo d.char d.color-fg d.color-bg))
 
 ; The functions `tx->px` and `ty->py` map terminal coordinates to
-; Pos (map coordinates). They center the view on the player
-; except when the player is near the edge of the map, in which
-; case they only scroll `G.map-border-width` units off the map,
-; so as not to waste screen real estate.
-(defn tx->px [tx]
-  (setv left (- G.player.pos.x (// G.screen-width 2)))
-  (setv right (+ G.player.pos.x (// G.screen-width 2)))
+; Pos (map coordinates). They center the view on the focus
+; position (usually the player's position) except when the focus
+; is near the edge of the map, in which case they only scroll
+; `G.map-border-width` units off the map, so as not to waste
+; screen real estate.
+(defn tx->px [tx focus-px]
+  (setv left (- focus-px (// G.screen-width 2)))
+  (setv right (+ focus-px (// G.screen-width 2)))
   (cond
     [(>= G.screen-width (+ G.map-width (* 2 G.map-border-width)))
       (+ tx (- (// G.map-width 2) (// G.screen-width 2)))]
@@ -59,10 +63,10 @@
     [(>= right (+ G.map-border-width G.map-width))
       (+ tx G.map-border-width G.map-width (- G.screen-width))]
     [True
-      (+ (- tx (// G.screen-width 2)) G.player.pos.x)]))
-(defn ty->py [ty]
-  (setv bottom (- G.player.pos.y (// G.screen-height 2)))
-  (setv top (+ G.player.pos.y (// G.screen-height 2)))
+      (+ (- tx (// G.screen-width 2)) focus-px)]))
+(defn ty->py [ty focus-py]
+  (setv bottom (- focus-py (// G.screen-height 2)))
+  (setv top (+ focus-py (// G.screen-height 2)))
   (cond
     [(>= G.screen-height (+ G.map-height (* 2 G.map-border-width) G.bottom-border))
       (- (+ (// G.map-height 2) (// (- G.screen-height G.bottom-border) 2)) ty)]
@@ -71,17 +75,19 @@
     [(>= top (+ G.map-border-width G.map-height))
       (- (+ G.map-height G.map-border-width) 1 ty)]
     [True
-      (+ (- (// G.screen-height 2) ty) G.player.pos.y)]))
+      (+ (- (// G.screen-height 2) ty) focus-py)]))
 
-(defn draw-map []
+(defn draw-map [focus show-cursor ty-min ty-max]
   (when G.fov-dirty?
     (recompute-fov)
     (setv G.fov-dirty? False))
-  (G.T.move 0 0)
-  (for [ty (range (- G.screen-height G.bottom-border))]
-    (setv py (ty->py ty))
+  (G.T.move 0 ty-min)
+  (for [ty (seq ty-min ty-max)]
+    (setv py (ty->py ty focus.y))
     (for [tx (range G.screen-width)]
-      (setv px (tx->px tx))
+      (setv px (tx->px tx focus.x))
+      (when (= (Pos px py) focus)
+        (setv focus-t-coords [ty tx]))
       (cond
         [(not (and (<= 0 px (dec G.map-width)) (<= 0 py (dec G.map-height))))
           ; Off the map.
@@ -94,7 +100,12 @@
             (Tile.at p))))]
         [True
           ; Unseen.
-          (echo " " G.fg-color G.unseen-color)]))))
+          (echo " " G.fg-color G.unseen-color)])))
+  (if show-cursor
+    (do
+      (curses.curs-set 1)
+      (apply G.T.move focus-t-coords))
+    (curses.curs-set 0)))
 
 (defn draw-status-line []
   (G.T.addstr (- G.screen-height 1 G.message-lines) 0
@@ -126,11 +137,18 @@
         (setv text (slice text (len t)))))
     (G.T.insstr text attr)))
 
-(defn full-redraw []
+(defn full-redraw [&optional focus]
   (G.T.erase)
-  (draw-status-line)
-  (draw-bottom-message-log)
-  (draw-map)
+  (when (= G.screen-mode :normal)
+    (draw-status-line)
+    (draw-bottom-message-log))
+  (kwc draw-map
+    :focus (or focus G.player.pos)
+    :show-cursor (= G.screen-mode :look)
+    :ty-min 0
+    :ty-max (if (= G.screen-mode :normal)
+      (dec (- G.screen-height G.bottom-border))
+      (dec G.screen-height)))
   (G.T.refresh))
 
 (defn draw-text-screen [text]
