@@ -4,6 +4,7 @@
   os
   curses
   [heidegger.pos [Pos]]
+  [kodhy.util [retf]]
   [roguetv.strings :as strings]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
@@ -51,11 +52,13 @@
       G.map-width G.map-height)
     (describe-tile G.player.pos)
 
-    (while True
+    (block :game-loop (while True
 
       (for [cr Creature.extant]
         (while (< cr.clock-debt-ms Creature.clock-factor)
-          (cr.act)))
+          (cr.act)
+          (when G.endgame
+            (retf :game-loop))))
       (+= G.current-time 1)
       (for [cr Creature.extant]
         (-= cr.clock-debt-ms Creature.clock-factor)
@@ -65,10 +68,10 @@
         (msg :tara "Alas! {p:The} has run out of time.")
         (msg :bob (pick strings.bob-too-bad))
         (setv G.time-limit None)
-        (setv G.endgame :out-of-time))
+        (setv G.endgame :out-of-time)
+        (break))))
 
-      (when G.endgame
-        (msg "Game over. Press Escape to quit.")
-        (full-redraw)
-        (hit-key-to-continue [G.key-escape])
-        (break)))))))
+    (when G.endgame
+      (msg "Game over. Press Escape to quit.")
+      (full-redraw)
+      (hit-key-to-continue [G.key-escape]))))))
