@@ -73,27 +73,6 @@
     [True
       (+ (- (// G.screen-height 2) ty) G.player.pos.y)]))
 
-;(defn tx->px [tx]
-;  (setv M-left (- MARGE))
-;  (setv M-right (+ MARGE G.map-width))
-;  (setv left (- G.player.pos.x (// G.screen-width 2)))
-;  (setv right (+ G.player.pos.x (// G.screen-width 2)))
-;  (setv bump (cond
-;    [(< left  M-left)  (- M-left  left)]
-;    [(> right M-right) (- M-right right)]
-;    [True              0]))
-;  (+ bump (- tx (// G.screen-width 2)) G.player.pos.x))
-;(defn ty->py [ty]
-;  (setv M-bottom (- (+ MARGE G.bottom-border)))
-;  (setv M-top (+ MARGE G.map-height))
-;  (setv bottom (- G.player.pos.y (// G.screen-height 2)))
-;  (setv top (+ G.player.pos.y (// G.screen-height 2)))
-;  (setv bump (cond
-;    [(< bottom M-bottom) (- M-bottom bottom)]
-;    [(> top    M-top)    (- M-top    top)]
-;    [True                0]))
-;  (+ bump (- (// G.screen-height 2) ty) G.player.pos.y))
-
 (defn draw-map []
   (when G.fov-dirty?
     (recompute-fov)
