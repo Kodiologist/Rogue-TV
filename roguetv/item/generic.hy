@@ -19,6 +19,8 @@
   [info-apply None]
   [info-carry None]
 
+  [price 0]
+
   [__init__ (fn [self &optional pos invlet]
     (MapObject.__init__ self pos)
     (set-self invlet)
@@ -28,38 +30,56 @@
     (setv self.appearance iapp)
     (setv self.color-fg iapp.color-fg)))]
 
+  [identified? (fn [self]
+    (not (and self.appearance (not self.appearance.known))))]
+
+  [identify (fn [self]
+    (unless (.identified? self)
+      (setv self.appearance.known True)
+      (when (in self G.inventory)
+        (msg "You have:  {}" (self.invstr)))))]
+
   [__format__ (fn [self formatstr]
     ; Examples:
     ;  "{}"               hookshot
     ;  "{:the}"           the hookshot
-    ;  "{:the:full}"      the hookshot (10)  (see Item.name-suffix)
-    ;  "{::full}"         hookshot (10)
-    ;  "{:the:true}"      the hookshot       (even if the player hasn't identified the hookshot yet)
-    ;  "{:the:true,full}" the hookshot (10)  (ditto)
+    ;  "{:the:full}"      the hookshot (10) [$5] (see Item.name-suffix)
+    ;  "{:the:most}"      the hookshot (10)
+    ;  "{::full}"         hookshot (10) [$5]
+    ;  "{:the:true}"      the hookshot           (even if the player hasn't identified the hookshot yet)
+    ;  "{:the:true,full}" the hookshot (10) [$5] (ditto)
     (setv [article tags] (.groups (re.match
       "( [^:]* )  (?: : (.+) )?"
       formatstr
       re.VERBOSE)))
     (setv tags (set (if tags (.split tags ",") [])))
     (setv name (if (in "true" tags) self.name (self.apparent-name)))
-    (cat (.format-nounphrase self name article)
-      (when (in "full" tags) (self.name-suffix))))]
+    (kwc cat :sep " " (.format-nounphrase self name article)
+      (when (or (in "most" tags) (in "full" tags)) (kwc cat :sep " "
+        (self.name-suffix)
+        (when (in "full" tags)
+          (.format "[${}]" (self.apparent-price)))))))]
 
   [information (fn [self]
     (setv s (.format "\n  {:a:full}\n\n{}"
       self
-      (if (and self.appearance (not self.appearance.known))
-        self.info-unidentified
+      (if (.identified? self)
         (.join "\n\n" (+
           [self.info-flavor]
           (if self.info-apply [(+ "Effect when applied: " self.info-apply)] [])
-          (if self.info-carry [(+ "Effect when carried: " self.info-carry)] []))))))
+          (if self.info-carry [(+ "Effect when carried: " self.info-carry)] [])))
+        self.info-unidentified)))
     (apply .format [s] (. (type self) __dict__)))]
 
   [apparent-name (fn [self]
-    (if (and self.appearance (not self.appearance.known))
-      self.appearance.name
-      self.name))]
+    (if (.identified? self)
+      self.name
+      self.appearance.name))]
+
+  [apparent-price (fn [self]
+    (if (.identified? self)
+      (string self.price)
+      "?"))]
 
   [invstr (fn [self]
     (.format "{} - {:a:full}"
@@ -69,8 +89,8 @@
   [name-suffix (fn [self]
     ; This method can be overridden to provide extra information
     ; about an item, like the number of charges. It's only displayed
-    ; with the "full" formatting tag.
-    "")]
+    ; with the "full" or "most" formatting tags.
+    None)]
 
   [applied (fn [self]
     ; This is triggered when the player uses the :apply-item command.
@@ -100,9 +120,10 @@
   c)
 
 (def-itemtype Item "test-item"
-  :name "test item" :name-suffix (fn [self] " (testy)")
+  :name "test item" :name-suffix (fn [self] "(testy)")
   :char "&"
-  :info-flavor "This is a test item. It doesn't do anything.")
+  :info-flavor "This is a test item. It doesn't do anything."
+  :price 11)
 
 (defclass ItemAppearance [NounPhraseNamed] [
 

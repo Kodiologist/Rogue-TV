@@ -25,8 +25,8 @@
     None)]
 
   [name-suffix (fn [self]
-    (when self.appearance.known
-      (.format " ({})" self.charges)))]
+    (when (.identified? self)
+      (.format "({})" self.charges)))]
 
   [applied (fn [self] (block
     ; Do we have a charge to spare?
@@ -34,9 +34,7 @@
       (msg :bob "That oojah's all chatty, kemosabe.")
       (ret))
     ; Identify the item type.
-    (unless self.appearance.known
-      (setv self.appearance.known True)
-      (msg "You have:  {}" (self.invstr)))
+    (.identify self)
     ; Now you get the gadget effect.
     (self.gadget-effect)))]
 
@@ -92,6 +90,7 @@
     (.set-appearance itype (randpop unused-appearances))))
 
 (def-itemtype Gadget "panic-button" :name "panic button"
+  :price 5
   :info-flavor "Press it if you expect to be particularly lucky in the future, or if you are particularly unlucky in the present."
   :teleport-tries 100
 
@@ -118,6 +117,7 @@
     (msg :tara "{p:He's} teleported to another part of the level."))))
 
 (def-itemtype Gadget "warpback" :name "warpback machine"
+  :price 5
   ; Has an extra instance attribute .warpback-pos.
   :info-flavor "It's deja vu all over again."
 
@@ -141,6 +141,7 @@
         (msg "{:The} registers your current position." self)))))
 
 (def-itemtype Gadget "hookshot"
+  :price 3
   :info-flavor "Arfer's law of game design: any video game is improved by the addition of a grappling hook."
   :hookshot-dist 8
   :hookshot-travel-speed 2
@@ -181,6 +182,7 @@
     (msg "{:The} pulls you ahead." self))))
 
 (def-itemtype Gadget "chainsaw"
+  :price 1
   :info-flavor "Just what you need to kickstart a lucrative career in lumberjacking after winning gobs of dosh on Rogue TV. Or you could sell it for an additional gob of dosh. Whatever; I don't judge."
 
   :info-apply "Instantly destroys an adjacent door."
@@ -198,6 +200,7 @@
       (msg "Your {} won't help with that." self)))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
+  :price 2
   :info-flavor "They say it's unwise to use a GPS device as your only means of navigation in an unfamiliar area, but it's not as if you have lots of better options in a dungeon."
   :gps-range 10
 

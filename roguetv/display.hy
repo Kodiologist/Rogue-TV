@@ -165,12 +165,20 @@
     (G.T.insstr line)))
 
 (defn draw-inventory [prompt]
+  (setv names (amap (.format "{:a:most}" it) G.inventory))
+  (setv prices (amap (.apparent-price it) G.inventory))
   (setv lines (+
     [[None prompt]]
     (amap
-      [it (.format "  {} � {:a:full}" it.invlet it)]
+      [(get G.inventory it) (.format "  {} � {:{}}  {}{:>{}}"
         ; The character � will be replaced with the item's symbol.
-      G.inventory)
+        (. (get G.inventory it) invlet)
+        (get names it)
+        (max (map len names))
+        (if (zero? it) "$" " ")
+        (get prices it)
+        (max (map len prices)))]
+      (range (len G.inventory)))
     (* [[None "      ---"]] (- G.inventory-limit (len G.inventory)))))
   (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
   (for [[n [item text]] (enumerate lines)]
