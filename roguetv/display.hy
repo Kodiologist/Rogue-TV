@@ -196,9 +196,10 @@
     (or dunno
       (, (Tile.at p) (.format "  {} � {:a}" (get look-at-keys :tile) (Tile.at p))))])
   (setv lines (amap (or it (, None "      ---")) lines))
+  (assert (= (len lines) G.look-mode-legend-height))
   (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
   (for [[n [drawable text]] (enumerate lines)]
-    (G.T.move n 0)
+    (G.T.move (- G.screen-height (- (len lines) n)) 0)
     (setv text (slice (.ljust text width) 0 width))
     (setv parts (.split text "�" 1))
     (G.T.addstr (first parts))

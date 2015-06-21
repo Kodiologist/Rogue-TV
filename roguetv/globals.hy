@@ -55,7 +55,9 @@
 
 ;; * Declarations
 
-(def bottom-border (+ message-lines 1))
+(def look-mode-legend-height 4)
+
+(def bottom-border (max look-mode-legend-height (+ message-lines 1)))
   ; The extra 1 is for the status line.
 
 (def T None) ; This will be set to a curses screen.
