@@ -11,6 +11,7 @@
 (defclass Creature [Drawable MapObject TakesPronouns] [
   [extant []]
   [char "C"]
+  [info-text "[Missing info text]"]
 
   [can-open-doors False]
 
@@ -24,6 +25,12 @@
   [reset-ice-slipping (fn [self]
     (setv self.ice-slip-time 0)
     (setv self.ice-slip-towards None))]
+
+  [information (fn [self]
+    (setv s (.format "\n  {:a}\n\n{}"
+      self
+      self.info-text))
+    (apply .format [s] (. (type self) __dict__)))]
 
   [clock-factor 1000]
   [take-time (fn [self duration]

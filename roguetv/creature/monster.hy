@@ -46,6 +46,7 @@
   [name (NounPhrase "cat")]
   [char "f"]
   [color-fg :dark-orange]
+  [info-text "A regal creature with little concern for you or your affairs. It moves when the mood strikes it, or to avoid dirtying its dainty paws."]
 
   [move-chance (/ 1 30)]
 
@@ -63,6 +64,7 @@
   [name (NounPhrase "dog")]
   [char "d"]
   [color-fg :brown]
+  [info-text "A clingy, fawning mongrel that will cheerfully chase you and get underfoot. Fortunately, it's not the sharpest cheese in the pantry."]
 
   [detect-player-range 12]
 
