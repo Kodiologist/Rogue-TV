@@ -192,7 +192,7 @@
     (or dunno (whenn (Item.at p)
       (, it (.format "  o � {:a:full}" it))))
     (or dunno
-      (, (Tile.at p) (.format "  t � {}" (. (Tile.at p) description))))])
+      (, (Tile.at p) (.format "  t � {:a}" (Tile.at p))))])
   (setv lines (amap (or it (, None "      ---")) lines))
   (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
   (for [[n [drawable text]] (enumerate lines)]
@@ -213,9 +213,9 @@
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type
         ; may not be obvious.
-        (msg "There is also {} here." tile.description)))]
+        (msg "There is also {:a} here." tile)))]
     [verbose
       (if (instance? Floor tile)
         (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
           (if (G.player.female) "dowdy" "cull"))
-        (msg "There is {} here." tile.description))]))
+        (msg "There is {:a} here." tile))]))

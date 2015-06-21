@@ -3,13 +3,13 @@
 (import
   [random [randint]]
   [libtcodpy :as tcod]
+  [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [y-or-n]]
   [roguetv.types [Drawable MapObject]])
 
-(defclass Tile [Drawable MapObject] [
-  [description None]
+(defclass Tile [Drawable MapObject NounPhraseNamed] [
   [blocks-movement False]
   [blocks-sight False]
   [unpleasant False]
@@ -86,11 +86,13 @@
     (on-map (+ center (Pos dx dy)))))
 
 (defclass Floor [Tile] [
-  [description "ordinary floor"]
+  [name (kwc NounPhrase "ordinary floor"
+    :plural "tiles of ordinary floor"
+    :indefinite-singular "ordinary floor")]
   [char "."]])
 
 (defclass Wall [Tile] [
-  [description "a wall"]
+  [name (NounPhrase "wall")]
   [char "#"]
   [color-bg G.fg-color]
   [blocks-movement True]
@@ -101,7 +103,7 @@
   [color-bg :dark-green]])
 
 (defclass UpElevator [Elevator] [
-  [description "an elevator going up"]
+  [name (NounPhrase "elevator going up")]
   [char "<"]
 
   [use-tile (fn [self cr]
@@ -111,7 +113,7 @@
         (setv G.endgame :used-up-elevator))))]])
 
 (defclass DownElevator [Elevator] [
-  [description "an elevator going down"]
+  [name (NounPhrase "elevator going down")]
   [char ">"]
 
   [use-tile (fn [self cr]
@@ -122,7 +124,7 @@
         G.map-width G.map-height)))]])
 
 (defclass Door [Tile] [
-  [description "a closed door"]
+  [name (NounPhrase "closed door")]
   [char "+"]
   [color-fg :brown]
   [blocks-movement True]
@@ -142,7 +144,8 @@
     False))]])
 
 (defclass Mud [Tile] [
-  [description "a pit full of mud"]
+  [name (kwc NounPhrase "pit full of mud"
+    :plural "pits full of mud")]
   [char "}"]
   [color-fg :white]
   [color-bg :brown]
@@ -158,7 +161,7 @@
     (cr.take-time (randint 1 self.max-exit-time)))]])
 
 (defclass Web [Tile] [
-  [description "a spiderweb"]
+  [name (NounPhrase "spiderweb")]
   [char "%"]
   [color-fg :dark-blue]
 
@@ -175,7 +178,8 @@
     (mset self.pos (Floor)))]])
 
 (defclass Ice [Tile] [
-  [description "a patch of ice"]
+  [name (kwc NounPhrase "patch of ice"
+    :plural "patches of ice")]
   [char ":"]
   [color-fg :white]
   [color-bg :pale-azure]

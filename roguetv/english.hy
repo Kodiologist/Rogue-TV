@@ -84,13 +84,16 @@
 
     (when proper
       (setv indefinite-singular stem))
-    (unless always-plural
-      (when (none? indefinite-singular)
-        (setv indefinite-singular (.a -inflect stem)))
+    (if always-plural
       (when (none? plural)
-        (setv plural (.plural-noun -inflect stem))))
+        (setv plural stem))
+      (do
+        (when (none? indefinite-singular)
+          (setv indefinite-singular (.a -inflect stem)))
+        (when (none? plural)
+          (setv plural (.plural-noun -inflect stem)))))
     (when (none? indefinite-plural)
-      (setv indefinite-plural (if always-plural stem (.plural-noun -inflect stem))))
+      (setv indefinite-plural plural))
     (setv definite-singular (+ (if proper "" "the ") stem))
 
     (set-self stem plural indefinite-singular indefinite-plural always-plural proper definite-singular)
