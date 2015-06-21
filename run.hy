@@ -1,3 +1,5 @@
+#!/usr/bin/env hy
+
 (import roguetv.main)
 
 (roguetv.main.new-game)
