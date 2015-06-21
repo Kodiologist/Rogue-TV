@@ -100,32 +100,39 @@
   [name None]
 
   [__format__ (fn [self formatstr]
+    (.format-nounphrase self self.name formatstr))]
+
+  [format-nounphrase (classmethod (fn [self name formatstr]
     (cond
       [(= formatstr "")
-        self.name.stem]
+        name.stem]
       [(= formatstr "a")
-        self.name.indefinite-singular]
+        name.indefinite-singular]
       [(= formatstr "A")
-        (ucfirst self.name.indefinite-singular)]
+        (ucfirst name.indefinite-singular)]
       [(= formatstr "the")
-        self.name.definite-singular]
+        name.definite-singular]
       [(= formatstr "The")
-        (ucfirst self.name.definite-singular)]))]])
+        (ucfirst name.definite-singular)])))]])
 
 (defclass TakesPronouns [NounPhraseNamed] [
   [gender :neuter]
   [plural False]
 
   [__format__ (fn [self formatstr]
-    (or (NounPhraseNamed.__format__ self formatstr) (cond
+    (or (.format-nounphrase self self.name formatstr)
+      (.format-pronoun-or-verb self self.gender self.plural formatstr)))]
+
+  [format-pronoun-or-verb (classmethod (fn [self gender plural formatstr]
+    (cond
       [(in formatstr pronoun-bases)
         (kwc pronoun formatstr
-          :gender self.gender
-          :plural self.plural)]
+          :gender gender
+          :plural plural)]
       [(.startswith formatstr "v:")
         (kwc verb (slice formatstr (len "v:"))
-          :gender self.gender
-          :plural self.plural)])))]
+          :gender gender
+          :plural plural)])))]
 
   [female (fn [self]
     (= self.gender :female))]])

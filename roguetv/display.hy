@@ -166,7 +166,7 @@
   (setv lines (+
     [[None prompt]]
     (amap
-      [it (.format "  {} � {}" it.invlet (it.display-name))]
+      [it (.format "  {} � {:a:full}" it.invlet it)]
         ; The character � will be replaced with the item's symbol.
       G.inventory)
     (* [[None "      ---"]] (- G.inventory-limit (len G.inventory)))))
@@ -190,7 +190,7 @@
     (or dunno (whenn (Creature.at p)
       (, it (.format "  c � {:a}" it))))
     (or dunno (whenn (Item.at p)
-      (, it (.format "  o � {}" (it.display-name)))))
+      (, it (.format "  o � {:a:full}" it))))
     (or dunno
       (, (Tile.at p) (.format "  t � {}" (. (Tile.at p) description))))])
   (setv lines (amap (or it (, None "      ---")) lines))
@@ -208,7 +208,7 @@
   (setv tile (Tile.at pos))
   (cond
     [(Item.at pos) (do
-      (msg "You see here {}." (.display-name (Item.at pos)))
+      (msg "You see here {:a:full}." (Item.at pos))
       (unless (instance? Floor tile)
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type

@@ -1,7 +1,8 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [kodhy.util [keyword->str shift]]
+  re
+  [kodhy.util [cat keyword->str shift]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -27,9 +28,26 @@
     (setv self.appearance iapp)
     (setv self.color-fg iapp.color-fg)))]
 
+  [__format__ (fn [self formatstr]
+    ; Examples:
+    ;  "{}"               hookshot
+    ;  "{:the}"           the hookshot
+    ;  "{:the:full}"      the hookshot (10)  (see Item.name-suffix)
+    ;  "{::full}"         hookshot (10)
+    ;  "{:the:true}"      the hookshot       (even if the player hasn't identified the hookshot yet)
+    ;  "{:the:true,full}" the hookshot (10)  (ditto)
+    (setv [article tags] (.groups (re.match
+      "( [^:]* )  (?: : (.+) )?"
+      formatstr
+      re.VERBOSE)))
+    (setv tags (set (if tags (.split tags ",") [])))
+    (setv name (if (in "true" tags) self.name (self.apparent-name)))
+    (cat (.format-nounphrase self name article)
+      (when (in "full" tags) (self.name-suffix))))]
+
   [information (fn [self]
-    (setv s (.format "\n  {}\n\n{}"
-      (self.display-name)
+    (setv s (.format "\n  {:a:full}\n\n{}"
+      self
       (if (and self.appearance (not self.appearance.known))
         self.info-unidentified
         (.join "\n\n" (+
@@ -43,18 +61,20 @@
       self.appearance.name
       self.name))]
 
-  [display-name (fn [self]
-    (. (.apparent-name self) indefinite-singular))]
-
   [invstr (fn [self]
-    (.format "{} - {}"
+    (.format "{} - {:a:full}"
       self.invlet
-      (self.display-name)))]
+      self))]
+
+  [name-suffix (fn [self]
+    ; This method can be overridden to provide extra information
+    ; about an item, like the number of charges. It's only displayed
+    ; with the "full" formatting tag.
+    "")]
 
   [applied (fn [self]
     ; This is triggered when the player uses the :apply-item command.
-    (msg "You can't do anything special with {.definite_singular}."
-      (self.apparent-name)))]
+    (msg "You can't do anything special with {:the}." self))]
 
   [on-reset-level (fn [self]
     ; This is triggered when the level is reset for each item
@@ -78,6 +98,11 @@
   (setv c.name (NounPhrase c.name))
 
   c)
+
+(def-itemtype Item "test-item"
+  :name "test item" :name-suffix (fn [self] " (testy)")
+  :char "&"
+  :info-flavor "This is a test item. It doesn't do anything.")
 
 (defclass ItemAppearance [NounPhraseNamed] [
 

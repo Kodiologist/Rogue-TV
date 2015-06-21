@@ -3,7 +3,7 @@
 (import
   [random [randrange]]
   [heidegger.pos [Pos]]
-  [kodhy.util [cat ret retf]]
+  [kodhy.util [ret retf]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -24,11 +24,9 @@
     (setv self.charges (if (none? charges) self.max-charges charges))
     None)]
 
-  [display-name (fn [self]
-    (cat
-      (.display-name (super Gadget self))
-      (and self.appearance.known
-        (.format " ({})" self.charges))))]
+  [name-suffix (fn [self]
+    (when self.appearance.known
+      (.format " ({})" self.charges)))]
 
   [applied (fn [self] (block
     ; Do we have a charge to spare?
@@ -44,7 +42,7 @@
 
   [gadget-effect (fn [self]
     ; Do whatever the gadget should do. If the user ends up
-    ; really getting the gadget effect (e.g., they don't cancel out
+    ; really getting the gadget effect (they don't, e.g., cancel out
     ; of a direction prompt), be sure to call .use-time-and-charge
     ; before otherwise affecting the game world.
     (.use-time-and-charge self)
