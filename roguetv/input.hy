@@ -161,7 +161,8 @@
             (rtv-get item.Item)]
           [(= (get look-at-keys :tile) key)
             (rtv-get map.Tile)]))
-        (whenn (mapobject-class.at focus)
-          (text-screen (.information it))))]))
+        (when (and (mapobject-class.at focus)
+            (get G.seen-map focus.x focus.y))
+          (text-screen (.information (mapobject-class.at focus)))))]))
 
   (setv G.screen-mode prev-screen-mode))

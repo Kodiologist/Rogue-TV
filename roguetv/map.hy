@@ -10,11 +10,18 @@
   [roguetv.types [Drawable MapObject]])
 
 (defclass Tile [Drawable MapObject NounPhraseNamed] [
+  [info-text "[Missing info text]"]
   [blocks-movement False]
   [blocks-sight False]
   [unpleasant False]
     ; `unpleasant` is a flag meaning that monsters tend not to
     ; want to be in this kind of tile.
+
+  [information (fn [self]
+    (setv s (.format "\n  {:a}\n\n{}"
+      self
+      self.info-text))
+    (apply .format [s] (. (type self) __dict__)))]
 
   [use-tile (fn [self cr]
     ; A creature has tried to do something with this tile. (For
@@ -89,12 +96,14 @@
   [name (kwc NounPhrase "ordinary floor"
     :plural "tiles of ordinary floor"
     :indefinite-singular "ordinary floor")]
-  [char "."]])
+  [char "."]
+  [info-text "Just what it says on the tin."]])
 
 (defclass Wall [Tile] [
   [name (NounPhrase "wall")]
   [char "#"]
   [color-bg G.fg-color]
+  [info-text "A common and persistent obstacle to scooping up all the prizes on the level and hopping into the down elevator."]
   [blocks-movement True]
   [blocks-sight True]])
 
@@ -105,16 +114,18 @@
 (defclass UpElevator [Elevator] [
   [name (NounPhrase "elevator going up")]
   [char "<"]
+  [info-text "Taking the elevator back up will immediately end your game of Rogue TV, but you'll be able to keep whatever winnings you're carrying."]
 
   [use-tile (fn [self cr]
     (when (player? cr)
-      (msg :tara "It looks like {p:the} is thinking of taking the elevator back up. If {p:he} {p:v:does}, {p:he} may keep all {p:his} currently held winnings, but {p:he} will lose whatever vast riches {p:he} might've gained here or in lower levels of the Dungeons of Doom, and {p:his} game of Rogue TV will be over! How will {p:he} decide?")
+      (msg :tara "Beware, there will be no return!")
       (when (y-or-n "Take the elevator up?" :+require-uppercase)
         (setv G.endgame :used-up-elevator))))]])
 
 (defclass DownElevator [Elevator] [
   [name (NounPhrase "elevator going down")]
   [char ">"]
+  [info-text "This elevator leads to a new, unexplored level. The time limit will be reset, but you won't be able to return to this level, so make sure you're carrying whatever you intend to keep."]
 
   [use-tile (fn [self cr]
     (when (player? cr)
@@ -127,6 +138,7 @@
   [name (NounPhrase "closed door")]
   [char "+"]
   [color-fg :brown]
+  [info-text "Rogue TV has obtained only the most rotten and ill-fitting of doors to block your progress through the level. They're unlocked, but heaving them open will take some time."]
   [blocks-movement True]
   [blocks-sight True]
 
@@ -147,6 +159,7 @@
   [name (kwc NounPhrase "pit full of mud"
     :plural "pits full of mud")]
   [char "}"]
+  [info-text "Stepping into a mud pit is easy enough, but stepping out of it will take some time to free yourself."]
   [color-fg :white]
   [color-bg :brown]
 
@@ -164,6 +177,7 @@
   [name (NounPhrase "spiderweb")]
   [char "%"]
   [color-fg :dark-blue]
+  [info-text "This sizable web will make stepping out of its tile difficult. You'll need to take some time to tear the web apart in order to escape."]
 
   [unpleasant True]
 
@@ -183,6 +197,7 @@
   [char ":"]
   [color-fg :white]
   [color-bg :pale-azure]
+  [info-text "A slippery sort of tile. If the next thing you do after stepping on it is move again in the same direction, you'll glide along without an issue. But if you take any other action, you'll need to take a moment to steady yourself first."]
 
   [unpleasant True]
 
