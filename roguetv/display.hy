@@ -8,6 +8,7 @@
   [kodhy.util [concat]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
+  [roguetv.input [look-at-keys]]
   [roguetv.types [Drawable MapObject]]
   [roguetv.map [Tile Floor]]
   [roguetv.item [Item]]
@@ -152,6 +153,7 @@
   (G.T.refresh))
 
 (defn draw-text-screen [text]
+  (curses.curs-set 0)
   (G.T.erase)
   (setv w (- G.screen-width G.text-screen-left-margin))
   (for [[i line] (enumerate (slice
@@ -188,11 +190,11 @@
     [None "At cursor: (press a key to examine)"]
     ; � characters will be replaced with map symbols.
     (or dunno (whenn (Creature.at p)
-      (, it (.format "  c � {:a}" it))))
+      (, it (.format "  {} � {:a}" (get look-at-keys :creature) it))))
     (or dunno (whenn (Item.at p)
-      (, it (.format "  o � {:a:full}" it))))
+      (, it (.format "  {} � {:a:full}" (get look-at-keys :item) it))))
     (or dunno
-      (, (Tile.at p) (.format "  t � {:a}" (Tile.at p))))])
+      (, (Tile.at p) (.format "  {} � {:a}" (get look-at-keys :tile) (Tile.at p))))])
   (setv lines (amap (or it (, None "      ---")) lines))
   (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
   (for [[n [drawable text]] (enumerate lines)]

@@ -101,9 +101,7 @@
 
   (while True
     (when (in (G.T.getkey) cancel-keys)
-      (break)))
-
-  (rtv display.full-redraw))
+      (break))))
 
 (defn inventory-loop [prompt &optional [select True]]
 
@@ -132,6 +130,11 @@
   (when (and (numeric? inp) (< inp (len G.inventory)))
     inp))
 
+(def look-at-keys {
+  :creature "c"
+  :item "o"
+  :tile "t"})
+
 (defn look-mode [initial-pos]
   (setv prev-screen-mode G.screen-mode)
   (setv G.screen-mode :look)
@@ -139,11 +142,26 @@
   (while True
     (rtv display.full-redraw focus)
     (setv key (G.T.getkey))
-    (when (in key cancel-keys)
-      (break))
-    (when (in key direction-keys)
-      (setv new-focus (+ focus (get direction-keys key)))
-      (unless (rtv map.on-map new-focus)
-        (continue))
-      (setv focus new-focus)))
+    (cond
+
+      [(in key cancel-keys)
+        (break)]
+
+      [(in key direction-keys) (do
+        (setv new-focus (+ focus (get direction-keys key)))
+        (unless (rtv map.on-map new-focus)
+          (continue))
+        (setv focus new-focus))]
+
+      [(in key (.values look-at-keys)) (do
+        (setv mapobject-class (cond
+          [(= (get look-at-keys :creature) key)
+            (rtv-get creature.Creature)]
+          [(= (get look-at-keys :item) key)
+            (rtv-get item.Item)]
+          [(= (get look-at-keys :tile) key)
+            (rtv-get map.Tile)]))
+        (whenn (mapobject-class.at focus)
+          (text-screen (.information it))))]))
+
   (setv G.screen-mode prev-screen-mode))
