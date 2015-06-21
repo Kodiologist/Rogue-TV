@@ -3,8 +3,9 @@
 (import
   os
   curses
+  [itertools [combinations]]
   [heidegger.pos [Pos]]
-  [kodhy.util [retf]]
+  [kodhy.util [retf concat]]
   [roguetv.strings :as strings]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
@@ -65,13 +66,31 @@
         (assert (>= cr.clock-debt-ms 0)))
 
       (when (and G.time-limit (>= G.current-time G.time-limit))
-        (msg :tara "Alas! {p:The} has run out of time.")
+        (msg :tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
         (msg :bob (pick strings.bob-too-bad))
         (setv G.time-limit None)
         (setv G.endgame :out-of-time)
         (break))))
 
     (when G.endgame
-      (msg "Game over. Press Escape to quit.")
+      (setv winnings G.inventory)
+      (defn total [l]
+        (sum (amap it.price l)))
+      (setv gross (total winnings))
+      (when (= G.endgame :out-of-time)
+        ; Reduce the player's winnings to the combination of
+        ; items with the highest total value less than or equal to
+        ; half the original sum of values.
+        ;
+        ; Yes, we're brute-forcing the knapsack problem here.
+        ; This should be fine so long as the inventory is small.
+        (setv winnings
+          (kwc max :key total
+          (filt (<= (total it) (/ gross 2))
+          (concat
+          (amap (list (combinations winnings it))
+          (range (inc (len winnings))))))))
+        (setv gross (total winnings)))
+      (msg "Game over. Your total winnings are ${}. Press Escape to quit." gross)
       (full-redraw)
       (hit-key-to-continue [G.key-escape]))))))
