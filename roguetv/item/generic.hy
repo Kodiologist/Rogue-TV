@@ -78,7 +78,7 @@
 
   [apparent-price (fn [self]
     (if (.identified? self)
-      (string self.price)
+      self.price
       "?"))]
 
   [invstr (fn [self]

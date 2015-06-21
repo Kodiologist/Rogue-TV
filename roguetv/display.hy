@@ -106,7 +106,7 @@
 
 (defn draw-status-line []
   (G.T.addstr (- G.screen-height 1 G.message-lines) 0
-    (.format "{} {}  DL:{: 2}"
+    (.format "{} {}  DL:{: 2}  {:>6}{}"
       (.rjust (minsec (max 0 (- (or G.time-limit 0) G.current-time)))
         (len "10:00"))
       (.ljust
@@ -114,7 +114,12 @@
          (.format "({})" (show-round G.last-action-duration 2))
           "")
         (len "(1.15)"))
-      G.dungeon-level)))
+      G.dungeon-level
+      (+ "$" (string (sum
+        (fmap (.apparent-price it) (.identified? it) G.inventory))))
+      (if (afind-or (not (.identified? it)) G.inventory)
+        " + ?"
+        "    "))))
 
 (defn draw-bottom-message-log []
   (setv lines (concat
@@ -177,7 +182,7 @@
         (max (map len names))
         (if (zero? it) "$" " ")
         (get prices it)
-        (max (map len prices)))]
+        (max (amap (len (string it)) prices)))]
       (range (len G.inventory)))
     (* [[None "      ---"]] (- G.inventory-limit (len G.inventory)))))
   (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
