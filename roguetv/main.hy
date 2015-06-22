@@ -20,16 +20,16 @@
   [roguetv.display [full-redraw default-color describe-tile]]
   [roguetv.creature.player [Player]])
 
-(defn new-game []
+(defn new-game [parsed-cmdline-args]
+  (setv p parsed-cmdline-args)
+
+  (setv G.debug p.debug)
 
   (roguetv.item.gadget.randomize-appearances)
 
   (setv G.player (Player))
-  (setv Player.gender :female)
-    ; Prefer :female for testing so it's easier to spot cases
-    ; where I mistakenly wrote, e.g., "he" instead of "{p:he}".
-  (setv Player.name (NounPhrase "contestant"))
-          ;(kwc NounPhrase "Josephine" :+proper))
+  (setv Player.gender p.gender)
+  (setv Player.name p.name)
 
   (setv G.dungeon-level 1)
   (reset-level))

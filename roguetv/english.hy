@@ -47,7 +47,7 @@
       (amap (ucfirst it) (.values v))))))
   d)))
 
-(def genders (frozenset [:male :female :neuter :singular-they]))
+(def genders (, :male :female :neuter :singular-they))
 (def pronoun-bases (frozenset (.keys -pronoun-d)))
 
 (defn pronoun [base &optional [gender :neuter] [person 3] [plural False]]
