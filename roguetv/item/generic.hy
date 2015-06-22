@@ -20,6 +20,7 @@
   [info-carry None]
 
   [price 0]
+    ; The money value of the item, a nonnegative integer.
 
   [__init__ (fn [self &optional pos invlet]
     (MapObject.__init__ self pos)
