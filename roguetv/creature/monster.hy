@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  [random [choice]]
   pypaths.astar
   [heidegger.pos [Pos]]
   [kodhy.util [ret]]
@@ -27,7 +28,7 @@
   (setv neighbors (filt (okay? it) (clear-neighbors cr.pos)))
   (unless neighbors
     (ret False))
-  (setv p-to (pick neighbors))
+  (setv p-to (choice neighbors))
   (.walk-to cr p-to)
   True))
 

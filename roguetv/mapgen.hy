@@ -1,7 +1,7 @@
 (require kodhy.macros)
 
 (import
-  [random [randint]]
+  [random [choice randint]]
   [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   heidegger.digger
@@ -47,18 +47,18 @@
   ; Add doors.
   (for [p (concat (amap (amap (- it (Pos 1 1)) it.doors) (get dugout "rooms")))]
     (when (and (instance? Floor (Tile.at p)) (1-in 5))
-      (mset p (kwc Door :open-time (pick [3 3.5 4 4.5 5])))
+      (mset p (kwc Door :open-time (choice [3 3.5 4 4.5 5])))
       (.remove free-floors p)))
 
   ; Add ice, mud, and webs.
   (for [pos free-floors]
     (when (1-in 50)
-      (setv mk-tile (pick [
+      (setv mk-tile (choice [
         (fn [] (kwc Ice :max-slip-time 5))
         (fn [] (kwc Mud :max-exit-time 5))
-        (fn [] (kwc Web :tear-time (pick [1 2 3 4])))]))
-      (setv v (pick [Pos.NORTH Pos.SOUTH]))
-      (setv h (pick [Pos.WEST Pos.EAST]))
+        (fn [] (kwc Web :tear-time (choice [1 2 3 4])))]))
+      (setv v (choice [Pos.NORTH Pos.SOUTH]))
+      (setv h (choice [Pos.WEST Pos.EAST]))
       (for [dx (range (randint 1 5))]
         (for [dy (range (randint 1 5))]
           (setv p (+ pos (* dx h) (* dy v)))

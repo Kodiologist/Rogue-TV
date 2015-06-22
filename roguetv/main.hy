@@ -2,6 +2,7 @@
 
 (import
   os
+  [random [choice]]
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
@@ -67,7 +68,7 @@
 
       (when (and G.time-limit (>= G.current-time G.time-limit))
         (msg :tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
-        (msg :bob (pick strings.bob-too-bad))
+        (msg :bob (choice strings.bob-too-bad))
         (setv G.time-limit None)
         (setv G.endgame :out-of-time)
         (break))))

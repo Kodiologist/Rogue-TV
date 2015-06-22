@@ -16,9 +16,6 @@
   (random.shuffle l)
   l)
 
-(defn pick [l]
-  (first (random.sample l 1)))
-
 (defn randpop [l]
   (l.pop (random.randrange (len l))))
 
