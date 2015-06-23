@@ -30,6 +30,8 @@
       (.split (.group it 1) "\n")))))
     (setv ix (amap (.index modules it) imports-from))
     (setv sorted? (all (lc [[a b] (zip ix (rest ix))] (< a b))))
-    (print module "import order -" (if sorted? "ok" "WRONG"))
+    (unless sorted?
+      (print module "import order - WRONG"))
     (setv backwards-deps? (any (amap (>= it (.index modules module)) ix)))
-    (print module "no backwards deps -" (if backwards-deps? "WRONG" "ok"))))
+    (when backwards-deps?
+      (print module "no backwards deps - WRONG"))))
