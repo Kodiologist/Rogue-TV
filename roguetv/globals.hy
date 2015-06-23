@@ -2,14 +2,22 @@
   curses
   [libtcodpy :as tcod])
 
+(def globals-to-save (set))
+(defmacro defs [varname value]
+  ; Define a variable and mark it to be saved.
+  (import [hy [HyString]])
+  `(do
+    (def ~varname ~value)
+    (.add globals-to-save ~(HyString varname))))
+
 ;; * Parameters
 
 (def debug False)
 
-(def map-width 80)
-(def map-height 40)
+(defs map-width 80)
+(defs map-height 40)
 
-(def inventory-limit 10)
+(defs inventory-limit 10)
 
 (def message-lines 3)
 (def map-border-width 2)
@@ -31,7 +39,7 @@
 
 (def key-escape "\x1b")
 
-(def invlets (list "abcdefghijklmnopqrstuvwxyz"))
+(defs invlets (list "abcdefghijklmnopqrstuvwxyz"))
 
 (def color-numbers {
   :black 16
@@ -51,9 +59,15 @@
   :dark-orange 166
   :brown 94})
 
-(setv push-past-monster-time 1)
+(defs push-past-monster-time 1)
 
 ;; * Declarations
+
+(defs save-file-path None)
+(defs dates {
+  "started" None
+  "saved" None
+  "loaded" None})
 
 (def look-mode-legend-height 4)
 
@@ -64,27 +78,24 @@
 (def screen-width None)
 (def screen-height None)
 (def color-pairs {})
-(def message-log [])
-(def last-new-message-number -1)
+(defs message-log [])
+(defs last-new-message-number -1)
 
 (def screen-mode None)
 
-(def player None)
+(defs player None)
 
 (def endgame False)
-(def dungeon-level None)
+(defs dungeon-level None)
 
 ; Times are in simulated seconds.
-(def current-time 0)
-(def time-limit None)
-(def last-action-duration 0)
+(defs current-time 0)
+(defs time-limit None)
+(defs last-action-duration 0)
 
 (def fov-map (tcod.map-new map-width map-height))
 (def fov-dirty? True)
-(def seen-map [])
+(defs seen-map [])
 
-(def inventory [])
+(defs inventory [])
 (def itypes {})
-
-; Item appearances and ItemAppearance known states must also
-; be saved.

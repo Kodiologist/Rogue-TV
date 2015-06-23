@@ -26,4 +26,5 @@ roguetv.mapgen
 roguetv.display
 roguetv.actions
 roguetv.creature.player
+roguetv.saves
 roguetv.main

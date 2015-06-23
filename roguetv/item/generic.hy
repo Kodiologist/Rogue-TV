@@ -111,6 +111,8 @@
     (let [[k (get body (* 2 it))] [v (get body (inc (* 2 it)))]]
       (, (.replace (keyword->str k) "-" "_") v))
     (range (// (len body) 2))))))
+  (setv (get (globals) c.__name__) c)
+    ; This ensures that jsonpickle can recreate itypes.
   (setv (get G.itypes tid) c)
 
   (setv c.tid tid)

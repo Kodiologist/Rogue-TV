@@ -3,6 +3,7 @@
 (import
   os
   [random [choice]]
+  [datetime [datetime]]
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
@@ -18,12 +19,11 @@
   roguetv.item.gadget
   [roguetv.mapgen [reset-level]]
   [roguetv.display [full-redraw default-color describe-tile]]
-  [roguetv.creature.player [Player]])
+  [roguetv.creature.player [Player]]
+  [roguetv.saves [write-save-file]])
 
 (defn new-game [parsed-cmdline-args]
   (setv p parsed-cmdline-args)
-
-  (setv G.debug p.debug)
 
   (roguetv.item.gadget.randomize-appearances)
 
@@ -32,16 +32,18 @@
   (setv Player.name p.name)
 
   (setv G.dungeon-level 1)
-  (reset-level))
+  (reset-level)
 
-(defn main-loop [] (block :main-loop
+  (setv (get G.dates "started") (.isoformat (datetime.utcnow))))
+
+(defn main-loop []
 
   (unless (in "ESCDELAY" os.environ)
     (setv (get os.environ "ESCDELAY") "10"))
       ; This ensures curses will respond to the escape key quickly
       ; in keypad mode (which is enabled by curses.wrapper).
 
-  (curses.wrapper (fn [scr]
+  (setv exit-reason (block :curses-wrapper (curses.wrapper (fn [scr]
 
     (setv G.T scr)
     (setv [G.screen-height G.screen-width] (G.T.getmaxyx))
@@ -50,9 +52,10 @@
 
     (setv G.screen-mode :normal)
 
-    (msg :tara "The game begins on a level with {} by {} squares. Good luck, {p}."
-      G.map-width G.map-height)
-    (describe-tile G.player.pos)
+    (unless (get G.dates "loaded")
+      (msg :tara "The game begins on a level with {} by {} squares. Good luck, {p}."
+        G.map-width G.map-height)
+      (describe-tile G.player.pos))
 
     (block :game-loop (while True
 
@@ -71,27 +74,33 @@
         (msg :bob (choice strings.bob-too-bad))
         (setv G.time-limit None)
         (setv G.endgame :out-of-time)
-        (break))))
+        (retf :game-loop))))
 
-    (when G.endgame
-      (setv winnings G.inventory)
-      (defn total [l]
-        (sum (amap it.price l)))
-      (setv gross (total winnings))
-      (when (= G.endgame :out-of-time)
-        ; Reduce the player's winnings to the combination of
-        ; items with the highest total value less than or equal to
-        ; half the original sum of values.
-        ;
-        ; Yes, we're brute-forcing the knapsack problem here.
-        ; This should be fine so long as the inventory is small.
-        (setv winnings
-          (kwc max :key total
-          (filt (<= (total it) (/ gross 2))
-          (concat
-          (amap (list (combinations winnings it))
-          (range (inc (len winnings))))))))
-        (setv gross (total winnings)))
-      (msg "Game over. Your total winnings are ${}. Press Escape to quit." gross)
-      (full-redraw)
-      (hit-key-to-continue [G.key-escape]))))))
+    (assert G.endgame)
+    (setv winnings G.inventory)
+    (defn total [l]
+      (sum (amap it.price l)))
+    (setv gross (total winnings))
+    (when (= G.endgame :out-of-time)
+      ; Reduce the player's winnings to the combination of
+      ; items with the highest total value less than or equal to
+      ; half the original sum of values.
+      ;
+      ; Yes, we're brute-forcing the knapsack problem here.
+      ; This should be fine so long as the inventory is small.
+      (setv winnings
+        (kwc max :key total
+        (filt (<= (total it) (/ gross 2))
+        (concat
+        (amap (list (combinations winnings it))
+        (range (inc (len winnings))))))))
+      (setv gross (total winnings)))
+    (msg "Game over. Your total winnings are ${}. Press Escape to quit." gross)
+    (full-redraw)
+    (hit-key-to-continue [G.key-escape])
+    :game-over))))
+
+  (when (= exit-reason :save-and-quit)
+    (print "Saving...")
+    (write-save-file G.save-file-path)
+    (print "Saved game to" G.save-file-path)))

@@ -63,8 +63,10 @@
     (setv key (G.T.getkey))
     (setv inp (cond
 
-      [(= key G.key-escape)
-        :quit-game]
+      [(= key "S")
+        :save-and-quit]
+      [(= key "Q")
+        :resign-game]
 
       [(in key direction-keys)
         [:move (get direction-keys key)]]

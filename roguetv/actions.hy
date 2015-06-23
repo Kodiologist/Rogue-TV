@@ -5,7 +5,7 @@
   [kodhy.util [ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [text-screen inventory-loop look-mode]]
+  [roguetv.input [text-screen inventory-loop look-mode y-or-n]]
   [roguetv.map [Tile Wall mset room-for?]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
@@ -25,8 +25,14 @@
 
   (block (cond
 
-    [(= cmd :quit-game)
-      (retf :main-loop)]
+    [(= cmd :resign-game)
+      (if G.debug
+         (retf :curses-wrapper :fast-quit)
+         (when (y-or-n "Resign this game?" :+require-uppercase)
+           (setv G.endgame :resigned)))]
+
+    [(= cmd :save-and-quit)
+      (retf :curses-wrapper :save-and-quit)]
 
     [(= cmd :move)
       (.walk-to G.player (+ G.player.pos arg))]

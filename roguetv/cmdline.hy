@@ -1,17 +1,23 @@
 (require kodhy.macros)
 
 (import
+  os
+  os.path
+  errno
   random
   argparse
+  appdirs
   [kodhy.util [keyword->str str->keyword]]
   [roguetv.english [genders NounPhrase]])
 
 (def parameters [
   ["name"
-    :help "name of your character"]
+    :help "name of your character (new game only)"]
   ["gender"
-    :help "gender of your character"
+    :help "gender of your character (new game only)"
     :choices (amap (keyword->str it) genders)]
+  ["save"
+    :help "filepath to read a saved game from or write saved games to"]
   ["debug"
     :help "enable debug mode"
     :action "store_true"]])
@@ -23,6 +29,15 @@
       [parser (+ "--" (first x))]
       (dict (amap2 (, (keyword->str a) b) (rest x)))))
   (setv p (.parse-args parser args))
+
+  (unless p.save
+    (setv d (appdirs.user-data-dir "Rogue TV" "Kodiologist"))
+    (try
+      (os.makedirs d)
+      (catch [e OSError]
+        (unless (= e.errno errno.EEXIST)
+          (raise))))
+    (setv p.save (os.path.join d "saved-game.json")))
 
   (unless p.gender
     (setv p.gender (random.choice ["male" "female"])))
