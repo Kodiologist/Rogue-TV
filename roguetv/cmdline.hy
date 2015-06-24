@@ -5,17 +5,24 @@
   os.path
   errno
   random
+  [collections [OrderedDict]]
   argparse
   appdirs
   [kodhy.util [keyword->str str->keyword]]
   [roguetv.english [genders NounPhrase]])
 
+(setv pronouns->genders (OrderedDict [
+  (, "he" :male)
+  (, "she" :female)
+  (, "it" :neuter)
+  (, "they" :singular-they)]))
+
 (def parameters [
   ["name"
     :help "name of your character (new game only)"]
-  ["gender"
-    :help "gender of your character (new game only)"
-    :choices (amap (keyword->str it) genders)]
+  ["pronouns"
+    :help "pronouns for your character (new game only)"
+    :choices (amap (str it) (.keys pronouns->genders))]
   ["save"
     :help "filepath to read a saved game from or write saved games to"]
   ["debug"
@@ -39,9 +46,9 @@
           (raise))))
     (setv p.save (os.path.join d "saved-game.json")))
 
-  (unless p.gender
-    (setv p.gender (random.choice ["male" "female"])))
-  (setv p.gender (str->keyword p.gender))
+  (unless p.pronouns
+    (setv p.pronouns (random.choice ["he" "she"])))
+  (setv p.gender (get pronouns->genders p.pronouns))
 
   (unless p.name
     (setv p.name (cond
@@ -52,8 +59,11 @@
         (random.choice (qw Meg Jo Beth Amy))]
           ; Little Women
       [(= p.gender :neuter)
-        (random.choice (qw Zorx Klax Jennifer))]
-          ; Captain Underpants and the Invasion of the Incredibly Naughty Cafeteria Ladies from Outer Space (and the Subsequent Assault of the Equally Evil Lunchroom Zombie Nerds)
+        (random.choice (+
+           (qw Zorx Klax Jennifer)
+             ; Captain Underpants and the Invasion of the Incredibly Naughty Cafeteria Ladies from Outer Space (and the Subsequent Assault of the Equally Evil Lunchroom Zombie Nerds)
+           ["Robert'); DROP TABLE Players;--"]))]
+            ; http://www.xkcd.com/327/
       [True
         (random.choice (qw Mac Nancy))])))
           ; Wayside School
