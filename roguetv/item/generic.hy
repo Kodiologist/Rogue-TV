@@ -34,11 +34,13 @@
   [identified? (fn [self]
     (not (and self.appearance (not self.appearance.known))))]
 
-  [identify (fn [self]
+  [identify (fn [self &optional [consumed False]]
     (unless (.identified? self)
       (setv self.appearance.known True)
       (when (in self G.inventory)
-        (msg "You have:  {}" (self.invstr)))))]
+        (msg "You {}:  {}"
+          (if consumed "had" "have")
+          (self.invstr)))))]
 
   [__format__ (fn [self formatstr]
     ; Examples:
@@ -129,13 +131,25 @@
   :price 11)
 
 (defclass ItemAppearance [NounPhraseNamed] [
+  [registry {}]
+  ; A dictionary mapping subclasses of Item to lists of eligible
+  ; appearances.
 
   [__init__ (fn [self name color-fg]
     (set-self name color-fg)
     (setv self.known False)
       ; .known is true when the player has learned the type of
       ; item that goes with this appearance.
-    None)]])
+    None)]
+
+  [randomize-appearances (classmethod (fn [self]
+     (setv unused-apps (dict (lc
+       [[c apps] (.items self.registry)]
+       (, c (list apps)))))
+     (for [itype (.values G.itypes)]
+       (whenn (afind-or (issubclass itype it) (.keys unused-apps))
+         (.set-appearance itype (randpop (get unused-apps it)))))))]])
+
 
 (defn add-to-inventory [item]
   (.move item None)

@@ -127,13 +127,14 @@
       (amap (, mn mtype it) (kwc textwrap.wrap :width G.screen-width (cond
         [(none? mtype)   text]
         [(= mtype :tara) (+ "Tara: " text)]
-        [(= mtype :bob)  (+ "Bob: " text)]))))))
+        [(= mtype :bob)  (+ "Bob: " text)]
+        [(= mtype :aud)  (+ "The audience " text)]))))))
   (setv lines (slice lines (- G.message-lines)))
   (for [[i [mn mtype text]] (enumerate lines)]
     (G.T.move (+ i (- G.screen-height G.message-lines)) 0)
     (setv attr (and (> mn G.last-new-message-number)
       G.new-msg-highlight))
-    (for [[kw t] [[:tara "Tara: "] [:bob "Bob: "]]]
+    (for [[kw t] [[:tara "Tara: "] [:bob "Bob: "] [:aud "The audience "]]]
       (when (and (= mtype kw) (.startswith text t))
         (G.T.addstr t (| attr (get-color (get G.announcer-colors kw) G.bg-color)))
         (setv text (slice text (len t)))))

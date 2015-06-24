@@ -33,7 +33,8 @@
 (def off-map-color :very-dark-gray)
 (def announcer-colors {
   :tara :blue
-  :bob :red})
+  :bob :red
+  :aud :dark-green})
 
 (def new-msg-highlight curses.A-BOLD)
 
@@ -60,6 +61,7 @@
   :brown 94})
 
 (defs push-past-monster-time 1)
+(defs stink-range 20)
 
 ;; * Declarations
 

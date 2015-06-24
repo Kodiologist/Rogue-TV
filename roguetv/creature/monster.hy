@@ -16,7 +16,27 @@
 
   [walk-to (fn [self p-to]
     (unless (.walk-to (super Monster self) p-to)
-      (raise (ValueError (.format "{} tried to walk where it couldn't: {}" self p-to)))))]])
+      (raise (ValueError (.format "{} tried to walk where it couldn't: {}" self p-to)))))]
+
+  [flee-from-stink (fn [self] (block
+    ; If the player stinks and we're in range of the stench, try
+    ; to run away (not very intelligently), and return True.
+    ; Otherwise, return False.
+    (unless (and
+        (< G.current-time G.player.stink-until)
+        (<= (dist-taxi self.pos G.player.pos) G.stink-range))
+      (ret False))
+    (setv neighbors (kwc sorted
+      (shuffle (clear-neighbors self.pos))
+      :key (λ (,
+        (- (/ (dist-taxi it G.player.pos) (dist-taxi it self.pos)))
+        (dist-taxi it self.pos)))))
+    (if (and neighbors (>
+        (dist-taxi (first neighbors) G.player.pos)
+        (dist-taxi self.pos G.player.pos)))
+      (.walk-to self (first neighbors))
+      (.wait self))
+    True))]])
 
 (defn clear-neighbors [pos]
   (filt (room-for? Creature it)
@@ -52,6 +72,8 @@
   [move-chance (/ 1 30)]
 
   [act (fn [self] (block
+    (when (.flee-from-stink self)
+      (ret))
     ; Usually just sit there. Occasionally, wander in a random
     ; direction. Avoid unpleasant tiles.
     (unless (and
@@ -70,6 +92,8 @@
   [detect-player-range 12]
 
   [act (fn [self] (block
+    (when (.flee-from-stink self)
+      (ret))
     ; If the player is close, try to chase after them, not very
     ; intelligently.
     (setv d (- G.player.pos self.pos))

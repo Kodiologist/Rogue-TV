@@ -21,6 +21,7 @@ roguetv.item.generic
 roguetv.creature
 roguetv.creature.generic
 roguetv.item.gadget
+roguetv.item.soda
 roguetv.creature.monster
 roguetv.mapgen
 roguetv.display

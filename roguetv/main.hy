@@ -14,9 +14,8 @@
   [roguetv.util [*]]
   [roguetv.input [hit-key-to-continue]]
   [roguetv.map [room-for?]]
-  [roguetv.item [Item def-itemtype]]
+  [roguetv.item [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]]
-  roguetv.item.gadget
   [roguetv.mapgen [reset-level]]
   [roguetv.display [full-redraw default-color describe-tile]]
   [roguetv.creature.player [Player]]
@@ -25,7 +24,7 @@
 (defn new-game [parsed-cmdline-args]
   (setv p parsed-cmdline-args)
 
-  (roguetv.item.gadget.randomize-appearances)
+  (ItemAppearance.randomize-appearances)
 
   (setv G.player (Player))
   (setv Player.gender p.gender)

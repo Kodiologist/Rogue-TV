@@ -3,6 +3,7 @@
 (import
   [random [randint]]
   [libtcodpy :as tcod]
+  [kodhy.util [ret]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -121,6 +122,12 @@
       (msg :tara "Beware, there will be no return!")
       (when (y-or-n "Take the elevator up?" :+require-uppercase)
         (setv G.endgame :used-up-elevator))))]])
+
+(defn upelevator-pos [] (block
+  (for [l Tile.omap]
+    (for [t l]
+      (when (instance? UpElevator t)
+        (ret t.pos))))))
 
 (defclass DownElevator [Elevator] [
   [name (NounPhrase "elevator going down")]

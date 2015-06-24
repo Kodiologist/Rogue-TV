@@ -16,14 +16,26 @@
 
   [can-open-doors True]
 
+  [__init__ (fn [self &optional pos]
+    (Creature.__init__ self pos)
+    (setv self.stink-until -1)
+      ; The player is considered stinky until (>= G.current-time G.player.stink-time).
+    None)]
+
   [move (fn [self p-to &optional [clobber False]]
     (.move (super Player self) p-to clobber)
     (soil-fov))]
 
   [act (fn [self]
     (full-redraw)
-    (setv old-clock-debt G.player.clock-debt-ms)
+    (setv old-clock-debt self.clock-debt-ms)
     (do-normal-command (get-normal-command))
+    (when (and
+        (!= self.stink-until -1)
+        (>= G.current-time self.stink-until))
+      (msg "You smell presentable again.")
+      (setv self.stink-until -1))
+        ; Just so this message doesn't print again.
     (setv G.last-action-duration (/
-      (- G.player.clock-debt-ms old-clock-debt)
+      (- self.clock-debt-ms old-clock-debt)
       Creature.clock-factor)))]])
