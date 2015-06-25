@@ -111,3 +111,7 @@
   [end-msg (fn [self]
     (msg "You feel like a 98-pound weakling."))]])
       ; Charles Atlas ads
+
+(defclass Sleep [Effect] [
+  [end-msg (fn [self]
+    (msg "You wake up."))]])

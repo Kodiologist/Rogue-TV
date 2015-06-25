@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require kodhy.macros roguetv.macros)
 
 (import
   [heidegger.pos [Pos]]
@@ -8,7 +8,7 @@
   [roguetv.util [*]]
   [roguetv.map [Tile upelevator-pos room-for? disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
-  [roguetv.creature [Stink Haste Strength]])
+  [roguetv.creature [Creature Stink Haste Strength Sleep]])
 
 (defclass Soda [Item] [
   [apply-time 1]
@@ -69,6 +69,31 @@
         (ret)))
     (msg "You feel homesick."))))
 
+(def-itemtype Soda "heeling-potion" :name (NounPhrase "potion of extra heeling" :plural "points of extra heeling")
+  ; A pun on Rogue's potion of extra healing.
+  :price 10
+  :info-flavor "Drink this magic potion and dogs will come heeling from far and wide."
+  :dog-summoning-range 3
+  :dogs-to-summon 5
+
+  :info-apply "Creates {dogs_to_summon} dogs within {dog_summoning_range} squares of you."
+  :soda-effect (fn [self]
+
+    (setv summoned 0)
+    (for [p (shuffle (disc-taxi G.player.pos self.dog-summoning-range))]
+      (when (room-for? Creature p)
+        (rtv creature.monster.Dog p)
+        (+= summoned 1)
+        (when (> summoned self.dogs-to-summon)
+          (break))))
+    (msg (cond
+      [(= summoned 1)
+        "Hey, where'd that dog come from?"]
+      [(> summoned 1)
+        "Hey, where'd those dogs come from?"]
+      [True
+        "You hear plaintive barking."]))))
+
 (def-itemtype Soda "stink-serum" :name (can-of "stink serum")
   ; Inspired by Yipe! III.
   :price 3
@@ -111,3 +136,16 @@
       (fn [] (msg "You feel strong."))
       (fn [] (msg "You feel ready for more gainz.")))))
         ; Bodybuilding slang.
+
+(def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
+  :price 5
+  :info-flavor "Here is that *drugless* way to quiet your ragged nerves so many people are asking about today."
+    ; Quoting from an old Ovaltine ad.
+  :sleep-time 30
+
+  :info-apply "Makes you fall asleep for {sleep_time} seconds."
+  :soda-effect (fn [self]
+
+    (.add-effect G.player Sleep self.sleep-time
+      (fn [] (msg :tara "Oh no! {p:The} has fallen asleep!"))
+      (fn [] (msg "You snore.")))))

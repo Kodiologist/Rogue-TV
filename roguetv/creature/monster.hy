@@ -63,6 +63,24 @@
     :cost dist-taxi))
   (slice (second (searcher p-from p-to max-cost)) 1))
 
+(defn find-path-thru-creatures [p-from p-to &optional [max-cost (int 1e6)]]
+  (setv searcher (kwc pypaths.astar.pathfinder
+    :neighbors (fn [p] (+
+       (filt (and (on-map it) (not (. (Tile.at it) blocks-movement)))
+         (amap (+ p it) Pos.DIR8))
+       (if (adjacent? p p-to) [p-to] [])))
+    :distance dist-euclid
+      ; This is the heuristic. Because the 2-norm ≤ the 1-norm,
+      ; Euclidean distance is an admissible heuristic for taxicab
+      ; geometry.
+    :cost (fn [p1 p2]
+      ; Prefer paths that don't go through creatures.
+      (when (or (none? p1) (none? p2))
+        (raise (ValueError [p1 p2 p-to])))
+      (+ (dist-taxi p1 p2)
+        (* 2 (bool (and (Creature.at p2) (!= p2 p-to))))))))
+  (slice (second (searcher p-from p-to max-cost)) 1))
+
 (defclass Cat [Monster] [
   [name (NounPhrase "cat")]
   [char "f"]
@@ -116,9 +134,12 @@
         (.wait self)
         (ret))
       ; If we have a path to the player, use it.
-      (setv path (find-path self.pos G.player.pos self.detect-player-range))
+      (setv path (find-path-thru-creatures self.pos G.player.pos
+        self.detect-player-range))
       (when path
-        (.walk-to self (first path))
+        (if (room-for? self (first path))
+          (.walk-to self (first path))
+          (.wait self))
         (ret)))
     ; Otherwise, wander.
     (or (wander self) (.wait self))))]])

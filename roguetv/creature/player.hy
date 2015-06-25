@@ -4,7 +4,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [get-normal-command]]
-  [roguetv.creature [Creature Haste]]
+  [roguetv.creature [Creature Haste Sleep]]
   [roguetv.display [full-redraw]]
   [roguetv.actions [do-normal-command]])
 
@@ -31,16 +31,18 @@
       1))]
 
   [act (fn [self]
-    (full-redraw)
-    (setv old-clock-debt self.clock-debt-ms)
-    (do-normal-command (get-normal-command))
-    (setv G.last-action-duration (/
-      (- self.clock-debt-ms old-clock-debt)
-      Creature.clock-factor))
     (for [e self.effects]
       (when (>= G.current-time e.expiry)
         (.end-msg e)
-        (.remove self.effects e))))]
+        (.remove self.effects e)))
+    (full-redraw)
+    (setv old-clock-debt self.clock-debt-ms)
+    (if (.has-effect self Sleep)
+      (.wait self)
+      (do-normal-command (get-normal-command)))
+    (setv G.last-action-duration (/
+      (- self.clock-debt-ms old-clock-debt)
+      Creature.clock-factor)))]
 
   [has-effect (fn [self effect-cls]
     (setv e (afind-or (instance? effect-cls it) self.effects))
