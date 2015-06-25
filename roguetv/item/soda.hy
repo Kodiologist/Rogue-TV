@@ -8,7 +8,7 @@
   [roguetv.util [*]]
   [roguetv.map [Tile upelevator-pos room-for? disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
-  [roguetv.creature [Stink Haste]])
+  [roguetv.creature [Stink Haste Strength]])
 
 (defclass Soda [Item] [
   [apply-time 1]
@@ -97,3 +97,17 @@
       (fn [] (msg "You feel jittery."))
       (fn [] (msg "Your jittering intensifies.")))))
         ; http://knowyourmeme.com/memes/intensifies
+
+(def-itemtype Soda "strength-soda" :name (can-of "Daffy's Elixir")
+  ; A name for several patent medicines.
+  :price 3
+  :info-flavor "This marvelous concoction will give you the strength of a raging bull!"
+  :strength-time (* 5 60)
+
+  :info-apply "Allows you to instantly open doors for five minutes."
+  :soda-effect (fn [self]
+
+    (.add-effect G.player Strength self.strength-time
+      (fn [] (msg "You feel strong."))
+      (fn [] (msg "You feel ready for more gainz.")))))
+        ; Bodybuilding slang.

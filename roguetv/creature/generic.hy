@@ -74,6 +74,9 @@
     (.after-step-onto (Tile.at p-to) self p-from)
     True))]
 
+  [has-effect (fn [self effect-cls]
+    False)]
+
   [walk-speed (fn [self]
     ; Return the applicable multiplier for the creature's walking
     ; speed.
@@ -103,3 +106,8 @@
 (defclass Haste [Effect] [
   [end-msg (fn [self]
     (msg "The rush of energy fades."))]])
+
+(defclass Strength [Effect] [
+  [end-msg (fn [self]
+    (msg "You feel like a 98-pound weakling."))]])
+      ; Charles Atlas ads

@@ -157,8 +157,11 @@
   [bump-into (fn [self cr] (block
     (unless cr.can-open-doors
       (ret True))
-    (msgp cr "You open the old door after a struggle.")
-    (cr.take-time self.open-time)
+    (if (.has-effect cr (rtv-get creature.Strength))
+      (msgp cr "You effortlessly tear the door off its hinges.")
+      (do
+        (msgp cr "You open the old door after a struggle.")
+        (cr.take-time self.open-time)))
     (mset self.pos (Floor))
     False))]])
 
