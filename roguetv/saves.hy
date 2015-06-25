@@ -2,6 +2,7 @@
 
 (import
   [datetime [datetime]]
+  gzip
   jsonpickle
   [kodhy.util [concat]]
   [roguetv.globals :as G]
@@ -35,11 +36,11 @@
 
   (setv (get x "Creature.extant") Creature.extant)
 
-  (with [[o (open path "w")]]
+  (with [[o (gzip.open path "wb")]]
     (o.write (kwc jsonpickle.encode x :+warn))))
 
 (defn load-from-save-file [path]
-  (with [[o (open path)]]
+  (with [[o (gzip.open path "rb")]]
     (setv x (jsonpickle.decode (.read o))))
 
   (for ([k v] (.items (get x "G")))

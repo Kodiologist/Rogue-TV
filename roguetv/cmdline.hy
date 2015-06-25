@@ -48,7 +48,7 @@
       (catch [e OSError]
         (unless (= e.errno errno.EEXIST)
           (raise))))
-    (setv p.save (os.path.join d "saved-game.json")))
+    (setv p.save (os.path.join d "saved-game.json.gz")))
 
   (unless p.pronouns
     (setv p.pronouns (random.choice ["he" "she"])))
