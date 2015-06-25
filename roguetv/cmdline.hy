@@ -1,6 +1,7 @@
 (require kodhy.macros)
 
 (import
+  sys
   os
   os.path
   errno
@@ -17,13 +18,16 @@
   (, "it" :neuter)
   (, "they" :singular-they)]))
 
+(defn uni [s]
+  (.decode s (sys.getfilesystemencoding)))
+
 (def parameters [
-  ["name"
+  ["name" :type uni
     :help "name of your character (new game only)"]
-  ["pronouns"
+  ["pronouns" :type uni
     :help "pronouns for your character (new game only)"
     :choices (amap (str it) (.keys pronouns->genders))]
-  ["save"
+  ["save" :type uni
     :help "filepath to read a saved game from or write saved games to"]
   ["debug"
     :help "enable debug mode"

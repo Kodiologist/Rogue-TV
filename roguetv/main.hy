@@ -2,6 +2,7 @@
 
 (import
   os
+  locale
   [random [choice]]
   [datetime [datetime]]
   curses
@@ -41,6 +42,9 @@
     (setv (get os.environ "ESCDELAY") "10"))
       ; This ensures curses will respond to the escape key quickly
       ; in keypad mode (which is enabled by curses.wrapper).
+
+  (locale.setlocale locale.LC-ALL "")
+  (setv G.locale-encoding (locale.getpreferredencoding))
 
   (setv exit-reason (block :curses-wrapper (curses.wrapper (fn [scr]
 

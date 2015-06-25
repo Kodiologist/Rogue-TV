@@ -14,6 +14,23 @@
   [roguetv.item [Item]]
   [roguetv.creature [Creature]])
 
+(defn encode [s]
+  (.encode s G.locale-encoding))
+
+(defn addstr [a1 &optional a2 a3 a4]
+  (try
+    (cond
+      [(not (none? a4))
+        (G.T.addstr a1 a2 (encode a3) a4)]
+      [(not (none? a3))
+        (G.T.addstr a1 a2 (encode a3))]
+      [(not (none? a2))
+        (G.T.addstr (encode a1) a2)]
+      [True
+        (G.T.addstr (encode a1))])
+    (catch [_ curses.error] None)))
+      ; http://bugs.python.org/issue8243
+
 (defn recompute-fov []
   (kwc tcod.map-compute-fov G.fov-map
     G.player.pos.x G.player.pos.y
@@ -39,10 +56,7 @@
   (get-color G.fg-color G.bg-color))
 
 (defn echo [str color-fg color-bg]
-  (try
-    (G.T.addstr str (get-color color-fg color-bg))
-    (catch [_ curses.error] None)))
-      ; http://bugs.python.org/issue8243
+  (addstr str (get-color color-fg color-bg)))
 
 (defn echo-drawable [d]
   (echo d.char d.color-fg d.color-bg))
@@ -105,7 +119,7 @@
   focus-t-coords)
 
 (defn draw-status-line []
-  (G.T.addstr (- G.screen-height 1 G.message-lines) 0
+  (addstr (- G.screen-height 1 G.message-lines) 0
     (.format "{} {}  DL:{: 2}  {:>6}{}"
       (.rjust (minsec (max 0 (- (or G.time-limit 0) G.current-time)))
         (len "10:00"))
@@ -136,9 +150,9 @@
       G.new-msg-highlight))
     (for [[kw t] [[:tara "Tara: "] [:bob "Bob: "] [:aud "The audience "]]]
       (when (and (= mtype kw) (.startswith text t))
-        (G.T.addstr t (| attr (get-color (get G.announcer-colors kw) G.bg-color)))
+        (addstr t (| attr (get-color (get G.announcer-colors kw) G.bg-color)))
         (setv text (slice text (len t)))))
-    (G.T.insstr text attr)))
+    (addstr text attr)))
 
 (defn full-redraw [&optional focus]
   (G.T.erase)
@@ -167,8 +181,7 @@
         (if it (kwc textwrap.wrap it :width w) [""])
         (.split text "\n")))
       0 (dec G.screen-height)))]
-    (G.T.move i G.text-screen-left-margin)
-    (G.T.insstr line)))
+    (addstr i G.text-screen-left-margin line)))
 
 (defn draw-inventory [prompt]
   (setv names (amap (.format "{:a:most}" it) G.inventory))
@@ -191,10 +204,10 @@
     (G.T.move n 0)
     (setv text (slice (.ljust text width) 0 width))
     (setv parts (.split text "�" 1))
-    (G.T.addstr (first parts))
+    (addstr (first parts))
     (when (> (len parts) 1)
       (echo-drawable item)
-      (G.T.addstr (second parts)))))
+      (addstr (second parts)))))
 
 (defn draw-look-legend [p]
   ; In look mode, show a legend describing the creature, item,
@@ -216,10 +229,10 @@
     (G.T.move (- G.screen-height (- (len lines) n)) 0)
     (setv text (slice (.ljust text width) 0 width))
     (setv parts (.split text "�" 1))
-    (G.T.addstr (first parts))
+    (addstr (first parts))
     (when (> (len parts) 1)
       (echo-drawable drawable)
-      (G.T.addstr (second parts)))))
+      (addstr (second parts)))))
 
 (defn describe-tile [pos &optional verbose]
   (setv tile (Tile.at pos))

@@ -80,6 +80,7 @@
 (def screen-width None)
 (def screen-height None)
 (def color-pairs {})
+(def locale-encoding None)
 (defs message-log [])
 (defs last-new-message-number -1)
 
