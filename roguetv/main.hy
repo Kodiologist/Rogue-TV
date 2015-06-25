@@ -62,11 +62,16 @@
 
     (block :game-loop (while True
 
-      (for [cr Creature.extant]
+      (for [cr Creature.extant] (block :cr
         (while (< cr.clock-debt-ms Creature.clock-factor)
+          (unless (in cr Creature.extant)
+            ; We have to check again that this creature is around
+            ; in case it disappeared (particularly, if the player
+            ; went to a new level) since we started the whole loop.
+            (retf :cr))
           (cr.act)
           (when G.endgame
-            (retf :game-loop))))
+            (retf :game-loop)))))
       (+= G.current-time 1)
       (for [cr Creature.extant]
         (-= cr.clock-debt-ms Creature.clock-factor)
