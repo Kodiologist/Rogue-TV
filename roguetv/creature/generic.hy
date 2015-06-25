@@ -84,3 +84,22 @@
     ; .take-time as needed.
     (msg "[No .act implemented for {}]" self)
     (.wait self))]])
+
+(defclass Effect [object] [
+; Despite that this class is in creature.generic instead of
+; creature.player, only the player can have effects.
+
+  [__init__ (fn [self expiry]
+    (set-self expiry)
+    None)]
+
+  [end-msg (fn [self]
+    None)]])
+
+(defclass Stink [Effect] [
+  [end-msg (fn [self]
+    (msg "You smell presentable again."))]])
+
+(defclass Haste [Effect] [
+  [end-msg (fn [self]
+    (msg "The rush of energy fades."))]])

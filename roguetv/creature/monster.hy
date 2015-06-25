@@ -9,7 +9,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.map [Tile room-for? on-map]]
-  [roguetv.creature [Creature]])
+  [roguetv.creature [Creature Stink]])
 
 (defclass Monster [Creature] [
   ; A class for all non-player creatures.
@@ -23,7 +23,7 @@
     ; to run away (not very intelligently), and return True.
     ; Otherwise, return False.
     (unless (and
-        (< G.current-time G.player.stink-until)
+        (.has-effect G.player Stink)
         (<= (dist-taxi self.pos G.player.pos) G.stink-range))
       (ret False))
     (setv neighbors (kwc sorted

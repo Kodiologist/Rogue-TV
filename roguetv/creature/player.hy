@@ -4,7 +4,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [get-normal-command]]
-  [roguetv.creature [Creature]]
+  [roguetv.creature [Creature Haste]]
   [roguetv.display [full-redraw]]
   [roguetv.actions [do-normal-command]])
 
@@ -18,8 +18,7 @@
 
   [__init__ (fn [self &optional pos]
     (Creature.__init__ self pos)
-    (setv self.stink-until -1)
-    (setv self.hasted-until -1)
+    (setv self.effects [])
     None)]
 
   [move (fn [self p-to &optional [clobber False]]
@@ -27,7 +26,7 @@
     (soil-fov))]
 
   [walk-speed (fn [self]
-    (if (< G.current-time self.hasted-until)
+    (if (.has-effect self Haste)
       G.speedup-soda-factor
       1))]
 
@@ -35,18 +34,29 @@
     (full-redraw)
     (setv old-clock-debt self.clock-debt-ms)
     (do-normal-command (get-normal-command))
-    ; We set .stink-until and .hasted-until to -1 just so the
-    ; effect-ending messages don't print again.
-    (when (and
-        (!= self.stink-until -1)
-        (>= G.current-time self.stink-until))
-      (msg "You smell presentable again.")
-      (setv self.stink-until -1))
-    (when (and
-        (!= self.hasted-until -1)
-        (>= G.current-time self.hasted-until))
-      (msg "The rush of energy fades.")
-      (setv self.hasted-until -1))
     (setv G.last-action-duration (/
       (- self.clock-debt-ms old-clock-debt)
-      Creature.clock-factor)))]])
+      Creature.clock-factor))
+    (for [e self.effects]
+      (when (>= G.current-time e.expiry)
+        (.end-msg e)
+        (.remove self.effects e))))]
+
+  [has-effect (fn [self effect-cls]
+    (setv e (afind-or (instance? effect-cls it) self.effects))
+    (and e (< G.current-time e.expiry)))]
+
+  [add-effect (fn [self effect-cls duration start-msg lengthen-msg]
+    (setv expiry (+ G.current-time duration))
+    (setv e (afind-or (instance? effect-cls it) self.effects))
+    ; If the player already has an effect of this kind,
+    ; refresh the duration to the maximum of the old one and the
+    ; new one.
+;    (raise (ValueError [e effect-cls duration start-msg lengthen-msg]))
+    (if e
+      (do
+        (lengthen-msg)
+        (setv e.expiry (max e.expiry expiry)))
+      (do
+        (start-msg)
+        (.append self.effects (effect-cls expiry)))))]])

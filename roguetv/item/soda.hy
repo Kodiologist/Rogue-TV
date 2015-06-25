@@ -7,7 +7,8 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.map [Tile upelevator-pos room-for? disc-taxi]]
-  [roguetv.item.generic [Item ItemAppearance def-itemtype]])
+  [roguetv.item.generic [Item ItemAppearance def-itemtype]]
+  [roguetv.creature [Stink Haste]])
 
 (defclass Soda [Item] [
   [apply-time 1]
@@ -77,11 +78,9 @@
   :info-apply (.format "You'll stink for {{stink_time}} seconds. While you stink, monsters within {} squares will run away from you." G.stink-range)
   :soda-effect (fn [self]
 
-    (if (>= G.current-time G.player.stink-until)
-      (msg :aud "cries out in disgust at the pungent odor.")
-      (msg :tara "Smells like {p:the} is going to keep on smelling for a while."))
-    (setv G.player.stink-until (max G.player.stink-until
-      (+ G.current-time self.stink-time)))))
+    (.add-effect G.player Stink self.stink-time
+      (fn [] (msg :aud "cries out in disgust at the pungent odor."))
+      (fn [] (msg :tara "Smells like {p:the} is going to keep on smelling for a while.")))))
 
 (def-itemtype Soda "speed-soda" :name (can-of "5-minute ENERGY™")
   ; In reference to the real dietary supplement 5-hour Energy.
@@ -94,9 +93,7 @@
   :info-apply "Doubles your walking speed for five minutes."
   :soda-effect (fn [self]
 
-    (if (>= G.current-time G.player.hasted-until)
-      (msg "You feel jittery.")
-      (msg "Your jittering intensifies."))
+    (.add-effect G.player Haste self.haste-time
+      (fn [] (msg "You feel jittery."))
+      (fn [] (msg "Your jittering intensifies.")))))
         ; http://knowyourmeme.com/memes/intensifies
-    (setv G.player.hasted-until (max G.player.hasted-until
-      (+ G.current-time self.haste-time)))))
