@@ -37,6 +37,9 @@
     [(= cmd :move)
       (.walk-to G.player (+ G.player.pos arg))]
 
+    [(= cmd :wait)
+      (.wait G.player)]
+
     [(= cmd :look-mode)
       (look-mode G.player.pos)]
 

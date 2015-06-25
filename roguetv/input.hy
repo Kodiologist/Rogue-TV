@@ -70,6 +70,8 @@
 
       [(in key direction-keys)
         [:move (get direction-keys key)]]
+      [(in key ["." "5" "KEY_B2"])
+        [:wait]]
 
       [(= key ";")
         :look-mode]
