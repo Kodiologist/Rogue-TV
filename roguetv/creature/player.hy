@@ -19,23 +19,34 @@
   [__init__ (fn [self &optional pos]
     (Creature.__init__ self pos)
     (setv self.stink-until -1)
-      ; The player is considered stinky until (>= G.current-time G.player.stink-time).
+    (setv self.hasted-until -1)
     None)]
 
   [move (fn [self p-to &optional [clobber False]]
     (.move (super Player self) p-to clobber)
     (soil-fov))]
 
+  [walk-speed (fn [self]
+    (if (< G.current-time self.hasted-until)
+      G.speedup-soda-factor
+      1))]
+
   [act (fn [self]
     (full-redraw)
     (setv old-clock-debt self.clock-debt-ms)
     (do-normal-command (get-normal-command))
+    ; We set .stink-until and .hasted-until to -1 just so the
+    ; effect-ending messages don't print again.
     (when (and
         (!= self.stink-until -1)
         (>= G.current-time self.stink-until))
       (msg "You smell presentable again.")
       (setv self.stink-until -1))
-        ; Just so this message doesn't print again.
+    (when (and
+        (!= self.hasted-until -1)
+        (>= G.current-time self.hasted-until))
+      (msg "The rush of energy fades.")
+      (setv self.hasted-until -1))
     (setv G.last-action-duration (/
       (- self.clock-debt-ms old-clock-debt)
       Creature.clock-factor)))]])

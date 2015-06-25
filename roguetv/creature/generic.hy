@@ -64,7 +64,7 @@
     ; Okay, we're clear to move.
     (setv p-from self.pos)
     (.step-out-of (Tile.at p-from) self p-to)
-    (.take-time self (dist-taxi p-from p-to))
+    (.take-time self (/ (dist-taxi p-from p-to) (self.walk-speed)))
     (kwc .move self p-to :+clobber)
     (when cr
       (msg "You push past {:the}." cr)
@@ -73,6 +73,11 @@
       (rtv display.describe-tile self.pos))
     (.after-step-onto (Tile.at p-to) self p-from)
     True))]
+
+  [walk-speed (fn [self]
+    ; Return the applicable multiplier for the creature's walking
+    ; speed.
+    1)]
 
   [act (fn [self]
     ; It's this creature's turn to act. Go wild, calling

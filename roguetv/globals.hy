@@ -62,6 +62,7 @@
 
 (defs push-past-monster-time 1)
 (defs stink-range 20)
+(defs speedup-soda-factor 2)
 
 ;; * Declarations
 

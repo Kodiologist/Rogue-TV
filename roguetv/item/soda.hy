@@ -82,3 +82,21 @@
       (msg :tara "Smells like {p:the} is going to keep on smelling for a while."))
     (setv G.player.stink-until (max G.player.stink-until
       (+ G.current-time self.stink-time)))))
+
+(def-itemtype Soda "speed-soda" :name (can-of "5-minute ENERGY™")
+  ; In reference to the real dietary supplement 5-hour Energy.
+  :price 15
+  :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, this is some kind of swill that you don't really want to know the origin or chemical composition of, but it's got quite a kick, for a short time."
+    ; Mid-20th-century Cheerios ads
+  :haste-time (* 5 60)
+  ; See also G.speedup-soda-factor.
+
+  :info-apply "Doubles your walking speed for five minutes."
+  :soda-effect (fn [self]
+
+    (if (>= G.current-time G.player.hasted-until)
+      (msg "You feel jittery.")
+      (msg "Your jittering intensifies."))
+        ; http://knowyourmeme.com/memes/intensifies
+    (setv G.player.hasted-until (max G.player.hasted-until
+      (+ G.current-time self.haste-time)))))
