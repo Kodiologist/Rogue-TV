@@ -45,10 +45,10 @@
     :name (NounPhrase (+ name " soda can"))
     :color-fg color)))
 
-(defn can-of [s]
+(defn can-of [s &optional force-a]
   (kwc NounPhrase
     :stem (+ "can of " s)
-    :plural (+ "cans of " s)))
+    :indefinite-singular (when force-a (+ "a can of " s))))
 
 (def-itemtype Soda "chicken-soup" :name (can-of "chicken soup")
   :price 10
@@ -69,7 +69,7 @@
         (ret)))
     (msg "You feel homesick."))))
 
-(def-itemtype Soda "heeling-potion" :name (NounPhrase "potion of extra heeling" :plural "points of extra heeling")
+(def-itemtype Soda "heeling-potion" :name (kwc NounPhrase "potion of extra heeling" :plural "potions of extra heeling")
   ; A pun on Rogue's potion of extra healing.
   :price 10
   :info-flavor "Drink this magic potion and dogs will come heeling from far and wide."
@@ -107,7 +107,8 @@
       (fn [] (msg :aud "cries out in disgust at the pungent odor."))
       (fn [] (msg :tara "Smells like {p:the} is going to keep on smelling for a while.")))))
 
-(def-itemtype Soda "speed-soda" :name (can-of "5-minute ENERGY™")
+(def-itemtype Soda "speed-soda" :name (kwc can-of "5-minute ENERGY™" :+force-a)
+    ; We need :+force-a because of a bug in inflect.
   ; In reference to the real dietary supplement 5-hour Energy.
   :price 15
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, this is some kind of swill that you don't really want to know the origin or chemical composition of, but it's got quite a kick, for a short time."
