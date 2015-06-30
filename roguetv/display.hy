@@ -40,7 +40,7 @@
       (when (tcod.map-is-in-fov G.fov-map x y)
         (setv (get G.seen-map x y) True)))))
 
-(defn get-color [fg bg]
+(defn get-color [fg &optional bg]
   (when (none? bg)
     (setv bg (G.pick-bg-color fg)))
   (curses.color-pair (try
@@ -53,7 +53,7 @@
       i))))
 
 (defn default-color []
-  (get-color G.fg-color G.bg-color))
+  (get-color G.fg-color))
 
 (defn echo [str color-fg color-bg]
   (addstr str (get-color color-fg color-bg)))
@@ -150,7 +150,7 @@
       G.new-msg-highlight))
     (for [[kw t] [[:tara "Tara: "] [:bob "Bob: "] [:aud "The audience "]]]
       (when (and (= mtype kw) (.startswith text t))
-        (addstr t (| attr (get-color (get G.announcer-colors kw) G.bg-color)))
+        (addstr t (| attr (get-color (get G.announcer-colors kw))))
         (setv text (slice text (len t)))))
     (addstr text attr)))
 
