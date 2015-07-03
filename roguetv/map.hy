@@ -11,6 +11,7 @@
   [roguetv.types [Drawable MapObject]])
 
 (defclass Tile [Drawable MapObject NounPhraseNamed] [
+  [escape-xml-in-np-format True]
   [info-text "[Missing info text]"]
   [blocks-movement False]
   [blocks-sight False]

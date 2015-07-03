@@ -24,6 +24,7 @@ roguetv.item.gadget
 roguetv.item.soda
 roguetv.creature.monster
 roguetv.mapgen
+roguetv.attrstr
 roguetv.display
 roguetv.actions
 roguetv.creature.player

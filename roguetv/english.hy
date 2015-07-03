@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  xml.sax.saxutils
   [kodhy.util [ret ucfirst]]
   inflect)
 
@@ -101,12 +102,13 @@
 
 (defclass NounPhraseNamed [object] [
   [name None]
+  [escape-xml-in-np-format False]
 
   [__format__ (fn [self formatstr]
     (.format-nounphrase self self.name formatstr))]
 
   [format-nounphrase (classmethod (fn [self name formatstr]
-    (cond
+    (setv x (cond
       [(= formatstr "")
         name.stem]
       [(= formatstr "a")
@@ -116,7 +118,10 @@
       [(= formatstr "the")
         name.definite-singular]
       [(= formatstr "The")
-        (ucfirst name.definite-singular)])))]])
+        (ucfirst name.definite-singular)]))
+    (if (and x self.escape-xml-in-np-format)
+      (xml.sax.saxutils.escape x)
+      x)))]])
 
 (defclass TakesPronouns [NounPhraseNamed] [
   [gender :neuter]

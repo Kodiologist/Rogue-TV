@@ -140,7 +140,7 @@
 
 (def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
   :price 5
-  :info-flavor "Here is that *drugless* way to quiet your ragged nerves so many people are asking about today. Ovaltine® marks one of the most important scientific findings of its time."
+  :info-flavor "Here is that <b>drugless</b> way to quiet your ragged nerves so many people are asking about today. Ovaltine® marks one of the most important scientific findings of its time."
     ; Quoting from old Ovaltine ads:
     ; - Collier's, 8 October 1932, p. 29 - http://web.archive.org/http://i.imgur.com/zX4Axys.jpg
     ; - Milwaukee Sentinel, 13 Oct 1928, p. 21 - http://web.archive.org/http://i.imgur.com/Q132P5l.png

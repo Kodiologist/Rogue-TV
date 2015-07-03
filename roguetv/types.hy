@@ -1,12 +1,22 @@
 (require kodhy.macros)
 
 (import
+  xml.sax.saxutils
+  [kodhy.util [keyword->str]]
   [roguetv.globals :as G])
 
 (defclass Drawable [object] [
   [char None]
   [color-fg G.fg-color]
-  [color-bg None]])
+  [color-bg None]
+
+  [xml-symbol (fn [self]
+    (.format "<c fg='{}'{}>{}</c>"
+      (keyword->str self.color-fg)
+      (if self.color-bg
+        (.format " bg='{}'" (keyword->str self.color-bg))
+        "")
+      (xml.sax.saxutils.escape self.char)))]])
 
 (defclass MapObject [object] [
 

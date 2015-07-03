@@ -9,6 +9,7 @@
   [roguetv.map [Tile on-map]])
 
 (defclass Creature [Drawable MapObject TakesPronouns] [
+  [escape-xml-in-np-format True]
   [extant []]
   [char "C"]
   [info-text "[Missing info text]"]

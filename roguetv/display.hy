@@ -12,22 +12,20 @@
   [roguetv.types [Drawable MapObject]]
   [roguetv.map [Tile Floor]]
   [roguetv.item [Item]]
-  [roguetv.creature [Creature]])
-
-(defn encode [s]
-  (.encode s G.locale-encoding))
+  [roguetv.creature [Creature]]
+  [roguetv.attrstr [AttrStr get-color curses-encode]])
 
 (defn addstr [a1 &optional a2 a3 a4]
   (try
     (cond
       [(not (none? a4))
-        (G.T.addstr a1 a2 (encode a3) a4)]
+        (G.T.addstr a1 a2 (curses-encode a3) a4)]
       [(not (none? a3))
-        (G.T.addstr a1 a2 (encode a3))]
+        (G.T.addstr a1 a2 (curses-encode a3))]
       [(not (none? a2))
-        (G.T.addstr (encode a1) a2)]
+        (G.T.addstr (curses-encode a1) a2)]
       [True
-        (G.T.addstr (encode a1))])
+        (G.T.addstr (curses-encode a1))])
     (catch [_ curses.error] None)))
       ; http://bugs.python.org/issue8243
 
@@ -39,21 +37,6 @@
     (for [y (range G.map-height)]
       (when (tcod.map-is-in-fov G.fov-map x y)
         (setv (get G.seen-map x y) True)))))
-
-(defn get-color [fg &optional bg]
-  (when (none? bg)
-    (setv bg (G.pick-bg-color fg)))
-  (curses.color-pair (try
-    (get G.color-pairs (, fg bg))
-    (catch [_ KeyError]
-      ; This color pair hasn't been initialized yet. So do that.
-      (setv i (+ 2 (len G.color-pairs)))
-      (curses.init-pair i (get G.color-numbers fg) (get G.color-numbers bg))
-      (setv (get G.color-pairs (, fg bg)) i)
-      i))))
-
-(defn default-color []
-  (get-color G.fg-color))
 
 (defn echo [str color-fg color-bg]
   (addstr str (get-color color-fg color-bg)))
@@ -137,22 +120,15 @@
 
 (defn draw-bottom-message-log []
   (setv lines (concat
-    (lc [[mn mtype text] (slice G.message-log (- G.message-lines))]
-      (amap (, mn mtype it) (kwc textwrap.wrap :width G.screen-width (cond
-        [(none? mtype)   text]
-        [(= mtype :tara) (+ "Tara: " text)]
-        [(= mtype :bob)  (+ "Bob: " text)]
-        [(= mtype :aud)  (+ "The audience " text)]))))))
+    (lc [[mn text-xml] (slice G.message-log (- G.message-lines))]
+      (amap (, mn it)
+        (.wrap (AttrStr.from-xml text-xml) G.screen-width)))))
   (setv lines (slice lines (- G.message-lines)))
-  (for [[i [mn mtype text]] (enumerate lines)]
+  (for [[i [mn astr]] (enumerate lines)]
     (G.T.move (+ i (- G.screen-height G.message-lines)) 0)
-    (setv attr (and (> mn G.last-new-message-number)
-      G.new-msg-highlight))
-    (for [[kw t] [[:tara "Tara: "] [:bob "Bob: "] [:aud "The audience "]]]
-      (when (and (= mtype kw) (.startswith text t))
-        (addstr t (| attr (get-color (get G.announcer-colors kw))))
-        (setv text (slice text (len t)))))
-    (addstr text attr)))
+    (.draw astr (if (> mn G.last-new-message-number)
+      G.new-msg-highlight
+      0))))
 
 (defn full-redraw [&optional focus]
   (G.T.erase)
@@ -172,80 +148,70 @@
     (apply G.T.move focus-t-coords))
   (G.T.refresh))
 
-(defn draw-text-screen [text]
+(defn draw-text-screen [text-xml]
   (curses.curs-set 0)
   (G.T.erase)
   (setv w (- G.screen-width G.text-screen-left-margin))
   (for [[i line] (enumerate (slice
       (concat (amap
-        (if it (kwc textwrap.wrap it :width w) [""])
-        (.split text "\n")))
+        (if it (.wrap (AttrStr.from-xml it) w) [(AttrStr)])
+        (.split text-xml "\n")))
       0 (dec G.screen-height)))]
-    (addstr i G.text-screen-left-margin line)))
+    (G.T.move i G.text-screen-left-margin)
+    (.draw line)))
 
 (defn draw-inventory [prompt]
   (setv names (amap (.format "{:a:most}" it) G.inventory))
   (setv prices (amap (.apparent-price it) G.inventory))
-  (setv lines (+
-    [[None prompt]]
+  (setv lines (amap (AttrStr.from-xml it) (+
+    [prompt]
     (amap
-      [(get G.inventory it) (.format "  {} � {:{}}  {}{:>{}}"
-        ; The character � will be replaced with the item's symbol.
+      (.format "  {} {} {:{}}  {}{:>{}}"
         (. (get G.inventory it) invlet)
+        (.xml-symbol (get G.inventory it))
         (get names it)
         (max (map len names))
         (if (zero? it) "$" " ")
         (get prices it)
-        (max (amap (len (string it)) prices)))]
+        (max (amap (len (string it)) prices)))
       (range (len G.inventory)))
-    (* [[None "      ---"]] (- G.inventory-limit (len G.inventory)))))
-  (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
-  (for [[n [item text]] (enumerate lines)]
+    (* ["      ---"] (- G.inventory-limit (len G.inventory))))))
+  (setv width (min G.screen-width (inc (max (map len lines)))))
+  (for [[n line] (enumerate lines)]
     (G.T.move n 0)
-    (setv text (slice (.ljust text width) 0 width))
-    (setv parts (.split text "�" 1))
-    (addstr (first parts))
-    (when (> (len parts) 1)
-      (echo-drawable item)
-      (addstr (second parts)))))
+    (.draw (.ljust line width))))
 
 (defn draw-look-legend [p]
   ; In look mode, show a legend describing the creature, item,
   ; and tile under the cursor.
-  (setv dunno (unless (get G.seen-map p.x p.y) (, None "    ? unseen")))
+  (setv dunno (unless (get G.seen-map p.x p.y) "    ? unseen"))
   (setv lines [
-    [None "At cursor: (press a key to examine)"]
-    ; � characters will be replaced with map symbols.
+    "At cursor: (press a key to examine)"
     (or dunno (whenn (Creature.at p)
-      (, it (.format "  {} � {:a}" (get look-at-keys :creature) it))))
+      (.format "  {} {} {:a}" (get look-at-keys :creature) (.xml-symbol it) it)))
     (or dunno (whenn (Item.at p)
-      (, it (.format "  {} � {:a:full}" (get look-at-keys :item) it))))
+      (.format "  {} {} {:a:full}" (get look-at-keys :item) (.xml-symbol it) it)))
     (or dunno
-      (, (Tile.at p) (.format "  {} � {:a}" (get look-at-keys :tile) (Tile.at p))))])
-  (setv lines (amap (or it (, None "      ---")) lines))
+      (.format "  {} {} {:a}" (get look-at-keys :tile) (.xml-symbol (Tile.at p)) (Tile.at p)))])
+  (setv lines (amap (AttrStr.from-xml (or it "      ---")) lines))
   (assert (= (len lines) G.look-mode-legend-height))
-  (setv width (min G.screen-width (inc (max (amap (len (second it)) lines)))))
-  (for [[n [drawable text]] (enumerate lines)]
+  (setv width (min G.screen-width (inc (max (map len lines)))))
+  (for [[n line] (enumerate lines)]
     (G.T.move (- G.screen-height (- (len lines) n)) 0)
-    (setv text (slice (.ljust text width) 0 width))
-    (setv parts (.split text "�" 1))
-    (addstr (first parts))
-    (when (> (len parts) 1)
-      (echo-drawable drawable)
-      (addstr (second parts)))))
+    (.draw (.ljust line width))))
 
 (defn describe-tile [pos &optional verbose]
   (setv tile (Tile.at pos))
   (cond
     [(Item.at pos) (do
-      (msg "You see here {:a:full}." (Item.at pos))
+      (msg "You see here {} {:a:full}." (.xml-symbol (Item.at pos)) (Item.at pos))
       (unless (instance? Floor tile)
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type
         ; may not be obvious.
-        (msg "There is also {:a} here." tile)))]
+        (msg "There is also {} {:a} here." (.xml-symbol tile) tile)))]
     [verbose
       (if (instance? Floor tile)
         (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
           (if (G.player.female) "dowdy" "cull"))
-        (msg "There is {:a} here." tile))]))
+        (msg "There is {} {:a} here." (.xml-symbol tile) tile))]))

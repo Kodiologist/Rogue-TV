@@ -2,7 +2,7 @@
   [math [sqrt]]
   random
   [heidegger.pos [Pos]]
-  [kodhy.util [seq]]
+  [kodhy.util [seq keyword->str]]
   [roguetv.globals :as G])
 
 (defn chance [x]
@@ -58,9 +58,13 @@
   (setv args (list args))
   (setv mtype (when (keyword? (first args))
     (.pop args 0)))
+  (when mtype
+    (setv (get args 0) (.format "<c fg='{}'>{}:</c> {}"
+      (keyword->str (get G.announcer-colors mtype))
+      (get {:tara "Tara" :bob "Bob" :aud "The audience"} mtype)
+      (get args 0))))
   (.append G.message-log (,
     (len G.message-log)
-    mtype
     (apply .format args {"p" G.player}))))
 
 (defn msgp [cr &rest args]

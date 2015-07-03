@@ -18,7 +18,8 @@
   [roguetv.item [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]]
   [roguetv.mapgen [reset-level]]
-  [roguetv.display [full-redraw default-color describe-tile]]
+  [roguetv.attrstr [default-color]]
+  [roguetv.display [full-redraw describe-tile]]
   [roguetv.creature.player [Player]]
   [roguetv.saves [write-save-file]])
 

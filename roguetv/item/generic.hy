@@ -9,6 +9,7 @@
   [roguetv.types [Drawable MapObject]])
 
 (defclass Item [Drawable MapObject NounPhraseNamed] [
+  [escape-xml-in-np-format True]
   [tid None]
     ; A string.
   [appearance None]
@@ -64,13 +65,14 @@
           (.format "[${}]" (self.apparent-price)))))))]
 
   [information (fn [self]
-    (setv s (.format "\n  {:a:full}\n\n{}"
+    (setv s (.format "\n  {} {:a:full}\n\n{}"
+      (.xml-symbol self)
       self
       (if (.identified? self)
         (.join "\n\n" (+
           [self.info-flavor]
-          (if self.info-apply [(+ "Effect when applied: " self.info-apply)] [])
-          (if self.info-carry [(+ "Effect when carried: " self.info-carry)] [])))
+          (if self.info-apply [(+ "<b>Effect when applied:</b> " self.info-apply)] [])
+          (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])))
         self.info-unidentified)))
     (apply .format [s] (. (type self) __dict__)))]
 
@@ -85,8 +87,9 @@
       "?"))]
 
   [invstr (fn [self]
-    (.format "{} - {:a:full}"
+    (.format "{} {} {:a:full}"
       self.invlet
+      (.xml-symbol self)
       self))]
 
   [name-suffix (fn [self]
