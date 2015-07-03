@@ -91,15 +91,18 @@
     (setv lines [])
     (setv line-chars "")
     (setv line-attrs [])
-    (setv attrs-i 0)
     (setv chunks (.split ws-re self.chars))
+    (setv attrs (list self.attrs))
+    (defn shift-attrs [n]
+      ; Removes and returns the first `n` attrs.
+      (amap (.pop attrs 0) (range n)))
     ; Remove trailing whitespace.
     (when (.isspace (get chunks -1))
       (.pop chunks))
     ; Begin the list with a zero-length fake whitespace
     ; element.
     (when (.isspace (first chunks))
-      (+= attrs-i (len (first chunks)))
+      (shift-attrs (len (first chunks)))
       (del (get chunks 0)))
     (.insert chunks 0 "")
     (for [[ws nonws] (zip (slice chunks 0 None 2) (slice chunks 1 None 2))]
@@ -110,12 +113,10 @@
         (setv line-attrs [])
         ; Clear the whitespace chunk. We don't need whitespace
         ; at the beginning of a line.
-        (+= attrs-i (len ws))
+        (shift-attrs (len ws))
         (setv ws ""))
       ; Append the chunks.
       (+= line-chars (+ ws nonws))
-      (setv attrs-i2 (+ attrs-i (len ws) (len nonws)))
-      (+= line-attrs (slice self.attrs attrs-i attrs-i2))
-      (setv attrs-i attrs-i2))
+      (+= line-attrs (shift-attrs (+ (len ws) (len nonws)))))
     (.append lines (AttrStr line-chars line-attrs))
     lines)]])
