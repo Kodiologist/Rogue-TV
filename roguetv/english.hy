@@ -17,7 +17,7 @@
     (qw they’re        he’s    she’s   it’s    I’m    we’re     you’re   you’re     they’re)
     (qw they’ll        he’ll   she’ll  it’ll   I’ll   we’ll     you’ll   you’ll     they’ll)
     (qw they’ve        he’s    she’s   it’s    I’ve   we’ve     you’ve   you’ve     they’ve)
-    (qw they’d         he’d    she’d   it_had  I’d    we’d      you’d   you’d       they’d)])
+    (qw they’d         he’d    she’d   it_had  I’d    we’d      you’d    you’d      they’d)])
   ; We only used smart quotes here because "'" can't be in a Hy
   ; identifier. Similarly, we used underscores in place of spaces.
   ; Switch them back.
