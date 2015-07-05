@@ -52,17 +52,17 @@
     ;  "{::full}"         hookshot (10) [$5]
     ;  "{:the:true}"      the hookshot           (even if the player hasn't identified the hookshot yet)
     ;  "{:the:true,full}" the hookshot (10) [$5] (ditto)
-    (setv [article tags] (.groups (re.match
-      "( [^:]* )  (?: : (.+) )?"
+    (setv [np-args tags] (.groups (re.match
+      "( (?: v:)? [^:]* )  (?: : (.+) )?"
       formatstr
       re.VERBOSE)))
     (setv tags (set (if tags (.split tags ",") [])))
     (setv name (if (in "true" tags) self.name (self.apparent-name)))
-    (kwc cat :sep " " (.format-nounphrase self name article)
+    (.escape self (kwc cat :sep " " (.__format__ name np-args)
       (when (or (in "most" tags) (in "full" tags)) (kwc cat :sep " "
         (self.name-suffix)
         (when (in "full" tags)
-          (.format "[${}]" (self.apparent-price)))))))]
+          (.format "[${}]" (self.apparent-price))))))))]
 
   [information (fn [self]
     (setv s (.format "\n  {} {:a:full}\n\n{}"

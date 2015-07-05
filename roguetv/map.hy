@@ -95,9 +95,7 @@
     (on-map (+ center (Pos dx dy)))))
 
 (defclass Floor [Tile] [
-  [name (kwc NounPhrase "ordinary floor"
-    :plural "tiles of ordinary floor"
-    :indefinite-singular "ordinary floor")]
+  [name (kwc NounPhrase "ordinary floor" :+mass :unit "tiles")]
   [char "."]
   [info-text "Just what it says on the tin."]])
 

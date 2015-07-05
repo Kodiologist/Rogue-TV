@@ -48,7 +48,7 @@
 (defn can-of [s &optional force-a]
   (kwc NounPhrase
     :stem (+ "can of " s)
-    :indefinite-singular (when force-a (+ "a can of " s))))
+    :article (when force-a "a")))
 
 (def-itemtype Soda "chicken-soup" :name (can-of "chicken soup")
   :price 10
@@ -69,7 +69,7 @@
         (ret)))
     (msg "You feel homesick."))))
 
-(def-itemtype Soda "heeling-potion" :name (kwc NounPhrase "potion of extra heeling" :plural "potions of extra heeling")
+(def-itemtype Soda "heeling-potion" :name "potion of extra heeling"
   ; A pun on Rogue's potion of extra healing.
   :price 10
   :info-flavor "Drink this magic potion and dogs will come heeling from far and wide."
@@ -150,5 +150,5 @@
   :soda-effect (fn [self]
 
     (.add-effect G.player Sleep self.sleep-time
-      (fn [] (msg :tara "Oh no! {p:The} has fallen asleep!"))
+      (fn [] (msg :tara "Oh no! {p:The} {p:v:has} fallen asleep!"))
       (fn [] (msg "You snore.")))))

@@ -2,13 +2,13 @@
 
 (import
   [kodhy.util [ret]]
-  [roguetv.english [TakesPronouns]]
+  [roguetv.english [NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject]]
   [roguetv.map [Tile on-map]])
 
-(defclass Creature [Drawable MapObject TakesPronouns] [
+(defclass Creature [Drawable MapObject NounPhraseNamed] [
   [escape-xml-in-np-format True]
   [extant []]
   [char "C"]

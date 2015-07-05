@@ -71,6 +71,6 @@
       [True
         (random.choice (qw Mac Nancy))])))
           ; Wayside School
-  (setv p.name (kwc NounPhrase p.name :+proper))
+  (setv p.name (kwc NounPhrase p.name :+bare-proper :gender p.gender))
 
   p)

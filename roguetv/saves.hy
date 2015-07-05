@@ -21,7 +21,6 @@
     G.globals-to-save)))
 
   (setv (get x "Player") {
-    "gender" Player.gender
     "name" Player.name})
 
   (setv (get x "item_appearances") (dict (fmap

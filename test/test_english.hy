@@ -2,11 +2,28 @@
 
 (import
   unittest
-  [roguetv.english [pronoun verb]])
+  [roguetv.english [pronoun verb NounPhrase]])
 
 (defmacro a= [&rest args]
   (setv [x v] [(butlast args) (get args -1)])
   `(.assertEqual self (kwc ~@x) ~v))
+
+(defn npf [np form] (cond
+  [(= form :ds)
+    (.format "{:The} {:v:is} destroyed." np np)]
+  [(= form :dp)
+    (.format "{:p-The} {:p-v:is} destroyed." np np)]
+  [(= form :is)
+    (.format "{:A} {:v:is} here." np np)]
+  [(= form :ip)
+    (.format "{:Some} {:p-v:is} here." np np)]
+  [(= form :p)
+    (.format "{:Your} {:v:is} destroyed." np np)]
+  [(= form :n)
+    (.format "You won 2 {:num}." np)]))
+
+(defmacro npf= [np form answer]
+  `(.assertEqual self (npf ~np ~form) ~answer))
 
 (defclass C [unittest.TestCase] [
 
@@ -73,7 +90,101 @@
     (a= verb "lurches" :+plural             "lurch")
     (a= verb "embargoes" :+plural           "embargo")
     (a= verb "does" :+plural                "do")
-    (a= verb "cries" :+plural               "cry"))]])
+    (a= verb "cries" :+plural               "cry"))]
+
+  [test-npformat-count (fn [self]
+    (setv np (NounPhrase "stapler"))
+    (npf= np :ds   "The stapler is destroyed.")
+    (npf= np :dp   "The staplers are destroyed.")
+    (npf= np :is   "A stapler is here.")
+    (npf= np :ip   "Some staplers are here.")
+    (npf= np :p    "Your stapler is destroyed.")
+    (npf= np :n    "You won 2 staplers.")
+
+    ; Manually setting the article.
+    (setv np (kwc NounPhrase "stapler" :article "an"))
+    (npf= np :is   "An stapler is here."))]
+
+  [test-npformat-count-irregplural (fn [self]
+    ; Automatically detectable by `inflect`.
+    (setv np (NounPhrase "mouse"))
+    (npf= np :ds   "The mouse is destroyed.")
+    (npf= np :dp   "The mice are destroyed.")
+    (npf= np :is   "A mouse is here.")
+    (npf= np :ip   "Some mice are here.")
+    (npf= np :p    "Your mouse is destroyed.")
+    (npf= np :n    "You won 2 mice.")
+
+    ; Not automatically detectable.
+    (setv np (kwc NounPhrase "box" :plural "boxen"))
+    (npf= np :ds   "The box is destroyed.")
+    (npf= np :dp   "The boxen are destroyed.")
+    (npf= np :is   "A box is here.")
+    (npf= np :ip   "Some boxen are here.")
+    (npf= np :p    "Your box is destroyed.")
+    (npf= np :n    "You won 2 boxen."))]
+
+  [test-npformat-mass (fn [self]
+    (setv np (kwc NounPhrase "peanut butter" :+mass :unit "globs"))
+    (npf= np :ds   "The peanut butter is destroyed.")
+    (npf= np :dp   "The peanut butter is destroyed.")
+    (npf= np :is   "Some peanut butter is here.")
+    (npf= np :ip   "Some peanut butter is here.")
+    (npf= np :p    "Your peanut butter is destroyed.")
+    (npf= np :n    "You won 2 globs of peanut butter."))]
+
+  [test-npformat-pluraletantum (fn [self]
+    (setv np (kwc NounPhrase "pants" :+always-plural :unit "pairs"))
+    (npf= np :ds   "The pants are destroyed.")
+    (npf= np :dp   "The pants are destroyed.")
+    (npf= np :is   "Some pants are here.")
+    (npf= np :ip   "Some pants are here.")
+    (npf= np :p    "Your pants are destroyed.")
+    (npf= np :n    "You won 2 pairs of pants.")
+
+    ; Nouns that are nominally count nouns, but are always
+    ; regarded in quantity by the game, may be treated the same
+    ; as real plurale tantum.
+    (setv np (kwc NounPhrase "sunflower seeds" :+always-plural :unit "handfuls"))
+    (npf= np :ds   "The sunflower seeds are destroyed.")
+    (npf= np :dp   "The sunflower seeds are destroyed.")
+    (npf= np :is   "Some sunflower seeds are here.")
+    (npf= np :ip   "Some sunflower seeds are here.")
+    (npf= np :p    "Your sunflower seeds are destroyed.")
+    (npf= np :n    "You won 2 handfuls of sunflower seeds."))]
+
+  [test-npformat-proper-singular (fn [self]
+    (setv np (kwc NounPhrase "Stormbringer" :+bare-proper))
+    (npf= np :ds   "Stormbringer is destroyed.")
+    (npf= np :dp   "The Stormbringers are destroyed.")
+    (npf= np :is   "Stormbringer is here.")
+    (npf= np :ip   "Some Stormbringers are here.")
+    (npf= np :p    "Stormbringer is destroyed.")
+    (npf= np :n    "You won 2 Stormbringers."))]
+
+  [test-npformat-theproper-singular (fn [self]
+    (setv np (kwc NounPhrase "Black Scythe" :+the-proper))
+    (npf= np :ds   "The Black Scythe is destroyed.")
+    (npf= np :dp   "The Black Scythes are destroyed.")
+    (npf= np :is   "The Black Scythe is here.")
+    (npf= np :ip   "Some Black Scythes are here.")
+    (npf= np :p    "The Black Scythe is destroyed.")
+    (npf= np :n    "You won 2 Black Scythes."))]
+
+  ; English grammar does not seem to allow a plural direct
+  ; equivalent of "Stormbringer". Here, "Santa's" is a determiner,
+  ; not just part of a name. "Your Santa's Pants" is arguably not
+  ; grammatical.
+  ; "Santa's Pants are destroyed.", etc.
+
+  [test-npformat-theproper-plural (fn [self]
+    (setv np (kwc NounPhrase "Eyes of the Overworld" :+the-proper :+always-plural :unit "pairs"))
+    (npf= np :ds   "The Eyes of the Overworld are destroyed.")
+    (npf= np :dp   "The pairs of the Eyes of the Overworld are destroyed.")
+    (npf= np :is   "The Eyes of the Overworld are here.")
+    (npf= np :ip   "Some pairs of the Eyes of the Overworld are here.")
+    (npf= np :p    "The Eyes of the Overworld are destroyed.")
+    (npf= np :n    "You won 2 pairs of the Eyes of the Overworld."))]])
 
 (when (= __name__ "__main__")
   (setv suite (.loadTestsFromTestCase (unittest.TestLoader) C))

@@ -29,7 +29,6 @@
   (ItemAppearance.randomize-appearances)
 
   (setv G.player (Player))
-  (setv Player.gender p.gender)
   (setv Player.name p.name)
 
   (setv G.dungeon-level 1)

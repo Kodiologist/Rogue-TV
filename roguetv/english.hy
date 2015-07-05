@@ -74,73 +74,102 @@
 
   [__init__ (fn [self stem &optional
       plural
-      indefinite-singular indefinite-plural
+      [gender :neuter]
+      article
+      [mass False]
       [always-plural False]
-      [proper False]] (block
+      unit
+      [bare-proper False]
+      [the-proper False]] (block
 
     (when (instance? NounPhrase stem)
       ; Just clone.
       (setv self.__dict__ stem.__dict__)
       (ret))
 
-    (when proper
-      (setv indefinite-singular stem))
-    (if always-plural
-      (when (none? plural)
-        (setv plural stem))
-      (do
-        (when (none? indefinite-singular)
-          (setv indefinite-singular (.a -inflect stem)))
-        (when (none? plural)
-          (setv plural (.plural-noun -inflect stem)))))
-    (when (none? indefinite-plural)
-      (setv indefinite-plural plural))
-    (setv definite-singular (+ (if proper "" "the ") stem))
+    (when (or
+        (not (in gender genders))
+        (and (or mass always-plural) (not unit))
+        (and unit (not (or mass always-plural)))
+        (and always-plural plural)
+        (and always-plural bare-proper))
+      (raise (ValueError (+ "Bad NounPhrase parameters: " stem))))
 
-    (set-self stem plural indefinite-singular indefinite-plural always-plural proper definite-singular)
-    None))]])
+    (setv united (when unit
+      (.format "{} of {}{}" unit (if the-proper "the " "") stem)))
+    (setv pluralized (cond
+      [(or always-plural mass)
+        (if the-proper united stem)]
+      [plural
+        plural]
+      [True
+        (.plural-noun -inflect stem)]))
+
+    (setv definite-singular
+      (if bare-proper stem (+ "the " stem)))
+    (setv definite-plural
+      (+ "the " pluralized))
+    (setv indefinite-singular
+      (cond
+        [(or bare-proper the-proper)
+          definite-singular]
+        [(or mass always-plural)
+          (+ "some " stem)]
+        [article
+          (+ article " " stem)]
+        [True
+          (.a -inflect stem)]))
+    (setv indefinite-plural
+      (+ "some " pluralized))
+    (setv your
+      (if (or bare-proper the-proper) definite-singular (+ "your " stem)))
+    (setv count
+      (if unit united pluralized))
+
+    (set-self
+      stem gender mass always-plural
+      definite-singular definite-plural indefinite-singular indefinite-plural your count)
+    None))]
+
+  [__format__ (fn [self formatstr]
+    (setv upper (not (none? (afind-or (.isupper it) formatstr))))
+    (setv formatstr (.lower formatstr))
+    ((if upper ucfirst identity) (cond
+      [(in formatstr pronoun-bases)
+        (kwc pronoun formatstr
+          :gender self.gender
+          :plural self.always-plural)]
+      [(.startswith formatstr "v:")
+        (kwc verb (slice formatstr (len "v:"))
+          :gender self.gender
+          :plural self.always-plural)]
+      [(.startswith formatstr "p-v:")
+        (kwc verb (slice formatstr (len "p-v:"))
+          :gender self.gender
+          :plural (not self.mass))]
+      [True
+        (get
+          {
+            ""      self.stem
+            "the"   self.definite-singular
+            "p-the" self.definite-plural
+            "a"     self.indefinite-singular
+            "some"  self.indefinite-plural
+            "your"  self.your
+            "num"   self.count}
+          formatstr)])))]
+
+  [female (fn [self]
+    (= self.gender :female))]])
 
 (defclass NounPhraseNamed [object] [
   [name None]
   [escape-xml-in-np-format False]
 
-  [__format__ (fn [self formatstr]
-    (.format-nounphrase self self.name formatstr))]
-
-  [format-nounphrase (classmethod (fn [self name formatstr]
-    (setv x (cond
-      [(= formatstr "")
-        name.stem]
-      [(= formatstr "a")
-        name.indefinite-singular]
-      [(= formatstr "A")
-        (ucfirst name.indefinite-singular)]
-      [(= formatstr "the")
-        name.definite-singular]
-      [(= formatstr "The")
-        (ucfirst name.definite-singular)]))
-    (if (and x self.escape-xml-in-np-format)
-      (xml.sax.saxutils.escape x)
-      x)))]])
-
-(defclass TakesPronouns [NounPhraseNamed] [
-  [gender :neuter]
-  [plural False]
+  [escape (classmethod (fn [self s]
+    (if (and s self.escape-xml-in-np-format)
+      (xml.sax.saxutils.escape s)
+      s)))]
 
   [__format__ (fn [self formatstr]
-    (or (.format-nounphrase self self.name formatstr)
-      (.format-pronoun-or-verb self self.gender self.plural formatstr)))]
-
-  [format-pronoun-or-verb (classmethod (fn [self gender plural formatstr]
-    (cond
-      [(in formatstr pronoun-bases)
-        (kwc pronoun formatstr
-          :gender gender
-          :plural plural)]
-      [(.startswith formatstr "v:")
-        (kwc verb (slice formatstr (len "v:"))
-          :gender gender
-          :plural plural)])))]
-
-  [female (fn [self]
-    (= self.gender :female))]])
+    (.escape self (.__format__ self.name formatstr)))]])
