@@ -147,5 +147,5 @@
   :soda-effect (fn [self]
 
     (.add-effect G.player Sleep self.sleep-time
-      (fn [] (msg :tara "Oh no! {p:The} {p:v:has} fallen asleep!"))
+      (fn [] (msg :tara "Oh no! {p:The} has fallen asleep!"))
       (fn [] (msg "You snore.")))))

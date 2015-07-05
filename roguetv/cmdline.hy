@@ -15,8 +15,7 @@
 (setv pronouns->genders (OrderedDict [
   (, "he" :male)
   (, "she" :female)
-  (, "it" :neuter)
-  (, "they" :singular-they)]))
+  (, "it" :neuter)]))
 
 (defn uni [s]
   (.decode s (sys.getfilesystemencoding)))
@@ -62,15 +61,12 @@
       [(= p.gender :female)
         (random.choice (qw Meg Jo Beth Amy))]
           ; Little Women
-      [(= p.gender :neuter)
+      [True
         (random.choice (+
            (qw Zorx Klax Jennifer)
              ; Captain Underpants and the Invasion of the Incredibly Naughty Cafeteria Ladies from Outer Space (and the Subsequent Assault of the Equally Evil Lunchroom Zombie Nerds)
-           ["Robert'); DROP TABLE Players;--"]))]
+           ["Robert'); DROP TABLE Players;--"]))])))
             ; http://www.xkcd.com/327/
-      [True
-        (random.choice (qw Mac Nancy))])))
-          ; Wayside School
   (setv p.name (kwc NounPhrase p.name :+bare-proper :gender p.gender))
 
   p)

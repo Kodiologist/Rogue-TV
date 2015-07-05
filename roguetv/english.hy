@@ -60,6 +60,10 @@
 (defn verb [base &optional [gender :neuter] [person 3] [plural False]]
 ; The 'base' should be in 3rd-person singular form
 ; (e.g., "is", "was", "does", "did", "swims").
+  (when (= gender :singular-they)
+    ; The pronoun requires a plural form, but the original noun
+    ; might be singular. We can't tell which is which.
+    (raise (ValueError "Inflecting a verb for a :singular-they subject is ambiguous")))
   (cond
     [(and (= base "is") (= person 1) (not plural))
       "am"]

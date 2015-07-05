@@ -61,25 +61,21 @@
     (a= pronoun "Hers" :gender :singular-they       "Theirs"))]
 
   [test-verb-be-present (fn [self]
-    (a= verb "is" :gender :singular-they    "are")
     (a= verb "is" :gender :male             "is")
     (a= verb "is" :gender :male :+plural    "are")
     (a= verb "is" :person 1                 "am"))]
 
   [test-verb-be-past (fn [self]
-    (a= verb "was" :gender :singular-they    "were")
     (a= verb "was" :gender :male             "was")
     (a= verb "was" :gender :male :+plural    "were")
     (a= verb "was" :person 1                 "was"))]
 
   [test-verb-present-have (fn [self]
-    (a= verb "has" :gender :singular-they  "have")
     (a= verb "has" :gender :male           "has")
     (a= verb "has" :gender :male :+plural  "have")
     (a= verb "has" :person 1               "have"))]
 
   [test-verb-present-swim (fn [self]
-    (a= verb "swims" :gender :singular-they "swim")
     (a= verb "swims" :gender :male          "swims")
     (a= verb "swims" :gender :male :+plural "swim")
     (a= verb "swims" :person 1              "swim"))]
