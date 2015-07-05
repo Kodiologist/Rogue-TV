@@ -86,13 +86,10 @@
         (+= summoned 1)
         (when (> summoned self.dogs-to-summon)
           (break))))
-    (msg (cond
-      [(= summoned 1)
-        "Hey, where'd that dog come from?"]
-      [(> summoned 1)
-        "Hey, where'd those dogs come from?"]
-      [True
-        "You hear plaintive barking."]))))
+    (msg (if summoned
+      (.format "Hey, where'd {} come from?"
+        (if (= summoned 1) "that dog" "those dogs"))
+      "You hear plaintive barking."))))
 
 (def-itemtype Soda "stink-serum" :name (can-of "stink serum")
   ; Inspired by Yipe! III.
