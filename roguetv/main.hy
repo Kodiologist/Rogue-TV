@@ -89,7 +89,7 @@
     (defn total [l]
       (sum (amap it.price l)))
     (setv gross (total winnings))
-    (when (= G.endgame :out-of-time)
+    (when (in G.endgame [:out-of-time :resigned])
       ; Reduce the player's winnings to the combination of
       ; items with the highest total value less than or equal to
       ; half the original sum of values.
