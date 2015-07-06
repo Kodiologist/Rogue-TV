@@ -46,6 +46,12 @@
     ; A creature is stepping out of this tile.
     None)]])
 
+(defclass LevelBoundary [NounPhraseNamed] [
+  ; This object is not a real tile. Rather, it is used as a flag
+  ; for the lack of a tile when you use `mget` rather than `Tile.at`.
+  [name (kwc NounPhrase "level boundary" :+mass :unit "sections")]])
+(setv LevelBoundary (LevelBoundary))
+
 (defn mset [pos tile]
   (kwc .move tile pos :+clobber)
   (when (or
@@ -56,6 +62,11 @@
     (soil-fov))
   (tcod.map-set-properties G.fov-map pos.x pos.y
     (not tile.blocks-sight) (not tile.blocks-movement)))
+
+(defn mget [pos]
+  (if (on-map pos)
+    (Tile.at pos)
+    LevelBoundary))
 
 (defn on-map [pos]
   (and (<= 0 pos.x (dec G.map-width)) (<= 0 pos.y (dec G.map-height))))

@@ -1,14 +1,14 @@
 (require kodhy.macros)
 
 (import
-  [random [randrange]]
+  [random [randrange choice]]
   [heidegger.pos [Pos]]
   [kodhy.util [ret retf]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door on-map room-for? mset ray-taxi disc-taxi]]
+  [roguetv.map [Tile Floor Door on-map room-for? mset mget ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]])
 
@@ -17,7 +17,7 @@
   [apply-time 1]
   [char "/"]
 
-  [info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges."]
+  [info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges. If the gadget can be aimed or otherwise controlled, you'll only be able to control it once you know what it is."]
 
   [__init__ (fn [self &optional charges &kwargs rest]
     (apply Item.__init__ [self] rest)
@@ -34,15 +34,19 @@
       (msg :bob "That oojah's all chatty, kemosabe.")
       (ret))
     ; Identify the item type.
+    (setv unid (not (.identified? self)))
     (.identify self)
     ; Now you get the gadget effect.
-    (self.gadget-effect)))]
+    (self.gadget-effect unid)))]
 
-  [gadget-effect (fn [self]
-    ; Do whatever the gadget should do. If the user ends up
-    ; really getting the gadget effect (they don't, e.g., cancel out
-    ; of a direction prompt), be sure to call .use-time-and-charge
-    ; before otherwise affecting the game world.
+  [gadget-effect (fn [self unid]
+    ; Do whatever the gadget should do. `unid` says whether
+    ; the item was unidentified before this use.
+    ;
+    ; If the user ends up really getting the gadget effect (they
+    ; don't, e.g., cancel out of a direction prompt), be sure to
+    ; call .use-time-and-charge before otherwise affecting the
+    ; game world.
     (.use-time-and-charge self)
     (msg "Nothing happens."))]
 
@@ -91,7 +95,9 @@
   :teleport-tries 100
 
   :info-apply "Teleports you to a random square elsewhere on the current dungeon level."
-  :gadget-effect (fn [self] (block :gadget
+  :gadget-effect (fn [self unid] (block :gadget
+
+    (.use-time-and-charge self)
 
     ; Find a place to teleport to.
     (block
@@ -103,12 +109,10 @@
             (instance? Floor (Tile.at p-to)))
           (ret)))
       ; We failed to find a legal square.
-      (.use-time-and-charge self)
       (msg "You feel cramped.")
       (retf :gadget))
 
     ; Now teleport there.
-    (.use-time-and-charge self)
     (.move G.player p-to)
     (msg :tara "{p:He's} teleported to another part of the level."))))
 
@@ -121,7 +125,7 @@
     (setv self.warpback-pos None))
 
   :info-apply "Use it once to register a warpback point (for you, sir, no charge). Use it again to teleport back to the warpback point. This will clear the warpback point, as will going to another dungeon level."
-  :gadget-effect (fn [self]
+  :gadget-effect (fn [self unid]
 
     (if (getattr self "warpback_pos" None)
       (do
@@ -143,9 +147,10 @@
   :hookshot-travel-speed 2
 
   :info-apply "Fire it at a solid obstacle up to {hookshot_dist} squares away to get yourself over there. Travel by hookshot is twice as fast as travel by foot, and you'll pass over unpleasant terrain along the way. Creatures will block the hookshot."
-  :gadget-effect (fn [self] (block :gadget
+  :gadget-effect (fn [self unid] (block :gadget
 
-    (setv d (or (input-direction) (ret)))
+    (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
+    (.use-time-and-charge self)
 
     ; Find our destination square.
     (setv ahead (+ G.player.pos d))
@@ -158,21 +163,19 @@
         (when (. (Tile.at p) blocks-movement)
           (ret))
         (whenn (Creature.at p)
-          (.use-time-and-charge self)
           (msg :tara "{p:The}'s {} bounces off {:the}."
             self it)
           (retf :gadget)))
-      (msg "Your {} can only reach objects up to {} squares away."
+      (msg "{:Your} doesn't hit anything. It can only reach objects up to {} squares away."
         self self.hookshot-dist)
       (retf :gadget))
     (setv p-to (- p d))
     (when (= p-to G.player.pos)
-      (msg :tara "It looks like {p:the}'s {} isn't very useful at that range."
-        self)
+      (msg "{:Your} uselessly hits {:the} right next to you."
+        self (mget ahead))
       (retf :gadget))
 
     ; And away we go.
-    (.use-time-and-charge self)
     (.take-time G.player (/ (len-taxi (- p-to G.player.pos)) self.hookshot-travel-speed))
     (.move G.player p-to)
     (msg "{:The} pulls you ahead." self))))
@@ -182,18 +185,18 @@
   :info-flavor "Just what you need to kickstart a lucrative career in lumberjacking after winning gobs of dosh on Rogue TV. Or you could sell it for an additional gob of dosh. Whatever; I don't judge."
 
   :info-apply "Instantly destroys an adjacent door."
-  :gadget-effect (fn [self] (block
+  :gadget-effect (fn [self unid] (block
 
-    (setv d (or (input-direction) (ret)))
+    (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
     (setv p (+ G.player.pos d))
-    (setv t (when (on-map p) (Tile.at p)))
+    (setv t (mget p))
 
+    (.use-time-and-charge self)
     (if (instance? Door t)
       (do
-        (.use-time-and-charge self)
-        (msg "Bzzt! The door is no more.")
+        (msg "Bzzt! The door is no more." t t)
         (mset p (Floor)))
-      (msg "Your {} won't help with that." self)))))
+      (msg "{:Your} proves ineffective against {:the}." self t)))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
   :price 20
@@ -201,7 +204,7 @@
   :gps-range 10
 
   :info-apply "Reveals the map in a radius of {gps_range} squares around you."
-  :gadget-effect (fn [self]
+  :gadget-effect (fn [self unid]
 
     (.use-time-and-charge self)
     (for [p (disc-taxi G.player.pos self.gps-range)]
