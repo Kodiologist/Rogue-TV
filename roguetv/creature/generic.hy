@@ -29,7 +29,8 @@
     (setv self.ice-slip-towards None))]
 
   [information (fn [self]
-    (setv s (.format "\n  {:a}\n\n{}"
+    (setv s (.format "\n  {} {:a}\n\n{}"
+      (.xml-symbol self)
       self
       self.info-text))
     (apply .format [s] (. (type self) __dict__)))]
