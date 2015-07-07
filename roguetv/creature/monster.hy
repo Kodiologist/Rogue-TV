@@ -81,6 +81,17 @@
         (* 2 (bool (and (Creature.at p2) (!= p2 p-to))))))))
   (slice (second (searcher p-from p-to max-cost)) 1))
 
+(defclass Bee [Monster] [
+  [name (NounPhrase "bumblebee")]
+  [char "a"]
+  [color-fg :yellow]
+  [info-text "A jolly little insect that buzzes about aimlessly. Your standard-issue contestant protective gear will protect you from stings. Bees can still kind of get in the way, though."]
+
+  [flying True]
+
+  [act (fn [self]
+    (or (wander self) (.wait self)))]])
+
 (defclass Cat [Monster] [
   [name (NounPhrase "cat")]
   [char "f"]

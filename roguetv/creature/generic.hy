@@ -15,6 +15,7 @@
   [info-text "[Missing info text]"]
 
   [can-open-doors False]
+  [flying False]
 
   [__init__ (fn [self &optional pos]
     (MapObject.__init__ self pos)

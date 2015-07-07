@@ -191,7 +191,8 @@
     None)]
 
   [step-out-of (fn [self cr p-to]
-    (cr.take-time (randint 1 self.max-exit-time)))]])
+    (unless cr.flying
+      (cr.take-time (randint 1 self.max-exit-time))))]])
 
 (defclass Web [Tile] [
   [name (NounPhrase "spiderweb")]
@@ -227,12 +228,14 @@
     None)]
 
   [after-step-onto (fn [self cr p-from]
-    ; Set up the creature to slip.
-    (setv cr.ice-slip-towards (- self.pos p-from))
-    (setv cr.ice-slip-time (randint 1 self.max-slip-time)))]
+    (unless cr.flying
+      ; Set up the creature to slip.
+      (setv cr.ice-slip-towards (- self.pos p-from))
+      (setv cr.ice-slip-time (randint 1 self.max-slip-time))))]
 
   [step-out-of (fn [self cr p-to]
-    ; If the creature moves in the same direction it moved to
-    ; get here, it doesn't slip.
-    (when (= (- p-to self.pos) cr.ice-slip-towards)
-      (cr.reset-ice-slipping)))]])
+    (unless cr.flying
+      ; If the creature moves in the same direction it moved to
+      ; get here, it doesn't slip.
+      (when (= (- p-to self.pos) cr.ice-slip-towards)
+        (cr.reset-ice-slipping))))]])

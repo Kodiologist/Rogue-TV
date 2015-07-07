@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require kodhy.macros roguetv.macros)
 
 (import
   [random [randrange choice]]
@@ -197,6 +197,33 @@
         (msg "Bzzt! The door is no more." t t)
         (mset p (Floor)))
       (msg "{:Your} proves ineffective against {:the}." self t)))))
+
+(def-itemtype Gadget "bee-machine" :name "personal beekeeping device"
+  :price 30
+  :info-flavor "A beekeeper is you! It's stuffed with everything you need to make your own honey. Including the bees. <b>Especially</b> the bees."
+    ; "A foobar is you" is originally from the NES game Pro
+    ; Wrestling, but is used here in a way paying tribute to the
+    ; Kingdom of Loathing.
+  :bee-summoning-range 3
+  :bees-to-summon 10
+
+  :info-apply "Creates {bees_to_summon} bees within {bee_summoning_range} squares of you."
+  :gadget-effect (fn [self unid]
+
+    (.use-time-and-charge self)
+    (setv summoned 0)
+    (for [p (shuffle (disc-taxi G.player.pos self.bee-summoning-range))]
+      (when (room-for? Creature p)
+        (rtv creature.monster.Bee p)
+        (+= summoned 1)
+        (when (> summoned self.bees-to-summon)
+          (break))))
+    (msg "A swarm of bees pours out of the device!")
+    (cond
+      [(= summoned 0)
+        (msg "Then they all go right back in.")]
+      [(< summoned (// self.bees-to-summon 2))
+        (msg "Most of them go back in.")])))
 
 (def-itemtype Gadget "gps" :name "GPS device"
   :price 20
