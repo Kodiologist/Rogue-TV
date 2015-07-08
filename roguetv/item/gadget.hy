@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door on-map room-for? mset mget ray-taxi disc-taxi]]
+  [roguetv.map [Tile Floor Door Wall on-map room-for? mset mget ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]])
 
@@ -194,9 +194,29 @@
     (.use-time-and-charge self)
     (if (instance? Door t)
       (do
-        (msg "Bzzt! The door is no more." t t)
+        (msg "Bzzt! The door is no more.")
         (mset p (Floor)))
       (msg "{:Your} proves ineffective against {:the}." self t)))))
+
+(def-itemtype Gadget "tunnel-machine" :name "tunnel-boring machine"
+  :price 40
+  :info-flavor "A wicked giant drill to pound through whatever solid obstacles happen to get in your way."
+  :drill-time 3
+
+  :info-apply "Destroys an adjacent wall or door. This takes {drill_time} seconds."
+  :gadget-effect (fn [self unid] (block
+
+    (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
+    (setv p (+ G.player.pos d))
+    (setv t (mget p))
+
+    (.use-time-and-charge self)
+    (if (or (instance? Wall t) (instance? Door t))
+      (do
+        (G.player.take-time (- self.drill-time self.apply-time))
+        (msg "Your drill reduces {:the} to dust." t)
+        (mset p (Floor)))
+      (msg "Your drill proves ineffective against {:the}." t)))))
 
 (def-itemtype Gadget "bee-machine" :name "personal beekeeping device"
   :price 30
