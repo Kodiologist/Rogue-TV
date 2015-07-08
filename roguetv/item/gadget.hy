@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door Wall on-map room-for? mset mget ray-taxi disc-taxi]]
+  [roguetv.map [Tile Floor Door Wall Ice on-map room-for? mset mget ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]])
 
@@ -197,6 +197,20 @@
         (msg "Bzzt! The door is no more.")
         (mset p (Floor)))
       (msg "{:Your} proves ineffective against {:the}." self t)))))
+
+(def-itemtype Gadget "hairdryer" :name "hair dryer"
+  :price 10
+  :info-flavor "Just because you're running around in a dungeon doesn't mean you can't have salon-quality hair."
+  :melt-range 10
+
+  :info-apply "Melts all ice within {melt_range} squares."
+  :gadget-effect (fn [self unid] (block
+
+    (.use-time-and-charge self)
+    (for [p (disc-taxi G.player.pos self.melt-range)]
+      (when (instance? Ice (Tile.at p))
+        (mset p (Floor))))
+    (msg "You are briefly immersed in a cloud of warm air."))))
 
 (def-itemtype Gadget "tunnel-machine" :name "tunnel-boring machine"
   :price 40
