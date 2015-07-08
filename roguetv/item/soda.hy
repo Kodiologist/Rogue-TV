@@ -104,20 +104,20 @@
       (fn [] (msg :aud "cries out in disgust at the pungent odor."))
       (fn [] (msg :tara "Smells like {p:the} is going to keep on smelling for a while.")))))
 
-(def-itemtype Soda "speed-soda" :name (kwc can-of "5-minute ENERGY™" :+force-a)
+(def-itemtype Soda "speed-soda" :name (kwc can-of "5-second ENERGY™" :+force-a)
     ; We need :+force-a because of a bug in inflect.
   ; In reference to the real dietary supplement 5-hour Energy.
   :price 15
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, this is some kind of swill that you don't really want to know the origin or chemical composition of, but it's got quite a kick, for a short time."
     ; Mid-20th-century Cheerios ads
-  :haste-time (* 5 60)
+  :haste-time 5
   ; See also G.speedup-soda-factor.
 
-  :info-apply "Doubles your walking speed for five minutes."
+  :info-apply (.format "Increases your walking speed by a factor of {} for {{haste_time}} seconds." G.speedup-soda-factor)
   :soda-effect (fn [self]
 
     (.add-effect G.player Haste self.haste-time
-      (fn [] (msg "You feel jittery."))
+      (fn [] (msg "You feel extremely jittery."))
       (fn [] (msg "Your jittering intensifies.")))))
         ; http://knowyourmeme.com/memes/intensifies
 
