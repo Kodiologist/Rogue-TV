@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction]]
-  [roguetv.map [Tile Floor Door Wall Ice on-map room-for? mset mget ray-taxi disc-taxi]]
+  [roguetv.map [Tile Floor Door Wall Ice Web on-map room-for? mset mget ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]])
 
@@ -231,6 +231,31 @@
         (msg "Your drill reduces {:the} to dust." t)
         (mset p (Floor)))
       (msg "Your drill proves ineffective against {:the}." t)))))
+
+(def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
+  :price 20
+  :info-flavor "Tired of buying can after can of SILLY STRING Brand Spray Streamer and still running out? This cutting-edge device produces SILLY STRING Brand Spray Streamer (new &amp; improved formula, patent pending) instantly, using chemicals already present in the air of a typical American household! Just press the button and fire away! Product is flammable. Keep mouth and eyes away from exhaust port. Replace filter regularly. Do not use if you are pregnant or nursing. Check for NWS Air Quality Alerts before and after each use."
+  :web-machine-range 8
+  :web-tear-time 5
+
+  :info-apply "Creates webs in a line up to {web_machine_range} squares long. Each web takes {web_tear_time} seconds to tear through."
+  :gadget-effect (fn [self unid] (block
+
+    (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
+    (.use-time-and-charge self)
+
+    (setv ahead (+ G.player.pos d))
+    (setv made-a-web False)
+    (for [p (kwc ray-taxi ahead d self.web-machine-range)]
+      (when (. (Tile.at p) blocks-movement)
+        (break))
+      (when (instance? Floor (Tile.at p))
+        (mset p (Web self.web-tear-time))
+        (setv made-a-web True)))
+
+    (msg "You spray some aerosol string.")
+    (unless made-a-web
+      (msg :tara "{p:The}'s spraying hasn't come to much.")))))
 
 (def-itemtype Gadget "bee-machine" :name "personal beekeeping device"
   :price 30
