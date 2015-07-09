@@ -7,7 +7,7 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [input-direction]]
+  [roguetv.input [input-direction inventory-loop]]
   [roguetv.map [Tile Floor Door Wall Ice Web on-map room-for? mset mget ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]])
@@ -283,6 +283,41 @@
         (msg "Then they all go right back in.")]
       [(< summoned (// self.bees-to-summon 2))
         (msg "Most of them go back in.")])))
+
+(def-itemtype Gadget "microscope"
+  :price 20
+  :info-flavor "Second only to beakers full of glowing green goo in proving one's credentials as a scientist."
+
+  :info-apply "Identifies an item."
+  :gadget-effect (fn [self unid] (block
+
+    (setv other-items (filt (is-not it self) G.inventory))
+    (unless other-items
+      (if unid
+        (do
+           (.use-time-and-charge self)
+           (msg "Nothing happens."))
+        (msg "You don't have anything to identify."))
+      (ret))
+
+    (setv item (if unid
+      (choice other-items)
+      (do
+        (setv i (inventory-loop "What do you want to identify?"))
+        (when (none? i)
+          (ret))
+        (get G.inventory i))))
+
+    (when (is item self)
+      (msg :bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
+      (ret))
+
+    (.use-time-and-charge self)
+    (when (.identified? item)
+      (msg "You admire the details of {:your} under the microscope." item)
+      (ret))
+    (msg "You inspect {:the}." item)
+    (.identify item))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
   :price 20
