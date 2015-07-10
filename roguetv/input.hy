@@ -31,21 +31,29 @@
 
   "KEY_UP" Pos.NORTH
   "8" Pos.NORTH
+  "k" Pos.NORTH
   "KEY_DOWN" Pos.SOUTH
   "2" Pos.SOUTH
+  "j" Pos.SOUTH
   "KEY_LEFT" Pos.WEST
   "4" Pos.WEST
+  "h" Pos.WEST
   "KEY_RIGHT" Pos.EAST
   "6" Pos.EAST
+  "l" Pos.EAST
 
   "KEY_HOME" Pos.NW
   "7" Pos.NW
+  "y" Pos.NW
   "KEY_PPAGE" Pos.NE
   "9" Pos.NE
+  "u" Pos.NE
   "KEY_END" Pos.SW
   "1" Pos.SW
+  "b" Pos.SW
   "KEY_NPAGE" Pos.SE
-  "3" Pos.SE})
+  "3" Pos.SE
+  "n" Pos.SE})
 
 (defn input-direction [] (block
   (msg "In what direction?")
