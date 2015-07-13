@@ -6,7 +6,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject]]
-  [roguetv.map [Tile on-map]])
+  [roguetv.map [Tile mget]])
 
 (defclass Creature [Drawable MapObject NounPhraseNamed] [
   [escape-xml-in-np-format True]
@@ -52,10 +52,12 @@
     (.take-time self 1))]
 
   [walk-to (fn [self p-to] (block
-    (unless (and
-        (on-map p-to)
-        (.bump-into (Tile.at p-to) self)
-        (not (. (Tile.at p-to) blocks-movement)))
+    (unless (.bump-into (mget p-to) self)
+      (ret False))
+    (when (. (mget p-to) blocks-movement)
+      (when (and (player? self) (.has-effect self Confusion))
+        (msg "You bump into {:the}." (mget p-to))
+        (.take-time self G.confusion-bump-time))
       (ret False))
     (setv cr (Creature.at p-to))
     ; The player can push past other creatures, but other creatures
@@ -109,6 +111,10 @@
 (defclass Haste [Effect] [
   [end-msg (fn [self]
     (msg "The rush of energy fades."))]])
+
+(defclass Confusion [Effect] [
+  [end-msg (fn [self]
+    (msg "Your mind clears."))]])
 
 (defclass Strength [Effect] [
   [end-msg (fn [self]

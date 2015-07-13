@@ -63,6 +63,8 @@
 (defs push-past-monster-time 1)
 (defs stink-range 20)
 (defs speedup-soda-factor 10)
+(defs confusion-misdirect-prob .25)
+(defs confusion-bump-time 1)
 
 ;; * Declarations
 

@@ -50,7 +50,10 @@
 (defclass LevelBoundary [NounPhraseNamed] [
   ; This object is not a real tile. Rather, it is used as a flag
   ; for the lack of a tile when you use `mget` rather than `Tile.at`.
-  [name (kwc NounPhrase "level boundary" :+mass :unit "sections")]])
+  [name (kwc NounPhrase "level boundary" :+mass :unit "sections")]
+  [blocks-movement True]
+  [blocks-sight True]
+  [bump-into (fn [self cr] True)]])
 (setv LevelBoundary (LevelBoundary))
 
 (defn mset [pos tile]

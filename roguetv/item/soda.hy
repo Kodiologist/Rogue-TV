@@ -8,7 +8,7 @@
   [roguetv.util [*]]
   [roguetv.map [Tile upelevator-pos room-for? disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
-  [roguetv.creature [Creature Stink Haste Strength Sleep]])
+  [roguetv.creature [Creature Stink Haste Confusion Strength Sleep]])
 
 (defclass Soda [Item] [
   [apply-time 1]
@@ -111,7 +111,6 @@
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, this is some kind of swill that you don't really want to know the origin or chemical composition of, but it's got quite a kick, for a short time."
     ; Mid-20th-century Cheerios ads
   :haste-time 5
-  ; See also G.speedup-soda-factor.
 
   :info-apply (.format "Increases your walking speed by a factor of {} for {{haste_time}} seconds." G.speedup-soda-factor)
   :soda-effect (fn [self]
@@ -120,6 +119,19 @@
       (fn [] (msg "You feel extremely jittery."))
       (fn [] (msg "Your jittering intensifies.")))))
         ; http://knowyourmeme.com/memes/intensifies
+
+(def-itemtype Soda "confusion-soda" :name (can-of "booze")
+  :price 10
+  :info-flavor "This is a generous portion of the most popular recreational drug in history, possibly excepting caffeine. Did you know that in 2012, about 3 million deaths (6% of all deaths worldwide) were attributable to alcoholic beverages? Seriously, folks, if you must drink, drink responsibly. Anyway, back to your regularly scheduled dumb jokes."
+    ; World Health Organization. (2014). Global status report on alcohol and health 2014. Retrieved from http://www.who.int/substance_abuse/publications/global_alcohol_report
+  :confusion-time 45
+
+  :info-apply "Confuses you for {confusion_time} seconds. While confused, you have a chance of walking or pointing in the wrong direction."
+  :soda-effect (fn [self]
+
+    (.add-effect G.player Confusion self.confusion-time
+      (fn [] (msg "Wow, that'shh good shhtuff."))
+      (fn [] (msg :tara "Keep your head in the game, {p}.")))))
 
 (def-itemtype Soda "strength-soda" :name (can-of "Daffy's Elixir")
   ; A name for several patent medicines.

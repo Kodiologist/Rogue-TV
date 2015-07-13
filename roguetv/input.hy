@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  [random [choice]]
   [heidegger.pos [Pos]]
   [kodhy.util [ret]]
   [roguetv.globals :as G]
@@ -55,6 +56,13 @@
   "3" Pos.SE
   "n" Pos.SE})
 
+(defn get-direction [key &optional [pure False]]
+  (setv d (get direction-keys key))
+  (if (and (not pure) (.has-effect G.player (rtv-get creature.Confusion))
+      (chance G.confusion-misdirect-prob))
+    (choice (filt (!= it d) Pos.DIR8))
+    d))
+
 (defn input-direction [] (block
   (msg "In what direction?")
   (rtv display.full-redraw)
@@ -62,7 +70,7 @@
   (while True
     (setv key (G.T.getkey))
     (when (in key direction-keys)
-      (ret (get direction-keys key)))
+      (ret (get-direction key)))
     (when (in key cancel-keys)
       (ret None)))))
 
@@ -77,7 +85,7 @@
         :resign-game]
 
       [(in key direction-keys)
-        [:move (get direction-keys key)]]
+        [:move (get-direction key)]]
       [(in key ["." "5" "KEY_B2"])
         [:wait]]
 
@@ -160,7 +168,7 @@
         (break)]
 
       [(in key direction-keys) (do
-        (setv new-focus (+ focus (get direction-keys key)))
+        (setv new-focus (+ focus (kwc get-direction key :+pure)))
         (unless (rtv map.on-map new-focus)
           (continue))
         (setv focus new-focus))]
