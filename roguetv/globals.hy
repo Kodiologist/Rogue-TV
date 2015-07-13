@@ -17,7 +17,7 @@
 (defs map-width 80)
 (defs map-height 40)
 
-(defs inventory-limit 10)
+(defs inventory-limit 5)
 
 (def message-lines 3)
 (def map-border-width 2)
