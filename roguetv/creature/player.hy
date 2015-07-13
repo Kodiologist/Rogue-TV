@@ -1,10 +1,12 @@
 (require kodhy.macros)
 
 (import
+  [kodhy.util [ret]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [get-normal-command]]
-  [roguetv.creature [Creature Haste Sleep]]
+  [roguetv.map [Tile room-for? circ-taxi]]
+  [roguetv.creature [Creature Haste Sleep Passwall]]
   [roguetv.display [full-redraw]]
   [roguetv.actions [do-normal-command]])
 
@@ -34,7 +36,19 @@
     (for [e self.effects]
       (when (>= G.current-time e.expiry)
         (.end-msg e)
-        (.remove self.effects e)))
+        (.remove self.effects e)
+        (when (and (instance? Passwall e) (. (Tile.at self.pos) blocks-movement))
+          (block
+            ; Passwall just ended while the player was in a solid
+            ; obstacle. Eject them to the nearest clear tile.
+            (for [r (seq 1 (+ G.map-width G.map-height))]
+              (for [p (shuffle (circ-taxi self.pos r))]
+                (when (room-for? Creature p)
+                  (msg "As you materialize, you are ejected from {:the}." (Tile.at self.pos))
+                  (.move self p)
+                  (ret))))
+            ; There's no room anywhere on the level!
+            (msg :tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at self.pos))))))
     (full-redraw)
     (setv old-clock-debt self.clock-debt-ms)
     (if (.has-effect self Sleep)

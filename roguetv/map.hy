@@ -109,6 +109,16 @@
       dy (seq (- (abs dx) radius) (- radius (abs dx)))]
     (on-map (+ center (Pos dx dy)))))
 
+(defn circ-taxi [
+    center  ; Pos
+    radius] ; int
+  ; Like disc-taxi, but with only the boundary points.
+  (list-comp (+ center (Pos dx dy))
+    [
+      dx (seq (- radius) radius)
+      dy [(- (abs dx) radius) (- radius (abs dx))]]
+    (on-map (+ center (Pos dx dy)))))
+
 (defclass Floor [Tile] [
   [name (kwc NounPhrase "ordinary floor" :+mass :unit "tiles")]
   [char "."]

@@ -8,7 +8,7 @@
   [roguetv.util [*]]
   [roguetv.map [Tile upelevator-pos room-for? disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
-  [roguetv.creature [Creature Stink Haste Confusion Strength Sleep]])
+  [roguetv.creature [Creature Stink Haste Confusion Strength Sleep Passwall]])
 
 (defclass Soda [Item] [
   [apply-time 1]
@@ -146,6 +146,18 @@
       (fn [] (msg "You feel strong."))
       (fn [] (msg "You feel ready for more gainz.")))))
         ; Bodybuilding slang.
+
+(def-itemtype Soda "passwall-soda" :name (can-of "pass-through punch")
+  :price 30
+  :info-flavor "It lets you walk through walls! Too bad it doesn't let you see through walls."
+  :passwall-time 45
+
+  :info-apply "Allows you to walk through soild obstacles for {passwall_time} seconds. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
+  :soda-effect (fn [self]
+
+    (.add-effect G.player Passwall self.passwall-time
+      (fn [] (msg "You feel ethereal."))
+      (fn [] (msg "You feel more subtle.")))))
 
 (def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
   :price 5

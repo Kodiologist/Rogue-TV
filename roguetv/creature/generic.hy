@@ -6,7 +6,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject]]
-  [roguetv.map [Tile mget]])
+  [roguetv.map [Tile on-map mget]])
 
 (defclass Creature [Drawable MapObject NounPhraseNamed] [
   [escape-xml-in-np-format True]
@@ -54,7 +54,10 @@
   [walk-to (fn [self p-to] (block
     (unless (.bump-into (mget p-to) self)
       (ret False))
-    (when (. (mget p-to) blocks-movement)
+    (when (or
+        (not (on-map p-to))
+        (and (. (Tile.at p-to) blocks-movement)
+          (not (and (player? self) (.has-effect self Passwall)))))
       (when (and (player? self) (.has-effect self Confusion))
         (msg "You bump into {:the}." (mget p-to))
         (.take-time self G.confusion-bump-time))
@@ -120,6 +123,10 @@
   [end-msg (fn [self]
     (msg "You feel like a 98-pound weakling."))]])
       ; Charles Atlas ads
+
+(defclass Passwall [Effect] [
+  [end-msg (fn [self]
+    (msg "You feel solid again."))]])
 
 (defclass Sleep [Effect] [
   [end-msg (fn [self]
