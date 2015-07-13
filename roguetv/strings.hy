@@ -15,4 +15,5 @@
   "Sad trombone."
   "Oh, I'm sorry!"
   "The agony of defeat!"
-  "Shazbot!"])
+  "Shazbot!"
+  "Press F to pay respects."])
