@@ -13,7 +13,7 @@
   [roguetv.creature [Creature]])
 
 (defclass Gadget [Item] [
-  [max-charges 10]
+  [max-charges None]
   [apply-time 1]
   [char "/"]
 
@@ -53,7 +53,7 @@
   [use-time-and-charge (fn [self]
     ; Use up a charge and some time.
     (G.player.take-time self.apply-time)
-    (-= self.charges 1))]])
+    (-= self.charges 1))]])  
 
 (def appearances {
   "crazy"           :green
@@ -92,6 +92,7 @@
 (def-itemtype Gadget "panic-button" :name "panic button"
   :price 50
   :info-flavor "Press it if you expect to be particularly lucky in the future, or if you are particularly unlucky in the present."
+  :max-charges 3
   :teleport-tries 100
 
   :info-apply "Teleports you to a random square elsewhere on the current dungeon level."
@@ -120,6 +121,7 @@
   :price 50
   ; Has an extra instance attribute .warpback-pos.
   :info-flavor "It's deja vu all over again."
+  :max-charges 3
 
   :on-reset-level (fn [self]
     (setv self.warpback-pos None))
@@ -143,6 +145,7 @@
 (def-itemtype Gadget "hookshot"
   :price 30
   :info-flavor "Arfer's law of game design: any video game is improved by the addition of a grappling hook."
+  :max-charges 10
   :hookshot-dist 8
   :hookshot-travel-speed 2
 
@@ -183,6 +186,7 @@
 (def-itemtype Gadget "chainsaw"
   :price 10
   :info-flavor "Just what you need to kickstart a lucrative career in lumberjacking after winning gobs of dosh on Rogue TV. Or you could sell it for an additional gob of dosh. Whatever; I don't judge."
+  :max-charges 10
 
   :info-apply "Instantly destroys an adjacent door."
   :gadget-effect (fn [self unid] (block
@@ -201,6 +205,7 @@
 (def-itemtype Gadget "hairdryer" :name "hair dryer"
   :price 10
   :info-flavor "Just because you're running around in a dungeon doesn't mean you can't have salon-quality hair."
+  :max-charges 8
   :melt-range 10
 
   :info-apply "Melts all ice within {melt_range} squares."
@@ -215,6 +220,7 @@
 (def-itemtype Gadget "tunnel-machine" :name "tunnel-boring machine"
   :price 40
   :info-flavor "A wicked giant drill to pound through whatever solid obstacles happen to get in your way."
+  :max-charges 5
   :drill-time 3
 
   :info-apply "Destroys an adjacent wall or door. This takes {drill_time} seconds."
@@ -235,6 +241,7 @@
 (def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
   :price 20
   :info-flavor "Tired of buying can after can of SILLY STRING Brand Spray Streamer and still running out? This cutting-edge device produces SILLY STRING Brand Spray Streamer (new &amp; improved formula, patent pending) instantly, using chemicals already present in the air of a typical American household! Just press the button and fire away! Product is flammable. Keep mouth and eyes away from exhaust port. Replace filter regularly. Do not use if you are pregnant or nursing. Check for NWS Air Quality Alerts before and after each use."
+  :max-charges 10
   :web-machine-range 8
   :web-tear-time 5
 
@@ -263,6 +270,7 @@
     ; "A foobar is you" is originally from the NES game Pro
     ; Wrestling, but is used here in a way paying tribute to the
     ; Kingdom of Loathing.
+  :max-charges 5
   :bee-summoning-range 3
   :bees-to-summon 10
 
@@ -287,6 +295,7 @@
 (def-itemtype Gadget "microscope"
   :price 20
   :info-flavor "Second only to beakers full of glowing green goo in proving one's credentials as a scientist."
+  :max-charges 3
 
   :info-apply "Identifies an item."
   :gadget-effect (fn [self unid] (block
@@ -322,7 +331,8 @@
 (def-itemtype Gadget "gps" :name "GPS device"
   :price 20
   :info-flavor "They say it's unwise to use a GPS device as your only means of navigation in an unfamiliar area, but it's not as if you have lots of better options in a dungeon."
-  :gps-range 10
+  :max-charges 5
+  :gps-range 20
 
   :info-apply "Reveals the map in a radius of {gps_range} squares around you."
   :gadget-effect (fn [self unid]
