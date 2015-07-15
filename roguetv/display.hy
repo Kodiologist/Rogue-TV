@@ -111,7 +111,7 @@
          (.format "({})" (show-round G.last-action-duration 2))
           "")
         (len "(1.15)"))
-      G.dungeon-level
+      (inc G.dungeon-level)
       (+ "$" (string (sum
         (fmap (.apparent-price it) (.identified? it) G.inventory))))
       (if (afind-or (not (.identified? it)) G.inventory)

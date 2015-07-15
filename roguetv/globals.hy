@@ -93,6 +93,7 @@
 
 (def endgame False)
 (defs dungeon-level None)
+  ; 0-based, but displayed as 1-based.
 
 ; Times are in simulated seconds.
 (defs current-time 0)

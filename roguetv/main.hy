@@ -31,7 +31,7 @@
   (setv G.player (Player))
   (setv Player.name p.name)
 
-  (setv G.dungeon-level 1)
+  (setv G.dungeon-level 0)
   (reset-level)
 
   (setv (get G.dates "started") (.isoformat (datetime.utcnow))))
