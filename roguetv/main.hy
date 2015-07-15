@@ -62,16 +62,23 @@
 
     (block :game-loop (while True
 
-      (for [cr Creature.extant] (block :cr
-        (while (< cr.clock-debt-ms Creature.clock-factor)
-          (unless (in cr Creature.extant)
-            ; We have to check again that this creature is around
-            ; in case it disappeared (particularly, if the player
-            ; went to a new level) since we started the whole loop.
-            (retf :cr))
-          (cr.act)
-          (when G.endgame
-            (retf :game-loop)))))
+      (while True
+        (setv somebody-moved False)
+        (for [cr (list Creature.extant)] (block :cr
+          (while (< cr.clock-debt-ms Creature.clock-factor)
+            (unless (in cr Creature.extant)
+              ; We have to check again that this creature is around
+              ; in case it disappeared (particularly, if the player
+              ; went to a new level) since we started the whole loop.
+              (retf :cr))
+            (.act cr)
+            (setv somebody-moved True)
+            (when G.endgame
+              (retf :game-loop)))))
+        ; Re-loop through the creatures if anybody moved, in case
+        ; some (.act cr) has caused a new creature to be created.
+        (unless somebody-moved
+          (break)))
       (+= G.current-time 1)
       (for [cr Creature.extant]
         (-= cr.clock-debt-ms Creature.clock-factor)

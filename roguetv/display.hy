@@ -35,7 +35,7 @@
     :algo tcod.FOV-BASIC)
   (for [x (range G.map-width)]
     (for [y (range G.map-height)]
-      (when (tcod.map-is-in-fov G.fov-map x y)
+      (when (or G.omnivision (tcod.map-is-in-fov G.fov-map x y))
         (setv (get G.seen-map x y) True)))))
 
 (defn echo [str color-fg color-bg]

@@ -199,14 +199,17 @@
 
   [unpleasant True]
 
+  [min-exit-time 1]
+
   [__init__ (fn [self max-exit-time]
     (.__init__ (super Mud self))
+    (assert (>= max-exit-time self.min-exit-time))
     (set-self max-exit-time)
     None)]
 
   [step-out-of (fn [self cr p-to]
     (unless cr.flying
-      (cr.take-time (randint 1 self.max-exit-time))))]])
+      (cr.take-time (randint self.min-exit-time self.max-exit-time))))]])
 
 (defclass Web [Tile] [
   [name (NounPhrase "spiderweb")]
@@ -236,8 +239,11 @@
 
   [unpleasant True]
 
+  [min-slip-time 1]
+
   [__init__ (fn [self max-slip-time]
     (.__init__ (super Ice self))
+    (assert (>= max-slip-time self.min-slip-time))
     (set-self max-slip-time)
     None)]
 
@@ -245,7 +251,7 @@
     (unless cr.flying
       ; Set up the creature to slip.
       (setv cr.ice-slip-towards (- self.pos p-from))
-      (setv cr.ice-slip-time (randint 1 self.max-slip-time))))]
+      (setv cr.ice-slip-time (randint self.min-slip-time self.max-slip-time))))]
 
   [step-out-of (fn [self cr p-to]
     (unless cr.flying

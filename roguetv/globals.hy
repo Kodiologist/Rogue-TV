@@ -13,11 +13,10 @@
 ;; * Parameters
 
 (def debug False)
-
-(defs map-width 80)
-(defs map-height 40)
+(def omnivision False)
 
 (defs inventory-limit 5)
+(defs max-dungeon-level 9)
 
 (def message-lines 3)
 (def map-border-width 2)
@@ -95,12 +94,15 @@
 (defs dungeon-level None)
   ; 0-based, but displayed as 1-based.
 
+(defs map-width 0)
+(defs map-height 0)
+
 ; Times are in simulated seconds.
 (defs current-time 0)
 (defs time-limit None)
 (defs last-action-duration 0)
 
-(def fov-map (tcod.map-new map-width map-height))
+(def fov-map None)
 (def fov-dirty? True)
 (defs seen-map [])
 
