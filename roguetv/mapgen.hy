@@ -8,6 +8,7 @@
   [kodhy.util [concat shift ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
+  [roguetv.types [Generated]]
   [roguetv.map [*]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]]
@@ -63,8 +64,8 @@
 
   ; Add obstacles.
   (setv n-obstacles (randint (+ dl 3) (* 2 (+ dl 3))))
-    ; So 3 to 6 obstacles on level 1,
-    ; and 12 to 24 on level 10.
+    ; So 3 to 6 obstacles on level 0,
+    ; and 12 to 24 on level 9.
   (setv Obstacle.dl dl)
   (setv Obstacle.free-floors free-floors)
   (setv Obstacle.door-pos (shuffle (concat (amap
@@ -72,9 +73,19 @@
     (get dugout "rooms")))))
   (for [_ (range n-obstacles)]
     (setv o-type (weighted-choice (amap
-      (, (it.generation-weight) it)
+      (, (it.generation-weight dl) it)
       Obstacle.types)))
     (.f o-type))
+
+  ; Add items.
+  (setv n-items (+ (// dl 3) (randint 3 8)))
+    ; So 3 to 8 items on level 1,
+    ; and 6 to 11 on level 9.
+  (for [_ (range n-items)]
+    (setv itype (weighted-choice (amap
+      (, (it.generation-weight dl) it)
+      (.values G.itypes))))
+    (kwc itype :pos (shift free-floors)))
 
   ; Perhaps add a cat.
   (when (1-in 20)
@@ -85,23 +96,8 @@
   (for [item G.inventory]
     (.on-reset-level item)))
 
-(defcls Obstacle [object]
-  types []
-
-  level-lo 0
-  level-hi G.max-dungeon-level
-  rarity :common
-
-  generation-weight (cmeth []
-    (*
-      (/ 1 (cond
-        [(= @rarity :common)    1]
-        [(= @rarity :uncommon)  4]
-        [(= @rarity :rare)     16]))
-      (/ 1 (cond
-        [(< @dl @level-lo) (inc (- @level-lo @dl))]
-        [(> @dl @level-hi) (inc (- @dl @level-hi))]
-        [True 1])))))
+(defcls Obstacle [Generated]
+  types [])
 
 (defmacro defobst [name inherit &rest body]
   `(do

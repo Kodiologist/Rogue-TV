@@ -51,3 +51,19 @@
 
   [at (classmethod (fn [self pos]
     (get self.omap pos.x pos.y)))]])
+
+(defcls Generated [object]
+  level-lo 0
+  level-hi G.max-dungeon-level
+  rarity :common
+
+  generation-weight (cmeth [dl]
+    (if (= @rarity :nongen) 0 (*
+      (/ 1 (cond
+        [(= @rarity :common)    1]
+        [(= @rarity :uncommon)  4]
+        [(= @rarity :rare)     16]))
+      (/ 1 (cond
+        [(< dl @level-lo) (inc (- @level-lo dl))]
+        [(> dl @level-hi) (inc (- dl @level-hi))]
+        [True 1]))))))

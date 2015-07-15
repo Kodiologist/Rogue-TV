@@ -6,9 +6,9 @@
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [Drawable MapObject]])
+  [roguetv.types [MapObject Generated Drawable]])
 
-(defclass Item [Drawable MapObject NounPhraseNamed] [
+(defclass Item [MapObject Generated NounPhraseNamed Drawable] [
   [escape-xml-in-np-format True]
   [tid None]
     ; A string.
@@ -131,7 +131,8 @@
   :name "test item" :name-suffix (fn [self] "(testy)")
   :char "&"
   :info-flavor "This is a test item. It doesn't do anything."
-  :price 11)
+  :price 11
+  :rarity :nongen)
 
 (defclass ItemAppearance [NounPhraseNamed] [
   [registry {}]

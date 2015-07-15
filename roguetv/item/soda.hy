@@ -52,6 +52,7 @@
 
 (def-itemtype Soda "chicken-soup" :name (can-of "chicken soup")
   :price 10
+  :level-lo 3
   :info-flavor "Tastes like the comforts of home. And it's still piping hot."
   :radius-around-upelv 5
 
@@ -72,6 +73,8 @@
 (def-itemtype Soda "heeling-potion" :name "potion of extra heeling"
   ; A pun on Rogue's potion of extra healing.
   :price 10
+  :level-lo 3
+  :level-hi 7
   :info-flavor "Drink this magic potion and dogs will come heeling from far and wide."
   :dog-summoning-range 3
   :dogs-to-summon 5
@@ -94,6 +97,7 @@
 (def-itemtype Soda "stink-serum" :name (can-of "stink serum")
   ; Inspired by Yipe! III.
   :price 3
+  :level-lo 1
   :info-flavor "This refreshing beverage has an odd but tasty flavor with notes of beans, Limburger cheese, durian, and asparagus. The, ah, aftereffects are somewhat less pleasant."
   :stink-time 30
 
@@ -108,6 +112,7 @@
     ; We need :+force-a because of a bug in inflect.
   ; In reference to the real dietary supplement 5-hour Energy.
   :price 15
+  :level-lo 4
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, this is some kind of swill that you don't really want to know the origin or chemical composition of, but it's got quite a kick, for a short time."
     ; Mid-20th-century Cheerios ads
   :haste-time 5
@@ -122,6 +127,7 @@
 
 (def-itemtype Soda "confusion-soda" :name (can-of "booze")
   :price 10
+  :level-hi 5
   :info-flavor "This is a generous portion of the most popular recreational drug in history, possibly excepting caffeine. Did you know that in 2012, about 3 million deaths (6% of all deaths worldwide) were attributable to alcoholic beverages? Seriously, folks, if you must drink, drink responsibly. Anyway, back to your regularly scheduled dumb jokes."
     ; World Health Organization. (2014). Global status report on alcohol and health 2014. Retrieved from http://www.who.int/substance_abuse/publications/global_alcohol_report
   :confusion-time 45
@@ -136,6 +142,7 @@
 (def-itemtype Soda "strength-soda" :name (can-of "Daffy's Elixir")
   ; A name for several patent medicines.
   :price 3
+  :level-hi 6
   :info-flavor "This marvelous concoction will give you the strength of a raging bull!"
   :strength-time (* 5 60)
 
@@ -149,6 +156,7 @@
 
 (def-itemtype Soda "passwall-soda" :name (can-of "pass-through punch")
   :price 30
+  :level-lo 7
   :info-flavor "It lets you walk through walls! Too bad it doesn't let you see through walls."
   :passwall-time 45
 
@@ -161,6 +169,7 @@
 
 (def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
   :price 5
+  :level-lo 6
   :info-flavor "Here is that <b>drugless</b> way to quiet your ragged nerves so many people are asking about today. Ovaltine® marks one of the most important scientific findings of its time."
     ; Quoting from old Ovaltine ads:
     ; - Collier's, 8 October 1932, p. 29 - http://web.archive.org/http://i.imgur.com/zX4Axys.jpg
