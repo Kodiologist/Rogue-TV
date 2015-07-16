@@ -16,8 +16,19 @@
 
 (defn reset-level []
   (setv dl G.dungeon-level)
+
   (setv G.map-width (+ 50 (* 4 dl)))
   (setv G.map-height (+ 20 (* 2 dl)))
+  (when (and (not-in dl [0 G.max-dungeon-level]) (1-in 10))
+    (if (1-in 2)
+      (do ; Wide level.
+        (+= G.map-width (// G.map-width 2))
+        (setv G.map-height 20))
+      (do ; Square level.
+        (setv d (// (+ G.map-width G.map-height) 2))
+        (setv G.map-width d)
+        (setv G.map-height d))))
+
   (setv G.fov-map (tcod.map-new G.map-width G.map-height))
   (setv G.time-limit (+ G.current-time (int (* 60
     (+ 3 (/ dl 2))))))
