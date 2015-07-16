@@ -1,6 +1,6 @@
 Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It's written in Hy_ with Python 2.
 
-Currently, it's in a very early stage of development, and there isn't much to do.
+Currently, the game is playable, but a lot of features remain to be implemented, and there's no documentation other than in-game information screens about items, creatures, and terrain.
 
 Dependencies include Hy_, Kodhy_, Heidegger_, and libtcod_. Currently, curses is also a requirement. When (or rather, if) Rogue TV reaches a releasable state, I'll provide one-stop bundles with all dependencies, one for Unix-likes and one for Windows.
 
