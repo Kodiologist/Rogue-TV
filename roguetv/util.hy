@@ -1,5 +1,5 @@
 (import
-  [math [sqrt]]
+  [math [sqrt exp]]
   random
   [heidegger.pos [Pos]]
   [kodhy.util [seq keyword->str]]
@@ -7,6 +7,15 @@
 
 (defn chance [x]
   (<= (random.random) x))
+
+(defn randpois [mean]
+; Poisson-distributed random variate.
+  (setv k -1)
+  (setv p 1)
+  (while (> p (exp (- mean)))
+    (+= k 1)
+    (*= p (random.random)))
+  k)
 
 (defn weighted-choice [l]
 ; The argument should be a list of (weight, object) pairs.

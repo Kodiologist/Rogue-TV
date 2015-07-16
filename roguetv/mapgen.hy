@@ -82,9 +82,12 @@
     (.f o-type))
 
   ; Add items.
-  (setv n-items (+ (// dl 3) (randint 3 8)))
-    ; So 3 to 8 items on level 1,
-    ; and 6 to 11 on level 9.
+  (setv n-items (inc (randpois (+ 3 (/ dl 5)))))
+    ; This yields:
+    ; level         quantiles
+    ;         .025  .25 .5 .75 .975
+    ; 0        1     3   4   5   8
+    ; 9        2     4   6   7   11
   (for [_ (range n-items)]
     (setv itype (weighted-choice (amap
       (, (it.generation-weight dl) it)
