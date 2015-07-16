@@ -90,7 +90,7 @@
     :color-fg color)))
 
 (def-itemtype Gadget "panic-button" :name "panic button"
-  :price 50
+  :price 10
   :level-lo 5
   :info-flavor "Press it if you expect to be particularly lucky in the future, or if you are particularly unlucky in the present."
   :max-charges 3
@@ -119,7 +119,7 @@
     (msg :tara "{p:He's} teleported to another part of the level."))))
 
 (def-itemtype Gadget "warpback" :name "warpback machine"
-  :price 50
+  :price 10
   :level-lo 6
   :rarity :uncommon
   ; Has an extra instance attribute .warpback-pos.
@@ -146,7 +146,7 @@
         (msg "{:The} registers your current position." self)))))
 
 (def-itemtype Gadget "hookshot"
-  :price 30
+  :price 5
   :level-lo 1
   :info-flavor "Arfer's law of game design: any video game is improved by the addition of a grappling hook."
   :max-charges 10
@@ -188,7 +188,7 @@
     (msg "{:The} pulls you ahead." self))))
 
 (def-itemtype Gadget "chainsaw"
-  :price 10
+  :price 2
   :level-hi 7
   :info-flavor "Just what you need to kickstart a lucrative career in lumberjacking after winning gobs of dosh on Rogue TV. Or you could sell it for an additional gob of dosh. Whatever; I don't judge."
   :max-charges 10
@@ -208,7 +208,7 @@
       (msg "{:Your} proves ineffective against {:the}." self t)))))
 
 (def-itemtype Gadget "hairdryer" :name "hair dryer"
-  :price 10
+  :price 2
   :level-lo 1
   :level-hi 6
   :info-flavor "Just because you're running around in a dungeon doesn't mean you can't have salon-quality hair."
@@ -225,7 +225,7 @@
     (msg "You are briefly immersed in a cloud of warm air."))))
 
 (def-itemtype Gadget "tunnel-machine" :name "tunnel-boring machine"
-  :price 40
+  :price 8
   :level-lo 2
   :info-flavor "A wicked giant drill to pound through whatever solid obstacles happen to get in your way."
   :max-charges 5
@@ -247,7 +247,7 @@
       (msg "Your drill proves ineffective against {:the}." t)))))
 
 (def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
-  :price 20
+  :price 4
   :level-lo 4
   :info-flavor "Tired of buying can after can of SILLY STRING Brand Spray Streamer and still running out? This cutting-edge device produces SILLY STRING Brand Spray Streamer (new &amp; improved formula, patent pending) instantly, using chemicals already present in the air of a typical American household! Just press the button and fire away! Product is flammable. Keep mouth and eyes away from exhaust port. Replace filter regularly. Do not use if you are pregnant or nursing. Check for NWS Air Quality Alerts before and after each use."
   :max-charges 10
@@ -274,7 +274,7 @@
       (msg :tara "{p:The}'s spraying hasn't come to much.")))))
 
 (def-itemtype Gadget "bee-machine" :name "personal beekeeping device"
-  :price 30
+  :price 5
   :level-hi 4
   :info-flavor "A beekeeper is you! It's stuffed with everything you need to make your own honey. Including the bees. <b>Especially</b> the bees."
     ; "A foobar is you" is originally from the NES game Pro
@@ -303,7 +303,7 @@
         (msg "Most of them go back in.")])))
 
 (def-itemtype Gadget "microscope"
-  :price 20
+  :price 6
   :level-lo 7
   :rarity :uncommon
   :info-flavor "Second only to beakers full of glowing green goo in proving one's credentials as a scientist."
@@ -341,7 +341,7 @@
     (.identify item))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
-  :price 20
+  :price 4
   :level-lo 3
   :info-flavor "They say it's unwise to use a GPS device as your only means of navigation in an unfamiliar area, but it's not as if you have lots of better options in a dungeon."
   :max-charges 5
