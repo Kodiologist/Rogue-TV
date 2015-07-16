@@ -249,7 +249,7 @@
 (def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
   :price 4
   :level-lo 4
-  :info-flavor "Tired of buying can after can of SILLY STRING Brand Spray Streamer and still running out? This cutting-edge device produces SILLY STRING Brand Spray Streamer (new &amp; improved formula, patent pending) instantly, using chemicals already present in the air of a typical American household! Just press the button and fire away! Product is flammable. Keep mouth and eyes away from exhaust port. Replace filter regularly. Do not use if you are pregnant or nursing. Check for NWS Air Quality Alerts before and after each use."
+  :info-flavor "Tired of buying can after can of generic-brand areosol string and still running out? This cutting-edge device produces aerosol string (new &amp; improved formula, patent pending; compare with SILLY STRING Brand Spray Streamer) instantly, using chemicals already present in the air of a typical American household! Just press the button and fire away! Product is flammable. Keep mouth and eyes away from exhaust port. Replace filter regularly. Do not use if you are pregnant or nursing. Check for NWS Air Quality Alerts before and after each use."
   :max-charges 10
   :web-machine-range 8
   :web-tear-time 5

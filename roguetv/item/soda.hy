@@ -113,7 +113,7 @@
   ; In reference to the real dietary supplement 5-hour Energy.
   :price 3
   :level-lo 4
-  :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, this is some kind of swill that you don't really want to know the origin or chemical composition of, but it's got quite a kick, for a short time."
+  :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, compared to its namesake, which is basically caffeine, this novel beverage is of mysterious origin, and it's got a veritably supernatural kick, for a (very, very) short time."
     ; Mid-20th-century Cheerios ads
   :haste-time 5
 
@@ -170,8 +170,8 @@
 (def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
   :price 10
   :level-lo 6
-  :info-flavor "Here is that <b>drugless</b> way to quiet your ragged nerves so many people are asking about today. Ovaltine® marks one of the most important scientific findings of its time."
-    ; Quoting from old Ovaltine ads:
+  :info-flavor (.join "\n\n" ["Here is that <b>drugless</b> way to quiet your ragged nerves so many people are asking about today. Ovaltine marks one of the most important scientific findings of its time."
+    "(No, seriously, those are exact quotes from Ovaltine ads from the 20s and 30s. So, the questionable claims ads make about dietary supplements these days are not so new. Ovaltine, at least, has cleaned up its act by limiting its claims to the observation that it's micronutrient-foritifed and that these micronutrients are essential for health.)"])
     ; - Collier's, 8 October 1932, p. 29 - http://web.archive.org/http://i.imgur.com/zX4Axys.jpg
     ; - Milwaukee Sentinel, 13 Oct 1928, p. 21 - http://web.archive.org/http://i.imgur.com/Q132P5l.png
   :sleep-time 30
