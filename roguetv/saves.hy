@@ -4,6 +4,7 @@
   [datetime [datetime]]
   gzip
   jsonpickle
+  [libtcodpy :as tcod]
   [kodhy.util [concat]]
   [roguetv.globals :as G]
   [roguetv.types [MapObject]]
@@ -54,6 +55,7 @@
   ; A bit of extra explicit initialization is necessary here
   ; because the omaps, G.fov-map, and G.player are redundant with
   ; MapObject fields.
+  (setv G.fov-map (tcod.map-new G.map-width G.map-height))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
   (for [o (get x "omaps" "Tile")]
