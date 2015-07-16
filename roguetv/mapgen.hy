@@ -62,6 +62,10 @@
   ; The down elevator is placed randomly.
   (mset (shift free-floors) (DownElevator))
 
+  ; Generate the Amulet if the player is on the last level.
+  (when (= dl G.max-dungeon-level)
+    (kwc (get G.itypes "aoy") :pos (shift free-floors)))
+
   ; Add obstacles.
   (setv n-obstacles (randint (+ dl 3) (* 2 (+ dl 3))))
     ; So 3 to 6 obstacles on level 0,

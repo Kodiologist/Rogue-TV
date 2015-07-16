@@ -92,7 +92,9 @@
         (retf :game-loop))))
 
     (assert G.endgame)
-    (setv winnings G.inventory)
+    (setv winnings (filt
+      (or (= G.endgame :won) (not (instance? (get G.itypes "aoy") it)))
+      G.inventory))
     (defn total [l]
       (sum (amap it.price l)))
     (setv gross (total winnings))

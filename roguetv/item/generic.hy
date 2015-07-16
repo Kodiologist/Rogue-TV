@@ -127,13 +127,6 @@
 
   c)
 
-(def-itemtype Item "test-item"
-  :name "test item" :name-suffix (fn [self] "(testy)")
-  :char "&"
-  :info-flavor "This is a test item. It doesn't do anything."
-  :price 11
-  :rarity :nongen)
-
 (defclass ItemAppearance [NounPhraseNamed] [
   [registry {}]
   ; A dictionary mapping subclasses of Item to lists of eligible
