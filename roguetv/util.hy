@@ -69,9 +69,9 @@
   (setv mtype (when (keyword? (first args))
     (.pop args 0)))
   (when mtype
-    (setv (get args 0) (.format "<c fg='{}'>{}:</c> {}"
+    (setv (get args 0) (.format "<c fg='{}'>{}</c> {}"
       (keyword->str (get G.announcer-colors mtype))
-      (get {:tara "Tara" :bob "Bob" :aud "The audience"} mtype)
+      (get {:tara "Tara:" :bob "Bob:" :aud "The audience"} mtype)
       (get args 0))))
   (.append G.message-log (,
     (len G.message-log)
