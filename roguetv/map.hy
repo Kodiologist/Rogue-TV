@@ -171,9 +171,9 @@
           (rtv mapgen.reset-level)
           (msg :tara
             (if (= G.dungeon-level G.max-dungeon-level)
-              "{p} has reached the final level. It's {} by {} squares. {p} must now find the mystical Amulet of Yendor and take the final down elevator to win Rogue TV!"
-              "And {p:he's} on to the next level. This one spans {} by {} squares.")
-            G.map-width G.map-height)))))]])
+              "{p} has reached level {}, the final level. It's {} by {} squares. {p} must now find the mystical Amulet of Yendor and take the final down elevator to win Rogue TV!"
+              "And {p:he's} on to level {}. It spans {} by {} squares.")
+            (inc G.dungeon-level) G.map-width G.map-height)))))]])
 
 (defclass Door [Tile] [
   [name (NounPhrase "closed door")]
