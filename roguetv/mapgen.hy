@@ -115,7 +115,7 @@
       (for [p @door-pos]
         (when (in p (list @free-floors))
           (mset p (kwc Door :open-time (+ 2 @dl (randint 1 8))))
-          (shift @free-floors)
+          (.remove @free-floors p)
           (-= n-to-place 1)
           (unless n-to-place
             (ret)))))))
@@ -132,13 +132,15 @@
       (setv start (shift @free-floors))
       (setv occupied [start])
       (block :done (while n-to-place (block :again
-        (for [p (shuffle occupied)]
+        (for [op (shuffle occupied)]
           (for [d (shuffle Pos.ORTHS)]
+            (setv p (+ op d))
             (when (and
-                (<= (dist-cheb start (+ p d)) mcr)
-                (in (+ p d) @free-floors)
-                (not-in (+ p d) occupied))
-              (.append occupied (+ p d))
+                (<= (dist-cheb start p) mcr)
+                (in p @free-floors)
+                (not-in p occupied))
+              (.append occupied p)
+              (.remove @free-floors p)
               (-= n-to-place 1)
               (retf (if n-to-place :again :done)))))
         ; We couldn't find anywhere to place the remaining tiles.
