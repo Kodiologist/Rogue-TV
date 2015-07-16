@@ -146,14 +146,14 @@
       (setv start (shift @free-floors))
       (setv occupied [start])
       (block :done (while n-to-place (block :again
-        (for [op (shuffle occupied)]
+        (for [op occupied]
           (for [d (shuffle Pos.ORTHS)]
             (setv p (+ op d))
             (when (and
                 (<= (dist-cheb start p) mcr)
                 (in p @free-floors)
                 (not-in p occupied))
-              (.append occupied p)
+              (.insert occupied (randint 0 (len occupied)) p)
               (.remove @free-floors p)
               (-= n-to-place 1)
               (retf (if n-to-place :again :done)))))
