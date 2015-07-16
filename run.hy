@@ -1,5 +1,7 @@
 #!/usr/bin/env hy
 
+;(import sys) (setv sys.path ["." "/usr/lib/python2.7" "/usr/lib/python2.7/lib-dynload"])
+
 (import
   os
   os.path
