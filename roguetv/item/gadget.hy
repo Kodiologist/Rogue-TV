@@ -201,11 +201,14 @@
     (setv t (mget p))
 
     (.use-time-and-charge self)
-    (if (instance? Door t)
-      (do
+    (cond
+      [(instance? Door t) (do
         (msg "Bzzt! The door is no more.")
-        (mset p (Floor)))
-      (msg "{:Your} proves ineffective against {:the}." self t)))))
+        (mset p (Floor)))]
+      [(and (on-map p) (Creature.at p))
+        (msg :bob "This is Rogue TV, not DoomRL!")]
+      [True
+        (msg "{:Your} proves ineffective against {:the}." self t)]))))
 
 (def-itemtype Gadget "hairdryer" :name "hair dryer"
   :price 2
@@ -239,12 +242,15 @@
     (setv t (mget p))
 
     (.use-time-and-charge self)
-    (if (or (instance? Wall t) (instance? Door t))
-      (do
+    (cond
+      [(or (instance? Wall t) (instance? Door t)) (do
         (G.player.take-time (- self.drill-time self.apply-time))
         (msg "Your drill reduces {:the} to dust." t)
-        (mset p (Floor)))
-      (msg "Your drill proves ineffective against {:the}." t)))))
+        (mset p (Floor)))]
+      [(and (on-map p) (Creature.at p))
+        (msg :aud "gasps. You can't use a drill like that on a family show.")]
+      [True
+        (msg "Your drill proves ineffective against {:the}." t)]))))
 
 (def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
   :price 4
