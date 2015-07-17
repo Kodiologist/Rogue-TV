@@ -8,12 +8,12 @@
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
-  [kodhy.util [retf concat]]
+  [kodhy.util [retf concat keyword->str]]
   [roguetv.strings :as strings]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [hit-key-to-continue]]
+  [roguetv.input [hit-key-to-continue text-screen]]
   [roguetv.map [room-for?]]
   [roguetv.item [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]]
@@ -56,6 +56,11 @@
     (setv G.screen-mode :normal)
 
     (unless (get G.dates "loaded")
+      (unless G.debug
+        (text-screen (.format "\nIn the far-distant future of the year 200X, the story of the lone hero who retrieved the mystical Amulet of Yendor from the depths of the Dungeon of Doom has passed into legend. But the legend lives on in <b>Rogue TV</b>, the hit new game show where one brave contestant races against the clock to collect fabulous prizes! Host <c fg='{}'>Tara Turner</c> and color commentator <c fg='{}'>Bob McRobertson</c> will be your guides as you navigate the perils of a family-friendly state-of-the-art dungeon (designed anew for every contestant, and constructed to the highest standards of safety) to the cheers of adoring fans. Will you reach dungeon level {}, where the Amulet of Yendor lies? Or will you go home with a booby prize? It's up to you and the roll of the dice!"
+          (keyword->str (get G.announcer-colors :tara))
+          (keyword->str (get G.announcer-colors :bob))
+          (inc G.max-dungeon-level))))
       (msg :tara "The game begins on a level with {} by {} squares. Good luck, {p}."
         G.map-width G.map-height)
       (describe-tile G.player.pos))
