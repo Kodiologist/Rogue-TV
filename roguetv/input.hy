@@ -74,43 +74,33 @@
     (when (in key cancel-keys)
       (ret None)))))
 
+(setv normal-command-keys [
+  ["?" :show-controls "Show these controls"]
+  ["S" :save-and-quit "Save your game and quit the program"]
+  ["Q" :resign-game "Resign the game"]
+  [";" :look-mode "Enter look mode"]
+  [":" :examine-ground "Examine what's beneath you"]
+  ["t" :use-tile "Use terrain (e.g., an elevator)"]
+  ["i" :inventory "Show inventory and examine items"]
+  ["," :pick-up "Pick up an item at your feet"]
+  ["d" :drop "Drop an item"]
+  ["a" :apply-item "Apply (use) an item"]
+  ["W" :make-wall :debug]
+  ["R" :reset-level :debug]])
+
 (defn get-normal-command [] (block
   (while True
     (setv key (G.T.getkey))
     (setv inp (cond
-
-      [(= key "S")
-        :save-and-quit]
-      [(= key "Q")
-        :resign-game]
-
       [(in key direction-keys)
         [:move (get-direction key)]]
       [(in key ["." "5" "KEY_B2"])
-        [:wait]]
-
-      [(= key ";")
-        :look-mode]
-
-      [(= key ":")
-        :examine-ground]
-      [(= key "t")
+        :wait]
+      [(in key ["<" ">"])
+        ; Muscle memory for using stairs.
         :use-tile]
-
-      [(= key "i")
-        :inventory]
-      [(= key ",")
-        :pick-up]
-      [(= key "d")
-        :drop]
-      [(= key "a")
-        :apply-item]
-
-      [(= key "W")
-        :make-wall]
-      [(= key "R")
-        :reset-level]))
-
+      [(in key (map first normal-command-keys))
+        (second (afind (= (first it) key) normal-command-keys))]))
     (when inp
       (ret inp)))))
 

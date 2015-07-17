@@ -5,7 +5,7 @@
   [kodhy.util [ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [text-screen inventory-loop look-mode y-or-n]]
+  [roguetv.input [text-screen inventory-loop look-mode y-or-n normal-command-keys]]
   [roguetv.map [Tile Wall mset room-for?]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
@@ -24,6 +24,15 @@
   (setv arg (when (coll? inp) (second inp)))
 
   (block (cond
+
+    [(= cmd :show-controls)
+      (text-screen (+
+        "<b>Controls</b>\n\n"
+        "Use the arrows, number pad, or vi keys to move. Use \".\" or numpad \"5\" to wait 1 second.\n\n"
+        (.join "\n"
+          (amap (.format "  <b>{}</b>  {}" (first it) (get it 2))
+          (filt (!= (get it 2) :debug)
+          normal-command-keys)))))]
 
     [(= cmd :resign-game)
       (if G.debug
