@@ -1,5 +1,4 @@
 inflect
-libtcod
 pypaths
 
 heidegger.pos
@@ -16,6 +15,7 @@ roguetv.util
 roguetv.input
 roguetv.types
 roguetv.map
+roguetv.fov
 roguetv.item
 roguetv.item.generic
 roguetv.creature

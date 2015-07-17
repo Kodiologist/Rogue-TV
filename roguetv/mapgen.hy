@@ -2,7 +2,6 @@
 
 (import
   [random [choice randint]]
-  [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   heidegger.digger
   [kodhy.util [concat shift ret retf]]
@@ -10,6 +9,7 @@
   [roguetv.util [*]]
   [roguetv.types [Generated]]
   [roguetv.map [*]]
+  [roguetv.fov [init-fov-map]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]]
   [roguetv.creature.monster [Dog Cat]])
@@ -29,7 +29,6 @@
         (setv G.map-width d)
         (setv G.map-height d))))
 
-  (setv G.fov-map (tcod.map-new G.map-width G.map-height))
   (setv G.time-limit (+ G.current-time (int (* 60
     (+ 3 (/ dl 2))))))
 
@@ -37,6 +36,7 @@
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
   (setv Creature.extant [G.player])
+  (init-fov-map Tile.omap)
   ; Now that we're on a new level, the positions of old
   ; MapObjects are invalid. But that's okay because there's no
   ; way to refer to old MapObjects anymore, either (except for
@@ -59,7 +59,7 @@
       (setv floor? (not (get dugout "map" (inc x) (inc y))))
       (when floor?
         (.append free-floors p))
-      (mset p (if floor? (Floor) (Wall)))))
+      (mset p (if floor? (Floor) (Wall)) False)))
   (setv free-floors (shuffle free-floors))
 
   ; Add elevators.

@@ -4,11 +4,11 @@
   [datetime [datetime]]
   gzip
   jsonpickle
-  [libtcodpy :as tcod]
   [kodhy.util [concat]]
   [roguetv.globals :as G]
   [roguetv.types [MapObject]]
   [roguetv.map [Tile mset]]
+  [roguetv.fov [init-fov-map]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]]
   [roguetv.creature.player [Player]])
@@ -53,17 +53,17 @@
     (.set-appearance (get G.itypes k) v))
 
   ; A bit of extra explicit initialization is necessary here
-  ; because the omaps, G.fov-map, and G.player are redundant with
+  ; because the omaps, FOV map, and G.player are redundant with
   ; MapObject fields.
-  (setv G.fov-map (tcod.map-new G.map-width G.map-height))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
   (for [o (get x "omaps" "Tile")]
-    (mset o.pos o))
+    (mset o.pos o False))
   (for [o (get x "omaps" "Item")]
     (MapObject.__init__ o o.pos))
   (setv Creature.extant (get x "Creature.extant"))
   (for [cr Creature.extant]
     (MapObject.__init__ cr cr.pos))
+  (init-fov-map Tile.omap)
 
   (setv (get G.dates "loaded") (.isoformat (datetime.utcnow))))

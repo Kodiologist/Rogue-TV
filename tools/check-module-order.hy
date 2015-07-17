@@ -19,6 +19,8 @@
     (setv fname (.replace (.replace module "." "/") "-" "_"))
     (when (and (os.path.exists fname) (os.path.isdir fname))
       (continue))
+    (when (os.path.exists (+ fname ".py"))
+      (continue))
     (+= fname ".hy")
     (with [[o (open fname)]] (o.read))))
 

@@ -3,7 +3,6 @@
 (import
   textwrap
   curses
-  [libtcodpy :as tcod]
   [heidegger.pos [Pos]]
   [kodhy.util [concat]]
   [roguetv.globals :as G]
@@ -11,6 +10,7 @@
   [roguetv.input [look-at-keys]]
   [roguetv.types [Drawable MapObject]]
   [roguetv.map [Tile Floor]]
+  [roguetv.fov [recompute-fov]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]]
   [roguetv.attrstr [AttrStr get-color curses-encode]])
@@ -28,15 +28,6 @@
         (G.T.addstr (curses-encode a1))])
     (catch [_ curses.error] None)))
       ; http://bugs.python.org/issue8243
-
-(defn recompute-fov []
-  (kwc tcod.map-compute-fov G.fov-map
-    G.player.pos.x G.player.pos.y
-    :algo tcod.FOV-BASIC)
-  (for [x (range G.map-width)]
-    (for [y (range G.map-height)]
-      (when (or G.omnivision (tcod.map-is-in-fov G.fov-map x y))
-        (setv (get G.seen-map x y) True)))))
 
 (defn echo [str color-fg color-bg]
   (addstr str (get-color color-fg color-bg)))

@@ -1,6 +1,5 @@
 (import
-  curses
-  [libtcodpy :as tcod])
+  curses)
 
 (def globals-to-save (set))
 (defmacro defs [varname value]
@@ -59,6 +58,7 @@
   :dark-orange 166
   :brown 94})
 
+(defs vision-radius 20)
 (defs push-past-monster-time 1)
 (defs stink-range 20)
 (defs speedup-soda-factor 10)
@@ -102,7 +102,6 @@
 (defs time-limit None)
 (defs last-action-duration 0)
 
-(def fov-map None)
 (def fov-dirty? True)
 (defs seen-map [])
 

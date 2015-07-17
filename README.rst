@@ -2,7 +2,7 @@ Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguel
 
 Currently, the game is playable, but a lot of features remain to be implemented.
 
-Dependencies include Hy_ (0.10.1, and no later), Kodhy_, Heidegger_, and libtcod_. Currently, curses is also a requirement. When (or rather, if) Rogue TV reaches a sufficiently mature state, I'll provide proper Windows and Mac OS ports as bundles with all dependencies. You can find a bundle for Linux (not including Python and its core modules) at http://arfer.net/downloads/roguetv-linux.tar.gz
+Dependencies include Hy_ (0.10.1, and no later), Kodhy_, and Heidegger_. Currently, curses is also a requirement. (All dependencies not already included with Python are in pure Python or Hy.) When (or rather, if) Rogue TV reaches a sufficiently mature state, I'll provide proper Windows and Mac OS ports as bundles with all dependencies. You can find a bundle for Linux (not including Python and its core modules) at http://arfer.net/downloads/roguetv-linux.tar.gz
 
 Start the game with ``sh run.sh`` (if you're using the bundle) or ``hy run.hy`` (if you're using the source code). Use the ``--help`` argument to see command-line options. Currently, the game requires a terminal emulator that supports 256 colors and Unicode, such as GNOME Terminal, Konsole, or LXTerminal.
 
@@ -30,4 +30,3 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 .. _Hy: http://hylang.org
 .. _Kodhy: https://github.com/Kodiologist/Kodhy
 .. _Heidegger: https://github.com/Kodiologist/Heidegger
-.. _libtcod: http://roguecentral.org/doryen

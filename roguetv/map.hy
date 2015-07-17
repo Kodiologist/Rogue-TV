@@ -2,7 +2,6 @@
 
 (import
   [random [randint]]
-  [libtcodpy :as tcod]
   [kodhy.util [ret]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
@@ -56,16 +55,10 @@
   [bump-into (fn [self cr] True)]])
 (setv LevelBoundary (LevelBoundary))
 
-(defn mset [pos tile]
-  (kwc .move tile pos :+clobber)
-  (when (or
-      (!= (tcod.map-is-transparent G.fov-map pos.x pos.y)
-        (not tile.blocks-sight))
-      (!= tcod.map-is-walkable  G.fov-map pos.x pos.y)
-        (not tile.blocks-movement))
+(defn mset [pos tile &optional [fov-adjust True]]
+  (when (and fov-adjust (!= tile.blocks-sight (. (Tile.at pos) blocks-sight)))
     (soil-fov))
-  (tcod.map-set-properties G.fov-map pos.x pos.y
-    (not tile.blocks-sight) (not tile.blocks-movement)))
+  (kwc .move tile pos :+clobber))
 
 (defn mget [pos]
   (if (on-map pos)
