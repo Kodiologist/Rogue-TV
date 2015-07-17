@@ -1,10 +1,21 @@
 Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It's written in Hy_ with Python 2.
 
-Currently, the game is playable, but a lot of features remain to be implemented, and there's no documentation other than in-game information screens about items, creatures, and terrain.
+Currently, the game is playable, but a lot of features remain to be implemented.
 
-Dependencies include Hy_, Kodhy_, Heidegger_, and libtcod_. Currently, curses is also a requirement. When (or rather, if) Rogue TV reaches a releasable state, I'll provide one-stop bundles with all dependencies, one for Unix-likes and one for Windows.
+Dependencies include Hy_, Kodhy_, Heidegger_, and libtcod_. Currently, curses is also a requirement. When (or rather, if) Rogue TV reaches a sufficiently mature state, I'll provide proper Windows and Mac OS ports as bundles with all dependencies. You can find a bundle for Linux (not including Python and its core modules) at http://arfer.net/downloads/roguetv-linux.tar.gz
 
-Start the game with ``hy run.hy``.
+Start the game with ``sh run.sh`` (if you're using the bundle) or ``hy run.hy`` (if you're using the source code). Use the ``--help`` argument to see command-line options. Currently, the game requires a terminal emulator that supports 256 colors and Unicode, such as GNOME Terminal, Konsole, or LXTerminal.
+
+Please `send me`__ bug reports and patches. Feature suggestions are also welcome, but I've got a lot planned already.
+
+.. __: http://arfer.net/elsewhere
+
+How to play
+============================================================
+
+Press the ``?`` key to see controls.
+
+The object of the game is to maximize your winnings. Your winnings are the sum of the monetary values of the items you're carrying. More broadly, the goal is to maximize your *average* winnings across many games of Rogue TV. If you take an up elevator, or you win the game (by taking the final down elevator with the Amulet of Yendor), you get to keep all your winnings. But if you run out of time or resign, prizes are taken away from you until you have half your original winnings or less. So, it's sometimes wiser to take an up elevator than to press your luck in pursuit of the Amulet.
 
 License
 ============================================================
