@@ -125,4 +125,6 @@
   (when (= exit-reason :save-and-quit)
     (print "Saving...")
     (write-save-file G.save-file-path)
-    (print "Saved game to" G.save-file-path)))
+    (print "Saved game to" G.save-file-path))
+
+  exit-reason)

@@ -24,8 +24,8 @@
 (when (or (os.path.exists "roguetv_init.hy") (os.path.exists "roguetv_init.py"))
   (import roguetv-init))
 
-(unless p.debug
+(setv exit-reason (roguetv.main.main-loop))
+
+(unless (or p.debug (= exit-reason :save-and-quit))
   (try (os.remove p.save)
     (catch [_ OSError])))
-
-(roguetv.main.main-loop)
