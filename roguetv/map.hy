@@ -160,6 +160,8 @@
             (setv G.endgame :won))
           (msg :tara "Sorry, {p}, you'll need the Amulet of Yendor to finish the game."))
         (do
+          (when G.autosave
+            (rtv saves.write-save-file G.save-file-path))
           (+= G.dungeon-level 1)
           (rtv mapgen.reset-level)
           (msg :tara

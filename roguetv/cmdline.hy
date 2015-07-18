@@ -28,6 +28,9 @@
     :choices (amap (str it) (.keys pronouns->genders))]
   ["save" :type uni
     :help "filepath to read a saved game from or write saved games to"]
+  ["no-autosave"
+    :help "don't automatically save at the end of each level"
+    :action "store_true"]
   ["debug"
     :help "enable debug mode"
     :action "store_true"]])

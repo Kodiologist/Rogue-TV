@@ -13,6 +13,7 @@
 
 (def debug False)
 (def omnivision False)
+(def autosave True)
 
 (defs inventory-limit 5)
 (defs max-dungeon-level 9)
