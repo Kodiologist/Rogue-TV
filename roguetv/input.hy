@@ -154,7 +154,8 @@
     (setv key (G.T.getkey))
     (cond
 
-      [(in key cancel-keys)
+      [(or (in key cancel-keys)
+         (= key (first (afind (= (second it) :look-mode) normal-command-keys))))
         (break)]
 
       [(in key direction-keys) (do
