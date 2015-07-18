@@ -1,5 +1,8 @@
+# encoding: UTF-8
+
 class FOVMap(object):
 # Originally from http://www.roguebasin.com/index.php?title=Python_shadowcasting_implementation
+# by Björn Bergström and Eric Burgess.
     # Multipliers for transforming coordinates to other octants:
     mult = [
                 [1,  0,  0, -1, -1,  0,  0,  1],
