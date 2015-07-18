@@ -38,7 +38,12 @@
     ; onto a Pos where there's already something else is an
     ; error.
     (when self.pos
-      (setv (get self.omap self.pos.x self.pos.y) None))
+      (try
+        (setv (get self.omap self.pos.x self.pos.y) None)
+        (catch [_ IndexError])))
+          ; An IndexError may arise from the assignment if we've
+          ; done a .move after an old position has become
+          ; invalid. This is fine.
     (when p-to
       (whenn (get self.omap p-to.x p-to.y)
         (if clobber
