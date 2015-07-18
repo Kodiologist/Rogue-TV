@@ -1,6 +1,7 @@
 (require kodhy.macros)
 
 (import
+  random
   [datetime [datetime]]
   gzip
   jsonpickle
@@ -15,6 +16,8 @@
 
 (defn write-save-file [path]
   (setv x {})
+
+  (setv (get x "random_state") (random.getstate))
 
   (setv (get G.dates "saved") (.isoformat (datetime.utcnow)))
   (setv (get x "G") (dict (amap
@@ -65,5 +68,7 @@
   (for [cr Creature.extant]
     (MapObject.__init__ cr cr.pos))
   (init-fov-map Tile.omap)
+
+  (random.setstate (get x "random_state"))
 
   (setv (get G.dates "loaded") (.isoformat (datetime.utcnow))))
