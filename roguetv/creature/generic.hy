@@ -57,7 +57,9 @@
     (when (or
         (not (on-map p-to))
         (and (. (Tile.at p-to) blocks-movement)
-          (not (and (player? self) (.has-effect self Passwall)))))
+          (not (and (player? self) (or
+            (.has-effect self Passwall)
+            G.always-passwall)))))
       (when (and (player? self) (.has-effect self Confusion))
         (msg "You bump into {:the}." (mget p-to))
         (.take-time self G.confusion-bump-time))

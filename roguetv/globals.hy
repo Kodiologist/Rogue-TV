@@ -13,6 +13,8 @@
 
 (def debug False)
 (def omnivision False)
+(def always-passwall False)
+
 (def autosave True)
 
 (defs inventory-limit 5)
