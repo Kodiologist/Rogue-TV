@@ -1,4 +1,4 @@
-Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It's written in Hy_ with Python 2.
+Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It draws inspiration from `Smash TV`_, `Weekend Warrior`_, MXC_, `Legends of the Hidden Temple`_, `Mazeworld Catacombs`_, `Scarab of RA`_, and, of course, Rogue_. It's written in Hy_ with Python 2.7.
 
 Currently, the game is playable, but a lot of features remain to be implemented.
 
@@ -32,3 +32,11 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 .. _Hy: http://hylang.org
 .. _Kodhy: https://github.com/Kodiologist/Kodhy
 .. _Heidegger: https://github.com/Kodiologist/Heidegger
+
+.. _Smash TV: http://en.wikipedia.org/wiki/Smash_TV
+.. _Weekend Warrior: http://www.pangeasoft.net/weekendwarrior.html
+.. _Legends of the Hidden Temple: http://en.wikipedia.org/wiki/Legends_of_the_Hidden_Temple
+.. _MXC: http://en.wikipedia.org/wiki/MXC
+.. _Mazeworld Catacombs: http://macintoshgarden.org/games/mazeworld-catacombs
+.. _Scarab of RA: http://macintoshgarden.org/games/scarab-of-ra
+.. _Rogue: http://en.wikipedia.org/wiki/Rogue_(video_game)
