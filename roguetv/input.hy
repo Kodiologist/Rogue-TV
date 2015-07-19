@@ -78,8 +78,9 @@
   ["?" :show-controls "Show these controls"]
   ["S" :save-and-quit "Save your game and quit the program"]
   ["Q" :resign-game "Resign the game"]
+  ["m" :message-log "See old messages"]
   [";" :look-mode "Enter look mode"]
-  [":" :examine-ground "Examine what's beneath you"]
+  [":" :examine-ground "Name what's beneath you"]
   ["t" :use-tile "Use terrain (e.g., an elevator)"]
   ["i" :inventory "Show inventory and examine items"]
   ["," :pick-up "Pick up an item at your feet"]
@@ -107,6 +108,15 @@
 (defn text-screen [text]
 
   (rtv display.draw-text-screen text)
+  (G.T.refresh)
+
+  (while True
+    (when (in (G.T.getkey) cancel-keys)
+      (break))))
+
+(defn message-log-screen []
+
+  (rtv display.draw-message-log True)
   (G.T.refresh)
 
   (while True

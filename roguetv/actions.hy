@@ -5,7 +5,7 @@
   [kodhy.util [ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [text-screen inventory-loop look-mode y-or-n normal-command-keys]]
+  [roguetv.input [text-screen message-log-screen inventory-loop look-mode y-or-n normal-command-keys]]
   [roguetv.map [Tile Wall mset room-for?]]
   [roguetv.item [Item add-to-inventory]]
   [roguetv.creature [Creature]]
@@ -48,6 +48,9 @@
 
     [(= cmd :wait)
       (.wait G.player)]
+
+    [(= cmd :message-log)
+      (message-log-screen)]
 
     [(= cmd :look-mode)
       (look-mode G.player.pos)]

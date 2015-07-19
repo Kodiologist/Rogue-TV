@@ -115,14 +115,17 @@
   (G.T.move (- G.screen-height 1 G.message-lines) 0)
   (.draw (.trunc s G.screen-width)))
 
-(defn draw-bottom-message-log []
+(defn draw-message-log [&optional [fullscreen False]]
+  (when fullscreen
+    (G.T.erase))
+  (setv height (if fullscreen G.screen-height G.message-lines))
   (setv lines (concat
-    (lc [[mn text-xml] (slice G.message-log (- G.message-lines))]
+    (lc [[mn text-xml] (slice G.message-log (- height))]
       (amap (, mn it)
         (.wrap (AttrStr.from-xml text-xml) G.screen-width)))))
-  (setv lines (slice lines (- G.message-lines)))
+  (setv lines (slice lines (- height)))
   (for [[i [mn astr]] (enumerate lines)]
-    (G.T.move (+ i (- G.screen-height G.message-lines)) 0)
+    (G.T.move (+ i (- G.screen-height height)) 0)
     (.draw astr (if (> mn G.last-new-message-number)
       G.new-msg-highlight
       0))))
@@ -137,7 +140,7 @@
       (dec G.screen-height))))
   (when (= G.screen-mode :normal)
     (draw-status-line)
-    (draw-bottom-message-log)
+    (draw-message-log)
     (curses.curs-set 0))
   (when (= G.screen-mode :look)
     (draw-look-legend focus)
