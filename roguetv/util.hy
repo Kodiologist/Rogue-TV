@@ -78,9 +78,10 @@
   (setv mtype (when (keyword? (first args))
     (.pop args 0)))
   (when mtype
-    (setv (get args 0) (.format "<c fg='{}'>{}</c> {}"
-      (keyword->str (get G.announcer-colors mtype))
-      (get {:tara "Tara:" :bob "Bob:" :aud "The audience"} mtype)
+    (setv (get args 0) (.format "{} {}"
+      (color-xml
+        (get {:tara "Tara:" :bob "Bob:" :aud "The audience"} mtype)
+        (get G.announcer-colors mtype))
       (get args 0))))
   (.append G.message-log (,
     (len G.message-log)
@@ -89,6 +90,16 @@
 (defn msgp [cr &rest args]
   (when (player? cr)
     (apply msg args)))
+
+(defn color-xml [text &optional fg bg]
+; Formats a colored string for AttrStr. (It should already be
+; escaped for XML.)
+  (if (or fg bg)
+    (.format "<c{}{}>{}</c>"
+      (if fg (.format " fg='{}'" (keyword->str fg)) "")
+      (if bg (.format " bg='{}'" (keyword->str bg)) "")
+      text)
+    text))
 
 (defn soil-fov []
   (setv G.fov-dirty? True))

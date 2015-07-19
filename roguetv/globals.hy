@@ -36,6 +36,9 @@
   :tara :blue
   :bob :red
   :aud :dark-green})
+(def low-time-bg-color :red)
+(def low-time-fg-color :white)
+(def low-time-threshold 60) ; In seconds
 
 (def new-msg-highlight curses.A-BOLD)
 
