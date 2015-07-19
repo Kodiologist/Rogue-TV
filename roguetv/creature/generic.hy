@@ -102,34 +102,35 @@
 ; Despite that this class is in creature.generic instead of
 ; creature.player, only the player can have effects.
 
+  [status "???"]
+    ; Text shown in the status bar.
+  [end-msg None]
+
   [__init__ (fn [self expiry]
     (set-self expiry)
-    None)]
-
-  [end-msg (fn [self]
     None)]])
 
-(defclass Stink [Effect] [
-  [end-msg (fn [self]
-    (msg "You smell presentable again."))]])
+(defcls Stink [Effect]
+  status "PU"
+  end-msg "You smell presentable again.")
 
-(defclass Haste [Effect] [
-  [end-msg (fn [self]
-    (msg "The rush of energy fades."))]])
+(defcls Haste [Effect]
+  status "5SE"
+  end-msg "The rush of energy fades.")
 
-(defclass Confusion [Effect] [
-  [end-msg (fn [self]
-    (msg "Your mind clears."))]])
+(defcls Confusion [Effect]
+  status "Conf"
+  end-msg "Your mind clears.")
 
-(defclass Strength [Effect] [
-  [end-msg (fn [self]
-    (msg "You feel like a 98-pound weakling."))]])
-      ; Charles Atlas ads
+(defcls Strength [Effect]
+  status "Str"
+  end-msg "You feel like a 98-pound weakling.")
+    ; Charles Atlas ads
 
-(defclass Passwall [Effect] [
-  [end-msg (fn [self]
-    (msg "You feel solid again."))]])
+(defcls Passwall [Effect]
+  status "Pass"
+  end-msg "You feel solid again.")
 
-(defclass Sleep [Effect] [
-  [end-msg (fn [self]
-    (msg "You wake up."))]])
+(defcls Sleep [Effect]
+  status "Zzz"
+  end-msg "You wake up.")

@@ -35,7 +35,7 @@
   [act (fn [self]
     (for [e self.effects]
       (when (>= G.current-time e.expiry)
-        (.end-msg e)
+        (msg e.end-msg)
         (.remove self.effects e)
         (when (and (instance? Passwall e) (. (Tile.at self.pos) blocks-movement))
           (block

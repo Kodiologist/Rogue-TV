@@ -85,6 +85,11 @@
       (.ljust self.chars width)
       (+ self.attrs (* [None] (max 0 (- width (len self.chars)))))))]
 
+  [trunc (fn [self width]
+    (if (<= (len self) width)
+      self
+      (AttrStr (slice self.chars 0 width) (slice self.attrs 0 width))))]
+
   [wrap (fn [self width]
     ; Returns a list of AttrStrs, each no longer than the
     ; specified width.

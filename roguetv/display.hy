@@ -93,10 +93,9 @@
   focus-t-coords)
 
 (defn draw-status-line []
-  (G.T.move (- G.screen-height 1 G.message-lines) 0)
   (setv time-left (max 0 (- (or G.time-limit 0) G.current-time)))
-  (.draw (AttrStr.from-xml
-    (.format "{} {}  DL:{: 2}  {:>6}{}"
+  (setv s (AttrStr.from-xml
+    (.format "{} {}  DL:{: 2}  {:>6}{}  {}"
       (color-xml
         (.rjust (minsec time-left) (len "10:00"))
         (when (<= time-left G.low-time-threshold) G.low-time-fg-color)
@@ -111,7 +110,10 @@
         (fmap (.apparent-price it) (.identified? it) G.inventory))))
       (if (afind-or (not (.identified? it)) G.inventory)
         " + ?"
-        "    ")))))
+        "    ")
+      (.join " " (amap it.status G.player.effects)))))
+  (G.T.move (- G.screen-height 1 G.message-lines) 0)
+  (.draw (.trunc s G.screen-width)))
 
 (defn draw-bottom-message-log []
   (setv lines (concat
