@@ -15,6 +15,8 @@ How to play
 
 Press the ``?`` key to see controls.
 
+Detailed descriptions of every item, creature, and kind of terrain are available in-game. To see them, enter look mode (``;``) or the inventory list (``i``) and press the appropriate key.
+
 In the status bar, the number in parenthesis next to the time remaining is the amount of time your last action took, in seconds. If there is no number, your last action took no time.
 
 The object of the game is to maximize your winnings. Your winnings are the sum of the monetary values of the items you're carrying. More broadly, the goal is to maximize your *average* winnings across many games of Rogue TV. If you take an up elevator, or you win the game (by taking the final down elevator with the Amulet of Yendor), you get to keep all your winnings. But if you run out of time or resign, prizes are taken away from you until you have half your original winnings or less. So, it's sometimes wiser to take an up elevator than to press your luck in pursuit of the Amulet.
