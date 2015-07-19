@@ -107,6 +107,7 @@
 (defs current-time 0)
 (defs time-limit None)
 (defs last-action-duration 0)
+(def super-low-time-threshold 5)
 
 (def fov-dirty? True)
 (defs seen-map [])

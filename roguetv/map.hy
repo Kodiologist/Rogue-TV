@@ -162,6 +162,10 @@
         (do
           (when G.autosave
             (rtv saves.write-save-file G.save-file-path))
+          (when (<= (- G.time-limit G.current-time) G.super-low-time-threshold)
+            ; The audience was counting down when the player got
+            ; to the down elevator.
+            (msg :aud "cheers. You made it!"))
           (+= G.dungeon-level 1)
           (rtv mapgen.reset-level)
           (msg :tara

@@ -89,12 +89,17 @@
         (-= cr.clock-debt-ms Creature.clock-factor)
         (assert (>= cr.clock-debt-ms 0)))
 
-      (when (and G.time-limit (>= G.current-time G.time-limit))
-        (msg :tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
-        (msg :bob (choice strings.bob-too-bad))
-        (setv G.time-limit None)
-        (setv G.endgame :out-of-time)
-        (retf :game-loop))))
+      (when G.time-limit
+        (setv time-left (- G.time-limit G.current-time))
+        (when (<= time-left 0)
+          (msg :tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
+          (msg :bob (choice strings.bob-too-bad))
+          (setv G.time-limit None)
+          (setv G.endgame :out-of-time)
+          (retf :game-loop))
+        (when (<= time-left G.super-low-time-threshold)
+          (msg :aud "chants \"{}!\""
+            (get [None "One" "Two" "Three" "Four" "Five"] time-left))))))
 
     (assert G.endgame)
     (setv winnings (filt
