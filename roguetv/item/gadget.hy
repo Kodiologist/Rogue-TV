@@ -135,12 +135,16 @@
     (if (getattr self "warpback_pos" None)
       (do
         (.use-time-and-charge self)
-        (if (room-for? G.player self.warpback-pos)
-          (do
+        (cond
+          [(= G.player.pos self.warpback-pos) (do
+            (msg "You momentarily flicker out of existence.")
+            (setv self.warpback-pos None))]
+          [(room-for? G.player self.warpback-pos) (do
             (msg "You reappear at {:the}'s registered location." self)
             (.move G.player self.warpback-pos)
-            (setv self.warpback-pos None))
-          (msg "{:The} beeps at you accusingly." self)))
+            (setv self.warpback-pos None))]
+          [True
+            (msg "{:The} beeps at you accusingly." self)]))
       (do
         (setv self.warpback-pos G.player.pos)
         (msg "{:The} registers your current position." self)))))
