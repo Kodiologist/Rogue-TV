@@ -90,7 +90,10 @@
   [flying True]
 
   [act (fn [self]
-    (or (wander self) (.wait self)))]])
+    (or
+      (.flee-from-stink self)
+      (wander self)
+      (.wait self)))]])
 
 (defclass Cat [Monster] [
   [name (NounPhrase "cat")]
