@@ -152,7 +152,7 @@
 
 (def look-at-keys {
   :creature "c"
-  :item "o"
+  :item "i"
   :tile "t"})
 
 (defn look-mode [initial-pos]
