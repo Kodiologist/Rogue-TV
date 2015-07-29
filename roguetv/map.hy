@@ -121,7 +121,14 @@
   [name (NounPhrase "wall")]
   [char "#"]
   [color-bg G.fg-color]
-  [info-text "A common and persistent obstacle to scooping up all the prizes on the level and hopping into the down elevator."]
+  [info-text (.join "\n" [
+    "A common and persistent obstacle to scooping up all the prizes on the level and hopping into the down elevator."
+    ""
+    "  This man, with lime and rough-cast, doth present"
+    "  Wall, that vile Wall which did these lovers sunder;"
+    "  And through Wall's chink, poor souls, they are content"
+    "  To whisper, at the which let no man wonder."])]
+      ; A Midsummer Night's Dream, 5.1.131–134
   [blocks-movement True]
   [blocks-sight True]])
 
