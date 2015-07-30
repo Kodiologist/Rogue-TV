@@ -132,8 +132,7 @@
   [blocks-sight True]])
 
 (defclass Elevator [Tile] [
-  [color-fg :white]
-  [color-bg :dark-green]])
+  [color-bg :green]])
 
 (defclass UpElevator [Elevator] [
   [name (NounPhrase "elevator going up")]
@@ -204,20 +203,20 @@
     (mset self.pos (Floor))
     False))]])
 
-(defclass Mud [Tile] [
-  [name (kwc NounPhrase "pit full of mud"
-    :plural "pits full of mud")]
+(defclass Slime [Tile] [
+  [name (kwc NounPhrase "slime" :+mass :unit "puddles")]
   [char "}"]
-  [info-text "Stepping into a mud pit is easy enough, but stepping out of it will take some time to free yourself."]
+  [info-text "Stepping into this mystery sludge is easy enough, but stepping out of it will take some time as you free yourself."]
+    ; The term "mystery sludge" is from MXC.
   [color-fg :white]
-  [color-bg :brown]
+  [color-bg :dark-green]
 
   [unpleasant True]
 
   [min-exit-time 1]
 
   [__init__ (fn [self max-exit-time]
-    (.__init__ (super Mud self))
+    (.__init__ (super Slime self))
     (assert (>= max-exit-time self.min-exit-time))
     (set-self max-exit-time)
     None)]

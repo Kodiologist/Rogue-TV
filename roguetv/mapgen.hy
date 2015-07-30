@@ -179,12 +179,12 @@
   make-tile (cmeth []
     (kwc Ice :max-slip-time (inc (* 2 @dl)))))
 
-(defobst O-Mud [MudlikeObstacle]
+(defobst O-Slime [MudlikeObstacle]
   level-lo 3
   max-cheb-radius (cmeth []
     (+ 1 (// @dl 4)))
   make-tile (cmeth []
-    (kwc Mud :max-exit-time (inc (* 2 @dl)))))
+    (kwc Slime :max-exit-time (inc (* 2 @dl)))))
 
 (defobst O-Dogs [Obstacle]
   level-lo 2
