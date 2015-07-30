@@ -128,7 +128,7 @@
       (setv n-to-place (inc (// @dl 3)))
       (for [p @door-pos]
         (when (in p (list @free-floors))
-          (mset p (kwc Door :open-time (+ 2 @dl (randint 1 8))))
+          (mset p (Door))
           (.remove @free-floors p)
           (-= n-to-place 1)
           (unless n-to-place
@@ -168,23 +168,20 @@
   level-hi 5
   max-cheb-radius (cmeth []
     (+ 2 (// @dl 4)))
-  make-tile (cmeth []
-    (kwc Web :tear-time (+ @dl (randint 1 8)))))
+  make-tile (cmeth [] (Web)))
 
 (defobst O-Ice [MudlikeObstacle]
   level-lo 1
   level-hi 6
   max-cheb-radius (cmeth []
     (+ 2 (// @dl 4)))
-  make-tile (cmeth []
-    (kwc Ice :max-slip-time (inc (* 2 @dl)))))
+  make-tile (cmeth [] (Ice)))
 
 (defobst O-Slime [MudlikeObstacle]
   level-lo 3
   max-cheb-radius (cmeth []
     (+ 1 (// @dl 4)))
-  make-tile (cmeth []
-    (kwc Slime :max-exit-time (inc (* 2 @dl)))))
+  make-tile (cmeth [] (Slime)))
 
 (defobst O-Dogs [Obstacle]
   level-lo 2

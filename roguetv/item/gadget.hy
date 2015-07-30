@@ -262,9 +262,8 @@
   :info-flavor "Tired of buying can after can of generic-brand areosol string and still running out? This cutting-edge device produces aerosol string (new &amp; improved formula, patent pending; compare with SILLY STRING Brand Spray Streamer) instantly, using chemicals already present in the air of a typical American household! Just press the button and fire away! Product is flammable. Keep mouth and eyes away from exhaust port. Replace filter regularly. Do not use if you are pregnant or nursing. Check for NWS Air Quality Alerts before and after each use."
   :max-charges 10
   :web-machine-range 8
-  :web-tear-time 5
 
-  :info-apply "Creates webs in a line up to {web_machine_range} squares long. Each web takes {web_tear_time} seconds to tear through."
+  :info-apply "Creates webs in a line up to {web_machine_range} squares long."
   :gadget-effect (fn [self unid] (block
 
     (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
@@ -276,7 +275,7 @@
       (when (. (Tile.at p) blocks-movement)
         (break))
       (when (instance? Floor (Tile.at p))
-        (mset p (Web self.web-tear-time))
+        (mset p (Web))
         (setv made-a-web True)))
 
     (msg "You spray some aerosol string.")

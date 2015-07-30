@@ -172,7 +172,7 @@
 
   act (meth []
     (when (instance? Floor (Tile.at @pos))
-      (mset @pos (Slime 5)))
+      (mset @pos (Slime)))
     (or
       (@flee-from-stink)
       (wander @)

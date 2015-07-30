@@ -187,10 +187,8 @@
   [blocks-movement True]
   [blocks-sight True]
 
-  [__init__ (fn [self open-time]
-    (.__init__ (super Door self))
-    (set-self open-time)
-    None)]
+  [open-time (fn [self]
+    (+ 2 G.dungeon-level (randint 1 8)))]
 
   [bump-into (fn [self cr] (block
     (unless cr.can-open-doors
@@ -199,7 +197,7 @@
       (msgp cr "You effortlessly tear the door off its hinges.")
       (do
         (msgp cr "You open the old door after a struggle.")
-        (cr.take-time self.open-time)))
+        (cr.take-time (.open-time self))))
     (mset self.pos (Floor))
     False))]])
 
@@ -213,17 +211,12 @@
 
   [unpleasant True]
 
-  [min-exit-time 1]
-
-  [__init__ (fn [self max-exit-time]
-    (.__init__ (super Slime self))
-    (assert (>= max-exit-time self.min-exit-time))
-    (set-self max-exit-time)
-    None)]
+  [min-exit-time (fn [self] 1)]
+  [max-exit-time (fn [self] (inc (* 2 G.dungeon-level)))]
 
   [step-out-of (fn [self cr p-to]
     (unless (or cr.flying cr.slime-immune)
-      (cr.take-time (randint self.min-exit-time self.max-exit-time))))]])
+      (cr.take-time (randint (.min-exit-time self) (.max-exit-time self)))))]])
 
 (defclass Web [Tile] [
   [name (NounPhrase "spiderweb")]
@@ -233,14 +226,11 @@
 
   [unpleasant True]
 
-  [__init__ (fn [self tear-time]
-    (.__init__ (super Web self))
-    (set-self tear-time)
-    None)]
+  [tear-time (fn [self] (+ G.dungeon-level (randint 1 8)))]
 
   [step-out-of (fn [self cr p-to]
     (msgp cr "You tear through the web.")
-    (cr.take-time self.tear-time)
+    (cr.take-time (.tear-time self))
     (mset self.pos (Floor)))]])
 
 (defclass Ice [Tile] [
@@ -253,19 +243,14 @@
 
   [unpleasant True]
 
-  [min-slip-time 1]
-
-  [__init__ (fn [self max-slip-time]
-    (.__init__ (super Ice self))
-    (assert (>= max-slip-time self.min-slip-time))
-    (set-self max-slip-time)
-    None)]
+  [min-slip-time (fn [self] 1)]
+  [max-slip-time (fn [self] (inc (* 2 G.dungeon-level)))]
 
   [after-step-onto (fn [self cr p-from]
     (unless cr.flying
       ; Set up the creature to slip.
       (setv cr.ice-slip-towards (- self.pos p-from))
-      (setv cr.ice-slip-time (randint self.min-slip-time self.max-slip-time))))]
+      (setv cr.ice-slip-time (randint (.min-slip-time self) (.max-slip-time self)))))]
 
   [step-out-of (fn [self cr p-to]
     (unless cr.flying
