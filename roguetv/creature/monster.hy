@@ -43,12 +43,15 @@
     (amap (+ pos it) Pos.DIR8)))
 
 (defn wander [cr &optional [okay? (λ True)]] (block
-  ; Try to step in a random direction. Return a boolean indicating
+  ; Try to step in a random direction. (Diagonal moves are half
+  ; as likely as orthogonal moves.) Return a boolean indicating
   ; whether we succeeded.
   (setv neighbors (filt (okay? it) (clear-neighbors cr.pos)))
   (unless neighbors
     (ret False))
-  (setv p-to (choice neighbors))
+  (setv p-to (weighted-choice (amap
+    (, (/ 1 (dist-taxi cr.pos it)) it)
+    neighbors)))
   (.walk-to cr p-to)
   True))
 
