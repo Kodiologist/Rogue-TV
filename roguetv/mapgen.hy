@@ -12,7 +12,7 @@
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]]
-  [roguetv.creature.monster [Dog Cat]])
+  [roguetv.creature.monster [Snail Dog Cat]])
 
 (defn reset-level []
   (setv dl G.dungeon-level)
@@ -190,3 +190,9 @@
       (setv n-to-place (+ (// @dl 4) (randint 1 3)))
       (for [_ (range n-to-place)]
         (kwc Dog :pos (shift @free-floors)))))
+
+(defobst O-Snails [Obstacle]
+  f (cmeth []
+      (setv n-to-place (randint (inc @dl) (* 2 (inc @dl))))
+      (for [_ (range n-to-place)]
+        (kwc Snail :pos (shift @free-floors)))))
