@@ -222,7 +222,7 @@
     None)]
 
   [step-out-of (fn [self cr p-to]
-    (unless cr.flying
+    (unless (or cr.flying cr.slime-immune)
       (cr.take-time (randint self.min-exit-time self.max-exit-time))))]])
 
 (defclass Web [Tile] [

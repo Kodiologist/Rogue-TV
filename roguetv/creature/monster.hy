@@ -8,7 +8,7 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.map [Tile room-for? on-map]]
+  [roguetv.map [Tile Floor Slime room-for? mset on-map]]
   [roguetv.creature [Creature Stink]])
 
 (defclass Monster [Creature] [
@@ -157,3 +157,20 @@
         (ret)))
     ; Otherwise, wander.
     (or (wander self) (.wait self))))]])
+
+(defcls Snail [Monster]
+  name (NounPhrase "giant snail")
+  char "S"
+  color-fg :dark-green
+  info-text "An oversized mindless gastropod that slithers around the dungeon, leaving a trail of slime in its wake. It is very slow, but it is not slowed any further by slime."
+
+  walk-speed (meth [] (/ 1 4))
+  slime-immune True
+
+  act (meth []
+    (when (instance? Floor (Tile.at @pos))
+      (mset @pos (Slime 5)))
+    (or
+      (@flee-from-stink)
+      (wander @)
+      (@wait))))
