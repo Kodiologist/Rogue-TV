@@ -29,11 +29,10 @@
     (setv self.ice-slip-towards None))]
 
   [information (fn [self]
-    (setv s (.format "\n  {} {:a}\n\n{}"
+    (.format "\n  {} {:a}\n\n{}"
       (.xml-symbol self)
       self
-      self.info-text))
-    (apply .format [s] (. (type self) __dict__)))]
+      (apply .format [self.info-text] (. (type self) __dict__))))]
 
   [clock-factor 1000]
   [take-time (fn [self duration]

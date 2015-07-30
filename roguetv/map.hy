@@ -19,11 +19,10 @@
     ; want to be in this kind of tile.
 
   [information (fn [self]
-    (setv s (.format "\n  {} {:a}\n\n{}"
+    (.format "\n  {} {:a}\n\n{}"
       (.xml-symbol self)
       self
-      self.info-text))
-    (apply .format [s] (. (type self) __dict__)))]
+      (apply .format [self.info-text] (. (type self) __dict__))))]
 
   [use-tile (fn [self cr]
     ; A creature has tried to do something with this tile. (For

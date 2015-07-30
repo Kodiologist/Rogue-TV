@@ -65,16 +65,17 @@
           (.format "[${}]" (self.apparent-price))))))))]
 
   [information (fn [self]
-    (setv s (.format "\n  {} {:a:full}\n\n{}"
+    (.format "\n  {} {:a:full}\n\n{}"
       (.xml-symbol self)
       self
-      (if (.identified? self)
-        (.join "\n\n" (+
-          [self.info-flavor]
-          (if self.info-apply [(+ "<b>Effect when applied:</b> " self.info-apply)] [])
-          (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])))
-        self.info-unidentified)))
-    (apply .format [s] (. (type self) __dict__)))]
+      (apply .format
+        [(if (.identified? self)
+          (.join "\n\n" (+
+            [self.info-flavor]
+            (if self.info-apply [(+ "<b>Effect when applied:</b> " self.info-apply)] [])
+            (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])))
+          self.info-unidentified)]
+        (. (type self) __dict__))))]
 
   [apparent-name (fn [self]
     (if (.identified? self)
