@@ -5,12 +5,11 @@
   [roguetv.english [NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [Drawable MapObject]]
+  [roguetv.types [Drawable MapObject Scheduled]]
   [roguetv.map [Tile on-map mget]])
 
-(defclass Creature [Drawable MapObject NounPhraseNamed] [
+(defclass Creature [Drawable MapObject Scheduled NounPhraseNamed] [
   [escape-xml-in-np-format True]
-  [extant []]
   [char "C"]
   [info-text "[Missing info text]"]
 
@@ -20,9 +19,9 @@
 
   [__init__ (fn [self &optional pos]
     (MapObject.__init__ self pos)
-    (setv self.clock-debt-ms 0)
+    (Scheduled.__init__ self)
+    (self.schedule)
     (self.reset-ice-slipping)
-    (.append Creature.extant self)
     None)]
 
   [reset-ice-slipping (fn [self]
@@ -35,21 +34,14 @@
       self
       (apply .format [self.info-text] (. (type self) __dict__))))]
 
-  [clock-factor 1000]
   [take-time (fn [self duration]
-    ; Mark the creature as accumulating 'duration' seconds of
-    ; clock debt.
-    (when duration
-      (+= self.clock-debt-ms (round (* self.clock-factor duration)))
-      (when self.ice-slip-time
-        ; The creature takes some extra time slipping.
-        (setv slip-time self.ice-slip-time)
-        (msgp self "You take a moment to steady yourself on the ice.")
-        (self.reset-ice-slipping)
-        (.take-time self slip-time))))]
-
-  [wait (fn [self]
-    (.take-time self 1))]
+    (.take-time Scheduled self duration)
+    (when (and duration self.ice-slip-time)
+      ; The creature takes some extra time slipping.
+      (setv slip-time self.ice-slip-time)
+      (msgp self "You take a moment to steady yourself on the ice.")
+      (self.reset-ice-slipping)
+      (.take-time self slip-time)))]
 
   [walk-to (fn [self p-to] (block
     (unless (.bump-into (mget p-to) self)
@@ -90,13 +82,7 @@
   [walk-speed (fn [self]
     ; Return the applicable multiplier for the creature's walking
     ; speed.
-    1)]
-
-  [act (fn [self]
-    ; It's this creature's turn to act. Go wild, calling
-    ; .take-time as needed.
-    (msg "[No .act implemented for {}]" self)
-    (.wait self))]])
+    1)]])
 
 (defclass Effect [object] [
 ; Despite that this class is in creature.generic instead of

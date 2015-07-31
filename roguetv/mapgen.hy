@@ -7,7 +7,7 @@
   [kodhy.util [concat shift ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [Generated]]
+  [roguetv.types [Generated Scheduled]]
   [roguetv.map [*]]
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item]]
@@ -35,7 +35,7 @@
   (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
-  (setv Creature.extant [G.player])
+  (setv Scheduled.queue [G.player])
   (init-fov-map Tile.omap)
   ; Now that we're on a new level, the positions of old
   ; MapObjects are invalid. But that's okay because there's no

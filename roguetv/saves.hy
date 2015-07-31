@@ -7,7 +7,7 @@
   jsonpickle
   [kodhy.util [concat]]
   [roguetv.globals :as G]
-  [roguetv.types [MapObject]]
+  [roguetv.types [MapObject Scheduled]]
   [roguetv.map [Tile mset]]
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item]]
@@ -35,9 +35,9 @@
   (setv (get x "omaps") (dict (amap
     (, it.__name__
       (filt (not (none? it)) (concat it.omap)))
-    [Tile Item])))
+    [Tile Item Creature])))
 
-  (setv (get x "Creature.extant") Creature.extant)
+  (setv (get x "Scheduled.queue") Scheduled.queue)
 
   (with [[o (gzip.open path "wb")]]
     (o.write (kwc jsonpickle.encode x :+warn))))
@@ -62,11 +62,9 @@
     (.init-omap t G.map-width G.map-height))
   (for [o (get x "omaps" "Tile")]
     (mset o.pos o False))
-  (for [o (get x "omaps" "Item")]
+  (for [o (+ (get x "omaps" "Item") (get x "omaps" "Creature"))]
     (MapObject.__init__ o o.pos))
-  (setv Creature.extant (get x "Creature.extant"))
-  (for [cr Creature.extant]
-    (MapObject.__init__ cr cr.pos))
+  (setv Scheduled.queue (get x "Scheduled.queue"))
   (init-fov-map Tile.omap)
 
   (random.setstate (get x "random_state"))

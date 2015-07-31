@@ -13,10 +13,10 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
+  [roguetv.types [Scheduled]]
   [roguetv.input [hit-key-to-continue text-screen]]
   [roguetv.map [room-for?]]
   [roguetv.item [Item ItemAppearance def-itemtype]]
-  [roguetv.creature [Creature]]
   [roguetv.mapgen [reset-level]]
   [roguetv.attrstr [default-color]]
   [roguetv.display [full-redraw describe-tile]]
@@ -67,27 +67,7 @@
 
     (block :game-loop (while True
 
-      (while True
-        (setv somebody-moved False)
-        (for [cr (list Creature.extant)] (block :cr
-          (while (< cr.clock-debt-ms Creature.clock-factor)
-            (unless (in cr Creature.extant)
-              ; We have to check again that this creature is around
-              ; in case it disappeared (particularly, if the player
-              ; went to a new level) since we started the whole loop.
-              (retf :cr))
-            (.act cr)
-            (setv somebody-moved True)
-            (when G.endgame
-              (retf :game-loop)))))
-        ; Re-loop through the creatures if anybody moved, in case
-        ; some (.act cr) has caused a new creature to be created.
-        (unless somebody-moved
-          (break)))
-      (+= G.current-time 1)
-      (for [cr Creature.extant]
-        (-= cr.clock-debt-ms Creature.clock-factor)
-        (assert (>= cr.clock-debt-ms 0)))
+      (Scheduled.run-schedule)
 
       (when G.time-limit
         (setv time-left (- G.time-limit G.current-time))
