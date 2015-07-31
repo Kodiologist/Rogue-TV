@@ -1,13 +1,13 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [random [randint]]
+  [random [randint expovariate]]
   [kodhy.util [ret]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [y-or-n]]
-  [roguetv.types [Drawable MapObject]])
+  [roguetv.types [Drawable MapObject Scheduled]])
 
 (defclass Tile [Drawable MapObject NounPhraseNamed] [
   [escape-xml-in-np-format True]
@@ -180,10 +180,13 @@
             (inc G.dungeon-level) G.map-width G.map-height)))))]])
 
 (defclass Door [Tile] [
+  [color-fg :brown]
+  [info-text "Rogue TV has obtained only the most rotten and ill-fitting of doors to block your progress through the level. They're unlocked, but heaving them open will take some time. And once open, they'll swing shut after a while."]])
+
+(defclass ClosedDoor [Door] [
   [name (NounPhrase "closed door")]
   [char "+"]
-  [color-fg :brown]
-  [info-text "Rogue TV has obtained only the most rotten and ill-fitting of doors to block your progress through the level. They're unlocked, but heaving them open will take some time."]
+
   [blocks-movement True]
   [blocks-sight True]
 
@@ -193,13 +196,40 @@
   [bump-into (fn [self cr] (block
     (unless cr.can-open-doors
       (ret True))
+    (setv open-time (.open-time self))
     (if (.has-effect cr (rtv-get creature.Strength))
-      (msgp cr "You effortlessly tear the door off its hinges.")
+      (msgp cr "You effortlessly kick the door open.")
       (do
         (msgp cr "You open the old door after a struggle.")
-        (cr.take-time (.open-time self))))
-    (mset self.pos (Floor))
+        (cr.take-time open-time)))
+    (mset self.pos (OpenDoor open-time))
     False))]])
+
+(defclass OpenDoor [Door Scheduled] [
+  [name (NounPhrase "open door")]
+  [char "|"]
+
+  [close-time (fn [self]
+    (+ 5 (expovariate (/ 1 (* 60 (inc G.dungeon-level))))))]
+      ; Yes, doors take longer to close at deeper levels, even
+      ; though that makes things easier rather than harder. The
+      ; point is to keep the question of whether a door will
+      ; close within a given period of time practically
+      ; uncertain. Later levels involve more travel and bigger
+      ; time losses due to obstacles, so we have to compensate.
+
+  [__init__ (fn [self open-time]
+    (Door.__init__ self)
+    (.schedule self)
+    (.take-time self (+ open-time (.close-time self)))
+    None)]
+
+  [act (fn [self]
+    (if (.at (rtv-get creature.Creature) self.pos)
+      (.wait self)
+      (do
+        (mset self.pos (ClosedDoor))
+        (.deschedule self))))]])
 
 (defclass Slime [Tile] [
   [name (kwc NounPhrase "slime" :+mass :unit "puddles")]

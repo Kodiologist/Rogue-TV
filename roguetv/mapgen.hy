@@ -128,7 +128,7 @@
       (setv n-to-place (inc (// @dl 3)))
       (for [p @door-pos]
         (when (in p (list @free-floors))
-          (mset p (Door))
+          (mset p (ClosedDoor))
           (.remove @free-floors p)
           (-= n-to-place 1)
           (unless n-to-place
