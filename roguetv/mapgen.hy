@@ -12,7 +12,7 @@
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]]
-  [roguetv.creature.monster [Snail Dog Cat]])
+  [roguetv.creature.monster [Snail Spider Dog Cat]])
 
 (defn reset-level []
   (setv dl G.dungeon-level)
@@ -163,12 +163,11 @@
       (for [p occupied]
         (mset p (@make-tile)))))
 
-(defobst O-Webs [MudlikeObstacle]
+(defobst O-Slime [MudlikeObstacle]
   level-lo 0
-  level-hi 5
   max-cheb-radius (cmeth []
     (+ 2 (// @dl 4)))
-  make-tile (cmeth [] (Web)))
+  make-tile (cmeth [] (Slime)))
 
 (defobst O-Ice [MudlikeObstacle]
   level-lo 1
@@ -177,11 +176,11 @@
     (+ 2 (// @dl 4)))
   make-tile (cmeth [] (Ice)))
 
-(defobst O-Slime [MudlikeObstacle]
-  level-lo 3
+(defobst O-Webs [MudlikeObstacle]
+  level-lo 2
   max-cheb-radius (cmeth []
     (+ 1 (// @dl 4)))
-  make-tile (cmeth [] (Slime)))
+  make-tile (cmeth [] (Web)))
 
 (defobst O-Dogs [Obstacle]
   level-lo 2
@@ -191,8 +190,17 @@
       (for [_ (range n-to-place)]
         (kwc Dog :pos (shift @free-floors)))))
 
-(defobst O-Snails [Obstacle]
+(defcls NormalMonster [Obstacle]
+  cr-cls None
+
   f (cmeth []
-      (setv n-to-place (randint (inc @dl) (* 2 (inc @dl))))
+      (setv n-to-place (randint 1 3))
       (for [_ (range n-to-place)]
-        (kwc Snail :pos (shift @free-floors)))))
+        (kwc @cr-cls :pos (shift @free-floors)))))
+
+(defobst O-Snails [NormalMonster]
+  cr-cls Snail)
+
+(defobst O-Spiders [NormalMonster]
+  level-lo 3
+  cr-cls Spider)
