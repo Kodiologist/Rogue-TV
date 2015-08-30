@@ -116,10 +116,10 @@
 
   generation-weight (cmeth [dl]
     (if (= @rarity :nongen) 0 (*
-      (/ 1 (cond
-        [(= @rarity :common)    1]
-        [(= @rarity :uncommon)  4]
-        [(= @rarity :rare)     16]))
+      (/ 1 (ecase @rarity
+        [:common    1]
+        [:uncommon  4]
+        [:rare     16]))
       (/ 1 (cond
         [(< dl @level-lo) (inc (- @level-lo dl))]
         [(> dl @level-hi) (inc (- dl @level-hi))]

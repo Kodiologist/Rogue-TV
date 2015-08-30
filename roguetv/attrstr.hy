@@ -28,17 +28,15 @@
 (defn -elem-attrs [e]
   ; Translates an xml.etree.ElementTree.Element to curses
   ; attributes.
-  (cond
-    [(= e.tag "root")
+  (ecase e.tag
+    ["root"
       0]
-    [(= e.tag "b")
+    ["b"
       curses.A-BOLD]
-    [(= e.tag "c")
+    ["c"
       (get-color
         (and (.get e "fg") (str->keyword (.get e "fg")))
-        (and (.get e "bg") (str->keyword (.get e "bg"))))]
-    [True
-      (raise (ValueError (+ "Unknown tag: " e.tag)))]))
+        (and (.get e "bg") (str->keyword (.get e "bg"))))]))
 
 (defn -from-xml-f [elem a]
   (|= a (-elem-attrs elem))

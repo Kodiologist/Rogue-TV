@@ -175,12 +175,12 @@
         (setv focus new-focus))]
 
       [(in key (.values look-at-keys)) (do
-        (setv mapobject-class (cond
-          [(= (get look-at-keys :creature) key)
+        (setv mapobject-class (ecase key
+          [(get look-at-keys :creature)
             (rtv-get creature.Creature)]
-          [(= (get look-at-keys :item) key)
+          [(get look-at-keys :item)
             (rtv-get item.Item)]
-          [(= (get look-at-keys :tile) key)
+          [(get look-at-keys :tile)
             (rtv-get map.Tile)]))
         (when (and (mapobject-class.at focus)
             (get G.seen-map focus.x focus.y))
