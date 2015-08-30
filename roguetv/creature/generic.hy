@@ -16,6 +16,7 @@
   [can-open-doors False]
   [flying False]
   [slime-immune False]
+  [web-immune False]
 
   [__init__ (fn [self &optional pos]
     (MapObject.__init__ self pos)

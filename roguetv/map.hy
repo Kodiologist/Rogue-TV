@@ -31,6 +31,12 @@
     ; The default implementaton does nothing.
     (msgp cr "There's nothing special you can do at this tile."))]
 
+  [use-item-while-here (fn [self]
+    ; The player has tried to use (i.e., apply or drop) an while
+    ; standing on this tile. Return False to halt further
+    ; processing of the action, and True to continue.
+    True)]
+
   [bump-into (fn [self cr]
     ; A creature has tried to step onto this tile. Return
     ; False to halt further processing of the step (in particular,
@@ -231,7 +237,12 @@
         (mset self.pos (ClosedDoor))
         (.deschedule self))))]])
 
-(defclass Slime [Tile] [
+(defclass HasExitTime [object] [
+
+  [min-exit-time (fn [self] 1)]
+  [max-exit-time (fn [self] (inc (* 2 G.dungeon-level)))]])
+
+(defclass Slime [Tile HasExitTime] [
   [name (kwc NounPhrase "slime" :+mass :unit "puddles")]
   [char "}"]
   [info-text "Stepping into this mystery sludge is easy enough, but stepping out of it will take some time as you free yourself."]
@@ -241,27 +252,28 @@
 
   [unpleasant True]
 
-  [min-exit-time (fn [self] 1)]
-  [max-exit-time (fn [self] (inc (* 2 G.dungeon-level)))]
-
   [step-out-of (fn [self cr p-to]
     (unless (or cr.flying cr.slime-immune)
       (cr.take-time (randint (.min-exit-time self) (.max-exit-time self)))))]])
 
-(defclass Web [Tile] [
+(defclass Web [Tile HasExitTime] [
   [name (NounPhrase "spiderweb")]
   [char "%"]
   [color-fg :dark-blue]
-  [info-text "This sizable web will make stepping out of its tile difficult. You'll need to take some time to tear the web apart in order to escape."]
+  [info-text "This sizable web will make stepping out of its tile difficult, just like slime. Furthermore, while you're standing in a web, you can't apply or drop items."]
 
   [unpleasant True]
 
-  [tear-time (fn [self] (+ G.dungeon-level (randint 1 8)))]
+  [use-item-while-here (fn [self]
+    (if G.player.web-immune
+      True
+      (do
+        (msg :tara "{p:The} is stuck in the web. {p:He} can't use items.")
+        False)))]
 
   [step-out-of (fn [self cr p-to]
-    (msgp cr "You tear through the web.")
-    (cr.take-time (.tear-time self))
-    (mset self.pos (Floor)))]])
+    (unless cr.web-immune
+      (cr.take-time (randint (.min-exit-time self) (.max-exit-time self)))))]])
 
 (defclass Ice [Tile] [
   [name (kwc NounPhrase "patch of ice"

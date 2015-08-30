@@ -85,6 +85,8 @@
       (msg "Taken:  {}" (item.invstr)))]
 
     [(= cmd :drop) (do
+      (unless (.use-item-while-here (Tile.at G.player.pos))
+        (ret))
       (unless G.inventory
         (msg "You don't have anything to drop.")
         (ret))
@@ -108,6 +110,8 @@
       (msg "Dropped:  {}" (item.invstr)))]
 
     [(= cmd :apply-item) (do
+      (unless (.use-item-while-here (Tile.at G.player.pos))
+        (ret))
       (unless G.inventory
         (msg "You aren't carrying any items to apply.")
         (ret))
