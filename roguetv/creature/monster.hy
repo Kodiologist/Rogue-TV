@@ -8,7 +8,7 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.map [Tile Floor Slime room-for? mset on-map]]
+  [roguetv.map [Tile Floor Slime Web room-for? mset on-map]]
   [roguetv.creature [Creature Stink]])
 
 (defclass Monster [Creature] [
@@ -173,6 +173,22 @@
   act (meth []
     (when (instance? Floor (Tile.at @pos))
       (mset @pos (Slime)))
+    (or
+      (@flee-from-stink)
+      (wander @)
+      (@wait))))
+
+(defcls Spider [Monster]
+  name (NounPhrase "giant spider")
+  char "s"
+  color-fg :red
+  info-text "It doesn't bite, but it leaves webs wherever it goes."
+
+  web-immune True
+
+  act (meth []
+    (when (instance? Floor (Tile.at @pos))
+      (mset @pos (Web)))
     (or
       (@flee-from-stink)
       (wander @)
