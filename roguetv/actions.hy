@@ -87,7 +87,7 @@
     [(= cmd :drop) (do
       (unless G.inventory
         (msg "You don't have anything to drop.")
-        (ret 0))
+        (ret))
       (setv i (inventory-loop "What do you want to drop?"))
       (when (none? i)
         ; Action canceled.
@@ -110,7 +110,7 @@
     [(= cmd :apply-item) (do
       (unless G.inventory
         (msg "You aren't carrying any items to apply.")
-        (ret 0))
+        (ret))
       (setv i (inventory-loop "What do you want to apply?"))
       (when (none? i)
         ; Action canceled.
