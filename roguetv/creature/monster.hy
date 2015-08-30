@@ -165,7 +165,7 @@
   name (NounPhrase "giant snail")
   char "S"
   color-fg :dark-green
-  info-text "An oversized mindless gastropod that slithers around the dungeon, leaving a trail of slime in its wake. It is very slow, but it is not slowed any further by slime."
+  info-text "A mindless, oversized gastropod that slithers around the dungeon, leaving a trail of slime in its wake. It's very slow, but it isn't slowed any further by slime."
 
   walk-speed (meth [] (/ 1 4))
   slime-immune True
