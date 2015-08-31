@@ -20,8 +20,11 @@
   [info-apply None]
   [info-carry None]
 
-  [price 0]
+  [price None]
     ; The money value of the item, a nonnegative integer.
+    ; If not set explicitly, def-itemtype will set it.
+  [price-adj None]
+    ; A keyword that can adjust the price set by def-itemtype.
 
   [__init__ (fn [self &optional pos invlet]
     (MapObject.__init__ self pos)
@@ -125,6 +128,18 @@
   (when (none? c.name)
     (setv c.name c.tid))
   (setv c.name (NounPhrase c.name))
+  (when (none? c.price) (setv c.price (*
+    (+ c.level-lo 2)
+    (ecase c.price-adj
+      [None         1]
+      [:bad-flavor  2])
+        ; Items that are flavored items (e.g., gadgets) and
+        ; have generally bad effects are worth more, so they
+        ; can still be valuable to the player.
+    (ecase c.rarity
+      [:common   1]
+      [:uncommon 2]
+      [:rare     3]))))
 
   c)
 
