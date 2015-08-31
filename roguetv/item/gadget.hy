@@ -27,7 +27,7 @@
 
   [name-suffix (fn [self]
     (when (.identified? self)
-      (.format "({})" self.charges)))]
+      (.format "({}/{})" self.charges self.max-charges)))]
 
   [applied (fn [self] (block
     ; Do we have a charge to spare?

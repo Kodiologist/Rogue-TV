@@ -75,7 +75,6 @@
         [(if (.identified? self)
           (.join "\n\n" (+
             [self.info-flavor]
-            (if (hasattr self "max_charges") [(.format "<b>Max charges:</b> {}" self.max-charges)] [])
             (if self.info-apply [(+ "<b>Effect when applied:</b> " self.info-apply)] [])
             (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])))
           self.info-unidentified)]
