@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  [math [*]]
   [random [randrange choice]]
   [heidegger.pos [Pos]]
   [kodhy.util [ret retf]]
@@ -359,3 +360,42 @@
 
 (assert (>= (len appearances)
   (len (filt (instance? Gadget it) (.values G.itypes)))))
+
+(defclass Battery [Item] [
+  [price 1]
+  [char "="]
+  [apply-time 1]
+  [charge-factor None]
+
+  [info-flavor "This generic battery can restore charges to any gadget. 'a'pply it to charge up a gadget."]
+
+  [applied (fn [self] (block
+    (setv i (inventory-loop "What gadget do you want to charge?"))
+    (when (none? i)
+      (ret))
+    (setv gadget (get G.inventory i))
+
+    (when (is gadget self)
+      (msg "Your attempts to insert the battery into itself prove futile.")
+      (ret))
+    (unless (instance? Gadget gadget)
+      (msg "{:The} doesn't seem to have a place for batteries." gadget)
+      (ret))
+
+    (.remove G.inventory self)
+    (.take-time G.player self.apply-time)
+    (msg "You insert {:the} into {:the}." self gadget)
+    (setv gadget.charges (min gadget.max-charges
+      (+ gadget.charges (int (ceil
+        (* gadget.max-charges self.charge-factor))))))))]])
+
+(def-itemtype Battery "battery-small" :name "button battery"
+  :color-fg :red
+  :info-apply "Restores half of a gadget's maximum charges, rounded up."
+  :charge-factor .5)
+
+(def-itemtype Battery "battery-big" :name "big battery"
+  :color-fg :purple
+  :level-lo 4
+  :info-apply "Completely restores a gadget's charges."
+  :charge-factor 1)
