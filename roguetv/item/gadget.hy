@@ -52,8 +52,8 @@
 
   [use-time-and-charge (fn [self]
     ; Use up a charge and some time.
-    (G.player.take-time self.apply-time)
-    (-= self.charges 1))]])  
+    (.take-time G.player self.apply-time)
+    (-= self.charges 1))]])
 
 (def appearances {
   "crazy"           :green
@@ -242,7 +242,7 @@
     (.use-time-and-charge self)
     (cond
       [(or (instance? Wall t) (instance? Door t)) (do
-        (G.player.take-time (- self.drill-time self.apply-time))
+        (.take-time G.player (- self.drill-time self.apply-time))
         (msg "Your drill reduces {:the} to dust." t)
         (mset p (Floor)))]
       [(and (on-map p) (Creature.at p))
