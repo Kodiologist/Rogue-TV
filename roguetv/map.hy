@@ -16,7 +16,7 @@
   [blocks-sight False]
   [unpleasant False]
     ; `unpleasant` is a flag meaning that monsters tend not to
-    ; want to be in this kind of tile.
+    ; want to be on this kind of tile.
 
   [information (fn [self]
     (.format "\n  {} {:a}\n\n{}"
@@ -32,8 +32,8 @@
     (msgp cr "There's nothing special you can do at this tile."))]
 
   [use-item-while-here (fn [self]
-    ; The player has tried to use (i.e., apply or drop) an while
-    ; standing on this tile. Return False to halt further
+    ; The player has tried to use (i.e., apply or drop) an item
+    ; while standing on this tile. Return False to halt further
     ; processing of the action, and True to continue.
     True)]
 
