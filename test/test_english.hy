@@ -13,6 +13,15 @@
     (.format "{:The} {:v:is} destroyed." np np)]
   [(= form :dp)
     (.format "{:p-The} {:p-v:is} destroyed." np np)]
+  ; "This", etc., are not currently implemented.
+;  [(= form :t1s)
+;    (.format "{:This} {:v:is} destroyed." np np)]
+;  [(= form :t1p)
+;    (.format "{:These} {:p-v:is} destroyed." np np)]
+;  [(= form :t2s)
+;    (.format "{:That} {:v:is} destroyed." np np)]
+;  [(= form :t2p)
+;    (.format "{:Those} {:p-v:is} destroyed." np np)]
   [(= form :is)
     (.format "{:A} {:v:is} here." np np)]
   [(= form :ip)
@@ -106,6 +115,10 @@
     (setv np (NounPhrase "mouse"))
     (npf= np :ds   "The mouse is destroyed.")
     (npf= np :dp   "The mice are destroyed.")
+;    (npf= np :t1s  "This mouse is destroyed.")
+;    (npf= np :t1p  "These mice are destroyed.")
+;    (npf= np :t2s  "That mouse is destroyed.")
+;    (npf= np :t2p  "Those mice are destroyed.")
     (npf= np :is   "A mouse is here.")
     (npf= np :ip   "Some mice are here.")
     (npf= np :p    "Your mouse is destroyed.")
@@ -124,6 +137,10 @@
     (setv np (kwc NounPhrase "peanut butter" :+mass :unit "globs"))
     (npf= np :ds   "The peanut butter is destroyed.")
     (npf= np :dp   "The peanut butter is destroyed.")
+;    (npf= np :t1s  "This peanut butter is destroyed.")
+;    (npf= np :t1p  "This peanut butter is destroyed.")
+;    (npf= np :t2s  "That peanut butter is destroyed.")
+;    (npf= np :t2p  "That peanut butter is destroyed.")
     (npf= np :is   "Some peanut butter is here.")
     (npf= np :ip   "Some peanut butter is here.")
     (npf= np :p    "Your peanut butter is destroyed.")
@@ -153,6 +170,10 @@
     (setv np (kwc NounPhrase "Stormbringer" :+bare-proper))
     (npf= np :ds   "Stormbringer is destroyed.")
     (npf= np :dp   "The Stormbringers are destroyed.")
+;    (npf= np :t1s  "Stormbringer is destroyed.")
+;    (npf= np :t1p  "These Stormbringers are destroyed.")
+;    (npf= np :t2s  "Stormbringer is destroyed.")
+;    (npf= np :t2p  "Those Stormbringers are destroyed.")
     (npf= np :is   "Stormbringer is here.")
     (npf= np :ip   "Some Stormbringers are here.")
     (npf= np :p    "Stormbringer is destroyed.")
@@ -162,6 +183,10 @@
     (setv np (kwc NounPhrase "Black Scythe" :+the-proper))
     (npf= np :ds   "The Black Scythe is destroyed.")
     (npf= np :dp   "The Black Scythes are destroyed.")
+;    (npf= np :t1s  "The Black Scythe is destroyed.")
+;    (npf= np :t1p  "The Black Scythes are destroyed.")
+;    (npf= np :t2s  "The Black Scythe is destroyed.")
+;    (npf= np :t2p  "The Black Scythes are destroyed.")
     (npf= np :is   "The Black Scythe is here.")
     (npf= np :ip   "Some Black Scythes are here.")
     (npf= np :p    "The Black Scythe is destroyed.")
@@ -177,6 +202,10 @@
     (setv np (kwc NounPhrase "Eyes of the Overworld" :+the-proper :+always-plural :unit "pairs"))
     (npf= np :ds   "The Eyes of the Overworld are destroyed.")
     (npf= np :dp   "The pairs of the Eyes of the Overworld are destroyed.")
+;    (npf= np :t1s  "The Eyes of the Overworld are destroyed.")
+;    (npf= np :t1p  "These pairs of the Eyes of the Overworld are destroyed.")
+;    (npf= np :t2s  "The Eyes of the Overworld are destroyed.")
+;    (npf= np :t2p  "Those pairs of the Eyes of the Overworld are destroyed.")
     (npf= np :is   "The Eyes of the Overworld are here.")
     (npf= np :ip   "Some pairs of the Eyes of the Overworld are here.")
     (npf= np :p    "The Eyes of the Overworld are destroyed.")
