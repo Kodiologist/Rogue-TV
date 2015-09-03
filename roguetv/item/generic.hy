@@ -33,6 +33,7 @@
     ; If True, the player can't walk while carrying this item.
 
   [__init__ (fn [self &optional pos invlet]
+    (Generated.__init__ self)
     (MapObject.__init__ self pos)
     (set-self invlet)
     None)]

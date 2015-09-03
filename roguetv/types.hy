@@ -113,14 +113,25 @@
   level-lo 0
   level-hi G.max-dungeon-level
   rarity :common
+  unique False
+
+  __init__ (meth []
+    (when @unique
+      (setv tname (. (type @) __name__))
+      (when (in tname G.uniques-generated)
+        (raise (ValueError (+ "Tried to generate a second instance of a unique type: " tname))))
+      (.append G.uniques-generated tname))
+    None)
 
   generation-weight (cmeth [dl]
-    (if (= @rarity :nongen) 0 (*
-      (/ 1 (ecase @rarity
-        [:common    1]
-        [:uncommon  4]
-        [:rare     16]))
-      (/ 1 (cond
-        [(< dl @level-lo) (inc (- @level-lo dl))]
-        [(> dl @level-hi) (inc (- dl @level-hi))]
-        [True 1]))))))
+    (if (or (= @rarity :nongen) (and @unique (in @__name__ G.uniques-generated)))
+      0
+      (*
+        (/ 1 (ecase @rarity
+          [:common    1]
+          [:uncommon  4]
+          [:rare     16]))
+        (/ 1 (cond
+          [(< dl @level-lo) (inc (- @level-lo dl))]
+          [(> dl @level-hi) (inc (- dl @level-hi))]
+          [True 1]))))))

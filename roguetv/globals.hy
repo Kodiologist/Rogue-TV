@@ -113,5 +113,7 @@
 (def fov-dirty? True)
 (defs seen-map [])
 
+(defs uniques-generated [])
+
 (defs inventory [])
 (def itypes {})
