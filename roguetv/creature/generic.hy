@@ -47,6 +47,9 @@
   [walk-to (fn [self p-to] (block
     (unless (.bump-into (mget p-to) self)
       (ret False))
+    (when (player? self) (whenn (afind-or it.superheavy G.inventory)
+      (msg "You can't move an inch so long as you're clinging to {:the}." it)
+      (ret False)))
     (when (or
         (not (on-map p-to))
         (and (. (Tile.at p-to) blocks-movement)

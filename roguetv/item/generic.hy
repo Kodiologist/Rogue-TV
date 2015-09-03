@@ -29,6 +29,8 @@
   [carry-speed-factor None]
     ; A floating-point number multiplying the player's speed
     ; when the item is carried.
+  [superheavy False]
+    ; If True, the player can't walk while carrying this item.
 
   [__init__ (fn [self &optional pos invlet]
     (MapObject.__init__ self pos)
