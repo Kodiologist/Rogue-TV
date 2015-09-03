@@ -18,8 +18,8 @@
     (print (.format "{:20} {:3} {:.3} {:2} {:2} {}"
       item.tid item.price
       (keyword->str item.rarity)
-      (if (= item.level-lo 0) "" item.level-lo)
-      (if (= item.level-hi G.max-dungeon-level) "" item.level-hi)
+      (if (= item.level-lo 0) "" (+ 1 item.level-lo))
+      (if (= item.level-hi G.max-dungeon-level) "" (+ 1 item.level-hi))
       item.name.stem)))
   (print))
 
