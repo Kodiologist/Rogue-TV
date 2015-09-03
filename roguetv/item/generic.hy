@@ -26,6 +26,10 @@
   [price-adj None]
     ; A keyword that can adjust the price set by def-itemtype.
 
+  [carry-speed-factor None]
+    ; A floating-point number multiplying the player's speed
+    ; when the item is carried.
+
   [__init__ (fn [self &optional pos invlet]
     (MapObject.__init__ self pos)
     (set-self invlet)
@@ -132,10 +136,12 @@
     (+ c.level-lo 2)
     (ecase c.price-adj
       [None         1]
-      [:bad-flavor  2])
+      [:bad-flavor  2]
         ; Items that are flavored items (e.g., gadgets) and
         ; have generally bad effects are worth more, so they
         ; can still be valuable to the player.
+      [:burden      4])
+        ; Items that are high-value but worse than useless.
     (ecase c.rarity
       [:common   1]
       [:uncommon 2]

@@ -1,7 +1,7 @@
 (require kodhy.macros)
 
 (import
-  [kodhy.util [ret]]
+  [kodhy.util [ret product]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [get-normal-command]]
@@ -28,9 +28,11 @@
     (soil-fov))]
 
   [walk-speed (fn [self]
-    (if (.has-effect self Haste)
-      G.speedup-soda-factor
-      1))]
+    (product (+
+      (amap (or it.carry-speed-factor 1) G.inventory)
+      [(if (.has-effect self Haste)
+        G.speedup-soda-factor
+        1)])))]
 
   [act (fn [self]
     (for [e self.effects]

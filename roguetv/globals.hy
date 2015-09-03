@@ -60,6 +60,7 @@
   :pale-azure 117
   :purple 90
   :yellow 226
+  :gold 178
   :orange 208
   :dark-orange 166
   :brown 94})
