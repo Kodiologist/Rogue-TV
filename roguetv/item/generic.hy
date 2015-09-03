@@ -19,6 +19,7 @@
   [info-flavor "[Missing flavor text]"]
   [info-apply None]
   [info-carry None]
+  [info-constant None]
 
   [price None]
     ; The money value of the item, a nonnegative integer.
@@ -84,7 +85,8 @@
             [self.info-flavor]
             (if self.unique ["<b>This item is unique.</b>"] [])
             (if self.info-apply [(+ "<b>Effect when applied:</b> " self.info-apply)] [])
-            (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])))
+            (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])
+            (if self.info-constant [(+ "<b>Constant effect:</b> " self.info-constant)] [])))
           self.info-unidentified)]
         (. (type self) __dict__))))]
 
@@ -124,10 +126,13 @@
   (when (in tid G.itypes)
     (raise (ValueError (.format "redeclared item type: {}" tid))))
 
-  (setv c (type (str (+ "itype:" tid)) (, inherit) (dict (amap
-    (let [[k (get body (* 2 it))] [v (get body (inc (* 2 it)))]]
-      (, (.replace (keyword->str k) "-" "_") v))
-    (range (// (len body) 2))))))
+  (setv c (type
+    (str (+ "itype:" tid))
+    (if (instance? list inherit) (tuple inherit) (, inherit))
+    (dict (amap
+      (let [[k (get body (* 2 it))] [v (get body (inc (* 2 it)))]]
+        (, (.replace (keyword->str k) "-" "_") v))
+      (range (// (len body) 2))))))
   (setv (get (globals) c.__name__) c)
     ; This ensures that jsonpickle can recreate itypes.
   (setv (get G.itypes tid) c)

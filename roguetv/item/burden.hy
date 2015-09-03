@@ -4,12 +4,12 @@
 (require kodhy.macros)
 
 (import
-  [math [*]]
-  [random [randrange choice]]
-  [heidegger.pos [Pos]]
-  [kodhy.util [ret retf]]
+  random
+  [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
+  [roguetv.types [Scheduled]]
+  [roguetv.map [disc-taxi Tile Floor Ice mset]]
   [roguetv.item.generic [Item def-itemtype]])
 
 (defcls Burden [Item]
@@ -44,3 +44,32 @@
 
   :info-carry "You can't walk. At all."
   :superheavy True)
+
+(defcls CursedGem [Burden]
+  char "*"
+  unique True)
+
+(def-itemtype [CursedGem Scheduled] "cursedgem-ice"
+  :name (kwc NounPhrase "White Ice" :+the-proper)
+  :color-fg :white
+  :level-lo 4
+
+  :ice-radius 3
+  :ice-per-second 3
+
+  :info-flavor "A frost-covered diamond the size of a baseball. You shiver just looking at it."
+  :info-constant "Produces ice around itself. Each second, up to {ice_per_second} tiles of ice are generated within {ice_radius} squares."
+
+  :__init__ (meth [&kwargs kw]
+    (apply CursedGem.__init__ [@] kw)
+    (@schedule)
+    None)
+
+  :act (meth []
+    (setv center (or @pos G.player.pos))
+      ; We assume that if the gem has no position, the player is
+      ; carrying it.
+    (for [p (random.sample (disc-taxi center @ice-radius) @ice-per-second)]
+      (when (instance? Floor (Tile.at p))
+        (mset p (Ice))))
+    (@wait)))

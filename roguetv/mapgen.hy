@@ -35,7 +35,8 @@
   (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
-  (setv Scheduled.queue [G.player])
+  (setv Scheduled.queue (+ [G.player]
+    (filt (in it G.inventory) Scheduled.queue)))
   (init-fov-map Tile.omap)
   ; Now that we're on a new level, the positions of old
   ; MapObjects are invalid. But that's okay because there's no
