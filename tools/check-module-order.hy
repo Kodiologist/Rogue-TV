@@ -33,7 +33,7 @@
     (setv ix (amap (.index modules it) imports-from))
     (setv sorted? (all (lc [[a b] (zip ix (rest ix))] (< a b))))
     (unless sorted?
-      (print module "import order - WRONG"))
+      (print (.format "{} import order - WRONG: {}" module (list (zip imports-from ix)))))
     (setv backwards-deps? (any (amap (>= it (.index modules module)) ix)))
     (when backwards-deps?
       (print module "no backwards deps - WRONG"))))
