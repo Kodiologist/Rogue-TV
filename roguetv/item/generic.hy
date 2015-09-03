@@ -82,6 +82,7 @@
         [(if (.identified? self)
           (.join "\n\n" (+
             [self.info-flavor]
+            (if self.unique ["<b>This item is unique.</b>"] [])
             (if self.info-apply [(+ "<b>Effect when applied:</b> " self.info-apply)] [])
             (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])))
           self.info-unidentified)]
