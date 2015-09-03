@@ -17,7 +17,7 @@
 
 (def autosave True)
 
-(defs inventory-limit 5)
+(defs inventory-limit 10)
 (defs max-dungeon-level 19)
 
 (def message-lines 3)
