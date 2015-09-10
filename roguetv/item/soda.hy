@@ -177,3 +177,6 @@
     (.add-effect G.player Sleep self.sleep-time
       (fn [] (msg :tara "Oh no! {p:The} has fallen asleep!"))
       (fn [] (msg "You snore.")))))
+
+(assert (>= (len appearances)
+  (len (filt (instance? Soda it) (.values G.itypes)))))
