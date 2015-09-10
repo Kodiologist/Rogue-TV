@@ -17,6 +17,7 @@
   [unpleasant False]
     ; `unpleasant` is a flag meaning that monsters tend not to
     ; want to be on this kind of tile.
+  [smooth False]
 
   [information (fn [self]
     (.format "\n  {} {:a}\n\n{}"
@@ -120,7 +121,9 @@
 (defclass Floor [Tile] [
   [name (kwc NounPhrase "ordinary floor" :+mass :unit "tiles")]
   [char "."]
-  [info-text "Just what it says on the tin."]])
+  [info-text "Just what it says on the tin."]
+
+  [smooth True]])
 
 (defclass Wall [Tile] [
   [name (NounPhrase "wall")]
@@ -138,7 +141,8 @@
   [blocks-sight True]])
 
 (defclass Elevator [Tile] [
-  [color-bg :green]])
+  [color-bg :green]
+  [smooth True]])
 
 (defclass UpElevator [Elevator] [
   [name (NounPhrase "elevator going up")]
@@ -215,6 +219,7 @@
   [name (NounPhrase "open door")]
   [char "|"]
 
+  [smooth True]
   [close-time (fn [self]
     (+ 5 (expovariate (/ 1 (* 60 (inc G.dungeon-level))))))]
       ; Yes, doors take longer to close at deeper levels, even
@@ -284,6 +289,7 @@
   [info-text "A slippery sort of tile. If the next thing you do after stepping on it is move again in the same direction, you'll glide along without an issue. But if you take any other action, you'll need to take a moment to steady yourself first."]
 
   [unpleasant True]
+  [smooth True]
 
   [min-slip-time (fn [self] 1)]
   [max-slip-time (fn [self] (inc (* 2 G.dungeon-level)))]

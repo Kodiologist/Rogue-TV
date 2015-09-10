@@ -5,4 +5,5 @@ from roguetv.item.generic import *
 import roguetv.item.misc
 import roguetv.item.gadget
 import roguetv.item.soda
+import roguetv.item.clothing
 import roguetv.item.burden

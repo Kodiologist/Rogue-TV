@@ -1,3 +1,5 @@
+(require kodhy.macros)
+
 (import
   [math [sqrt exp]]
   random
@@ -103,3 +105,6 @@
 
 (defn soil-fov []
   (setv G.fov-dirty? True))
+
+(defn active-inv []
+  (filt (.carry-effects-active? it) G.inventory))

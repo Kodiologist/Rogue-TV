@@ -17,7 +17,10 @@
   [info-unidentified "A Rogue TV-branded insulated miniature aluminum can of some unidentifiable beverage. 'a'pply it to chug it and find out what it is."]
 
   [applied (fn [self] (block
-    (kwc .identify self :+consumed)
+    (setv was-id? (.identified? self))
+    (.identify self)
+    (unless was-id?
+      (msg "You had:  {}" (self.invstr)))
     (G.player.take-time self.apply-time)
     (.remove G.inventory self)
     (self.soda-effect)))]])

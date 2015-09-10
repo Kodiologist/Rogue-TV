@@ -37,6 +37,8 @@
     ; Identify the item type.
     (setv unid (not (.identified? self)))
     (.identify self)
+    (when unid
+      (msg "You have:  {}" (self.invstr)))
     ; Now you get the gadget effect.
     (self.gadget-effect unid)))]
 
@@ -341,7 +343,8 @@
       (msg "You admire the details of {:your} under the microscope." item)
       (ret))
     (msg "You inspect {:the}." item)
-    (.identify item))))
+    (.identify item)
+    (msg "You have:  {}" (item.invstr)))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
   :level-lo 3

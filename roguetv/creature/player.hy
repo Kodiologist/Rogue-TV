@@ -29,7 +29,14 @@
 
   [walk-speed (fn [self]
     (product (+
-      (amap (or it.carry-speed-factor 1) G.inventory)
+      (amap (or it.carry-speed-factor 1) (active-inv))
+      (amap
+        (or
+          (if (. (Tile.at G.player.pos) smooth)
+            it.carry-speed-factor-smooth-terrain
+            it.carry-speed-factor-rough-terrain)
+          1)
+        (active-inv))
       [(if (.has-effect self Haste)
         G.speedup-soda-factor
         1)])))]

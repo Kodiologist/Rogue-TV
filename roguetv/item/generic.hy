@@ -30,6 +30,12 @@
   [carry-speed-factor None]
     ; A floating-point number multiplying the player's speed
     ; when the item is carried.
+  [carry-speed-factor-smooth-terrain None]
+    ; Like .carry-speed-factor, but applies only when exiting
+    ; smooth terrian.
+  [carry-speed-factor-rough-terrain None]
+    ; Like .carry-speed-factor, but applies only when exiting
+    ; non-smooth terrian.
   [superheavy False]
     ; If True, the player can't walk while carrying this item.
 
@@ -46,13 +52,9 @@
   [identified? (fn [self]
     (not (and self.appearance (not self.appearance.known))))]
 
-  [identify (fn [self &optional [consumed False]]
+  [identify (fn [self]
     (unless (.identified? self)
-      (setv self.appearance.known True)
-      (when (in self G.inventory)
-        (msg "You {}:  {}"
-          (if consumed "had" "have")
-          (self.invstr)))))]
+      (setv self.appearance.known True)))]
 
   [__format__ (fn [self formatstr]
     ; Examples:
@@ -81,14 +83,18 @@
       self
       (apply .format
         [(if (.identified? self)
-          (.join "\n\n" (+
-            [self.info-flavor]
-            (if self.unique ["<b>This item is unique.</b>"] [])
-            (if self.info-apply [(+ "<b>Effect when applied:</b> " self.info-apply)] [])
-            (if self.info-carry [(+ "<b>Effect when carried:</b> " self.info-carry)] [])
-            (if self.info-constant [(+ "<b>Constant effect:</b> " self.info-constant)] [])))
+          (kwc cat :sep "\n\n"
+            self.info-flavor
+            (when self.unique "<b>This item is unique.</b>")
+            (self.info-extra)
+            (when self.info-apply (+ "<b>Effect when applied:</b> " self.info-apply))
+            (when self.info-carry (+ "<b>Effect when carried:</b> " self.info-carry))
+            (when self.info-constant (+ "<b>Constant effect:</b> " self.info-constant)))
           self.info-unidentified)]
         (. (type self) __dict__))))]
+
+  [info-extra (fn [self]
+    None)]
 
   [apparent-name (fn [self]
     (if (.identified? self)
@@ -115,6 +121,9 @@
   [applied (fn [self]
     ; This is triggered when the player uses the :apply-item command.
     (msg "You can't do anything special with {:the}." self))]
+
+  [carry-effects-active? (fn [self]
+    True)]
 
   [on-reset-level (fn [self]
     ; This is triggered when the level is reset for each item
