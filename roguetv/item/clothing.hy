@@ -104,7 +104,16 @@
   :info-flavor "Guaranteed to make you run faster and jump higher! Nah, I lied. They only make you run faster. But that's more than can be said for PF Flyers and Cataclysm DDA."
 
   :carry-speed-factor-smooth-terrain 1.25
-  :info-carry "You walk {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain.")
+  :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain.")
+
+(def-itemtype Clothing "high-heels" :name (pair-of "fancy high heels")
+  :price-adj :bad-flavor
+  :level-lo 4
+  :info-flavor "Unless you're Ginger Rogers, these are going to make you somewhat less graceful."
+    ; http://www.reelclassics.com/Actresses/Ginger/ginger-article2.htm
+
+  :carry-speed-factor .8
+  :info-carry "You walk at {carry_speed_factor} times normal speed.")
 
 (def-itemtype Clothing "roller-skates" :name (pair-of "roller skates")
   :level-lo 7
@@ -112,7 +121,7 @@
 
   :carry-speed-factor-smooth-terrain 2
   :carry-speed-factor-rough-terrain .5
-  :info-carry "You walk {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain, but {carry_speed_factor_rough_terrain} times on rough terrain.")
+  :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain, but {carry_speed_factor_rough_terrain} times on rough terrain.")
 
 (assert (>= (len appearances)
   (len (filt (instance? Clothing it) (.values G.itypes)))))
