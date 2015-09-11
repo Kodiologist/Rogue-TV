@@ -39,6 +39,8 @@
     ; non-smooth terrian.
   [superheavy False]
     ; If True, the player can't walk while carrying this item.
+  [carry-ice-immunity False]
+    ; If True, the player is immune to ice.
   [carry-gadget-malfunction-1in None]
     ; A chance of gadgets malfunctioning when they're applied.
 

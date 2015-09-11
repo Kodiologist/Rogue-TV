@@ -139,5 +139,13 @@
   :carry-gadget-malfunction-1in 20
   :info-carry "When you apply a gadget, there's a 1 in {carry_gadget_malfunction_1in} chance that nothing will happen, wasting a charge.")
 
+(def-itemtype Clothing "fur-coat" :name "fancy fur coat"
+  :level-lo 3
+  :rarity :uncommon
+  :info-flavor "A thick, luxurious coat made from the pelts of many adorable woodland creatures. When this prize was announced, animal-welfare organizations lambasted Rogue TV, calling for a boycott of the middlingly popular game show. This gave Rogue TV's ratings a much-needed boost."
+
+  :carry-ice-immunity True
+  :info-carry "You don't slip on ice.")
+
 (assert (>= (len appearances)
   (len (filt (instance? Clothing it) (.values G.itypes)))))

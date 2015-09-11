@@ -23,6 +23,9 @@
     (setv self.effects [])
     None)]
 
+  [ice-immune (fn [self]
+    (afind-or it.carry-ice-immunity (active-inv)))]
+
   [move (fn [self p-to &optional [clobber False]]
     (.move (super Player self) p-to clobber)
     (soil-fov))]

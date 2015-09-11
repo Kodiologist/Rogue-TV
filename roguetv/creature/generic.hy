@@ -29,6 +29,9 @@
     (setv self.ice-slip-time 0)
     (setv self.ice-slip-towards None))]
 
+  [ice-immune (fn [self]
+    False)]
+
   [information (fn [self]
     (.format "\n  {} {:a}\n\n{}"
       (.xml-symbol self)

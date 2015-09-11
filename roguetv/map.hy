@@ -295,14 +295,13 @@
   [max-slip-time (fn [self] (inc (* 2 G.dungeon-level)))]
 
   [after-step-onto (fn [self cr p-from]
-    (unless cr.flying
+    (unless (or cr.flying (.ice-immune cr))
       ; Set up the creature to slip.
       (setv cr.ice-slip-towards (- self.pos p-from))
       (setv cr.ice-slip-time (randint (.min-slip-time self) (.max-slip-time self)))))]
 
   [step-out-of (fn [self cr p-to]
-    (unless cr.flying
-      ; If the creature moves in the same direction it moved to
-      ; get here, it doesn't slip.
-      (when (= (- p-to self.pos) cr.ice-slip-towards)
-        (cr.reset-ice-slipping))))]])
+    ; If the creature moves in the same direction it moved to
+    ; get here, it doesn't slip.
+    (when (= (- p-to self.pos) cr.ice-slip-towards)
+      (cr.reset-ice-slipping)))]])
