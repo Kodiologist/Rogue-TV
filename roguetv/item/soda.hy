@@ -21,7 +21,8 @@
     (.identify self)
     (unless was-id?
       (msg "You had:  {}" (self.invstr)))
-    (G.player.take-time self.apply-time)
+    (unless (afind-or it.carry-instant-soda-use (active-inv))
+      (G.player.take-time self.apply-time))
     (.remove G.inventory self)
     (self.soda-effect)))]])
 

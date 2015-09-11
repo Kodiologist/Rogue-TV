@@ -147,5 +147,25 @@
   :carry-ice-immunity True
   :info-carry "You don't slip on ice.")
 
+(def-itemtype Clothing "ugly-sweater" :name "ugly Christmas sweater"
+  :rarity :uncommon
+  :info-flavor "You can find this abomination in the dungeon all year round. It's your own ugly little Christmas in July. And, it's a gift that keeps on giving."
+
+  :carry-gen-item Clothing
+  :info-carry "Each time you enter a new level, an extra present is generated.")
+
+(def-itemtype Clothing "lab coat"
+  :info-flavor "With this groovy outerwear, you'll be chugging mystery sludge in no time."
+
+  :carry-instant-soda-use True
+  :info-carry "Removes the basic time cost of drinking sodas.")
+
+(def-itemtype Clothing "trenchcoat"
+  :level-lo 1
+  :info-flavor "It's full of pockets for easy access to all your toys."
+
+  :carry-instant-gadget-use True
+  :info-carry "Removes the basic time cost of using gadgets.")
+
 (assert (>= (len appearances)
   (len (filt (instance? Clothing it) (.values G.itypes)))))

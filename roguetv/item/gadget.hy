@@ -61,7 +61,8 @@
 
   [use-time-and-charge (fn [self]
     ; Use up a charge and some time.
-    (.take-time G.player self.apply-time)
+    (unless (afind-or it.carry-instant-gadget-use (active-inv))
+      (.take-time G.player self.apply-time))
     (-= self.charges 1))]])
 
 (def appearances {

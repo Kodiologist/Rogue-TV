@@ -43,6 +43,13 @@
     ; If True, the player is immune to ice.
   [carry-gadget-malfunction-1in None]
     ; A chance of gadgets malfunctioning when they're applied.
+  [carry-instant-gadget-use False]
+    ; Allows the player to apply gadgets without the usual time cost.
+  [carry-instant-soda-use False]
+     ; Allows the player to apply sodas without the usual time cost.
+  [carry-gen-item None]
+    ; If a class, one of that type of item is generated on each
+    ; new level.
 
   [__init__ (fn [self &optional pos invlet]
     (Generated.__init__ self)
