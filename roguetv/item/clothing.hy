@@ -96,7 +96,7 @@
     :color-fg color)))
 
 (defn pair-of [s]
-  (kwc NounPhrase s :+mass :unit "pairs"))
+  (kwc NounPhrase s :+always-plural :unit "pairs"))
 
 (def-itemtype Clothing "sneakers" :name (pair-of "expensive sneakers")
   :level-lo 4
