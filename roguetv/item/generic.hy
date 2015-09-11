@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  [math [ceil]]
   re
   [random [expovariate]]
   [kodhy.util [cat keyword->str shift]]
@@ -169,20 +170,29 @@
   (when (none? c.name)
     (setv c.name c.tid))
   (setv c.name (NounPhrase c.name))
-  (when (none? c.price) (setv c.price (*
-    (+ c.level-lo 2)
-    (ecase c.price-adj
-      [None         1]
-      [:bad-flavor  2]
-        ; Items that are flavored items (e.g., gadgets) and
-        ; have generally bad effects are worth more, so they
-        ; can still be valuable to the player.
-      [:burden      4])
-        ; Items that are high-value but worse than useless.
-    (ecase c.rarity
-      [:common   1]
-      [:uncommon 2]
-      [:rare     3]))))
+  (when (none? c.price)
+    (setv p (*
+      (+ c.level-lo 2)
+      (ecase c.price-adj
+        [None         1]
+        [:bad-flavor  2]
+          ; Items that are flavored items (e.g., gadgets) and
+          ; have generally bad effects are worth more, so they
+          ; can still be valuable to the player.
+        [:burden      4])
+          ; Items that are high-value but worse than useless.
+      (ecase c.rarity
+        [:common   1]
+        [:uncommon 2]
+        [:rare     3])))
+    (setv round-up-to (cond
+      [(<= p  15)   1]
+      [(<= p  50)   5]
+      [(<= p 150)  10]
+      [(<= p 500)  50]
+      [True       100]))
+;    (setv round-up-to 1)
+    (setv c.price (long (* round-up-to (ceil (/ p round-up-to))))))
 
   c)
 
