@@ -39,6 +39,8 @@
     ; non-smooth terrian.
   [superheavy False]
     ; If True, the player can't walk while carrying this item.
+  [carry-gadget-malfunction-1in None]
+    ; A chance of gadgets malfunctioning when they're applied.
 
   [__init__ (fn [self &optional pos invlet]
     (Generated.__init__ self)

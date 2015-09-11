@@ -34,6 +34,12 @@
     (when (= self.charges 0)
       (msg :bob "That oojah's all chatty, kemosabe.")
       (ret))
+    ; Do we succeed in applying the gadget?
+    (for [x (filt it.carry-gadget-malfunction-1in (active-inv))]
+      (when (1-in x.carry-gadget-malfunction-1in)
+        (.use-time-and-charge self)
+        (msg "Oops, wrong button. There goes a charge.")
+        (ret)))
     ; Identify the item type.
     (setv unid (not (.identified? self)))
     (.identify self)

@@ -21,7 +21,7 @@
 
   info-extra (meth [] (kwc cat :sep "\n\n"
     (when @boxed
-      "<b>This item is boxed</b>, suppressing its carry effect. 'a'pply it to open and discard the box.")
+      "<b>This item is boxed</b>, suppressing its normal effect when carried. 'a'pply it to open and discard the box.")
     (when @curse-on-unbox
       "<b>This item becomes cursed when it is unboxed.</b>")))
 
@@ -129,6 +129,15 @@
   :carry-speed-factor-smooth-terrain 2
   :carry-speed-factor-rough-terrain .5
   :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain, but {carry_speed_factor_rough_terrain} times on rough terrain.")
+
+(def-itemtype Clothing "distressed-jeans" :name (pair-of "faux-distressed blue jeans")
+  :price-adj :bad-flavor
+  :level-lo 2
+  :info-flavor "These are favored by fashion fanatics, but walking around in pants full of holes and tears may also make you look like a yokel."
+
+  :curse-on-unbox True
+  :carry-gadget-malfunction-1in 20
+  :info-carry "When you apply a gadget, there's a 1 in {carry_gadget_malfunction_1in} chance that nothing will happen, wasting a charge.")
 
 (assert (>= (len appearances)
   (len (filt (instance? Clothing it) (.values G.itypes)))))
