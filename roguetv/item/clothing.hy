@@ -167,5 +167,13 @@
   :carry-instant-gadget-use True
   :info-carry "Removes the basic time cost of using gadgets.")
 
+(def-itemtype Clothing "goggles" :name (pair-of "goggles")
+  :price 1
+  :level-lo 9
+  :info-flavor "The goggles do nothing!"
+    ; http://knowyourmeme.com/memes/the-goggles-do-nothing
+
+  :curse-on-unbox True)
+
 (assert (>= (len appearances)
   (len (filt (instance? Clothing it) (.values G.itypes)))))
