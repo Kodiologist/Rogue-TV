@@ -1,15 +1,17 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [kodhy.util [ret]]
+  [kodhy.util [ret cat]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]])
 
 (defcls Clothing [Item]
-  open-present-time 1
   char "["
+
+  open-present-time 1
+  curse-on-unbox False
 
   info-unidentified "This festively wrapped gift box contains an item of clothing. Your only clue as to what's inside is a cryptic product code. Clothing has a special effect on you so long you carry it, but the effect is suppressed while it's in a box. 'a'pply the box to open it."
 
@@ -17,9 +19,11 @@
     (when (and (@identified?) @boxed)
       "(boxed)"))
 
-  info-extra (meth []
+  info-extra (meth [] (kwc cat :sep "\n\n"
     (when @boxed
-      "<b>This item is boxed</b>, suppressing its carry effect. 'a'pply it to open and discard the box."))
+      "<b>This item is boxed</b>, suppressing its carry effect. 'a'pply it to open and discard the box.")
+    (when @curse-on-unbox
+      "<b>This item becomes cursed when it is unboxed.</b>")))
 
   __init__ (meth [&optional [boxed True] &kwargs rest]
     (apply Item.__init__ [@] rest)
@@ -43,6 +47,8 @@
       (.format "{:the}" @)))
     (@identify)
     (setv @boxed False)
+    (when @curse-on-unbox
+      (@mk-curse))
     (unless was-id?
       (msg "You found:  {}" (self.invstr)))))
 
@@ -112,6 +118,7 @@
   :info-flavor "Unless you're Ginger Rogers, these are going to make you somewhat less graceful."
     ; http://www.reelclassics.com/Actresses/Ginger/ginger-article2.htm
 
+  :curse-on-unbox True
   :carry-speed-factor .8
   :info-carry "You walk at {carry_speed_factor} times normal speed.")
 

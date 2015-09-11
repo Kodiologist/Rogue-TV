@@ -94,6 +94,11 @@
       (when (none? i)
         ; Action canceled.
         (ret))
+      (setv item (get G.inventory i))
+      (when item.curse
+        (msg :tara "{:The} {:v:is} cursed! {p:The} can't drop {:him}."
+          item item item)
+        (ret))
       (setv clear-spot (afind-or (room-for? Item it) (+
         ; Try to drop at the player's feet…
         [G.player.pos]
@@ -105,7 +110,7 @@
         (msg :bob "There ain't room on the ground for that truck.")
         (ret))
       (G.player.take-time 1)
-      (setv item (.pop G.inventory i))
+      (.pop G.inventory i)
       (.move item clear-spot)
       (msg "Dropped:  {}" (item.invstr)))]
 

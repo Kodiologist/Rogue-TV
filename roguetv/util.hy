@@ -72,6 +72,9 @@
 (defn adjacent? [p1 p2]
   (= (dist-cheb p1 p2) 1))
 
+(defn dl-time-limit [dl]
+  (int (* 60 (+ 3 (/ dl 2)))))
+
 (defn player? [cr]
   (is cr G.player))
 

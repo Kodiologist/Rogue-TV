@@ -2,11 +2,12 @@
 
 (import
   re
+  [random [expovariate]]
   [kodhy.util [cat keyword->str shift]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [MapObject Generated Drawable]])
+  [roguetv.types [MapObject Generated Drawable Scheduled]])
 
 (defclass Item [MapObject Generated NounPhraseNamed Drawable] [
   [escape-xml-in-np-format True]
@@ -43,6 +44,8 @@
     (Generated.__init__ self)
     (MapObject.__init__ self pos)
     (set-self invlet)
+    (setv self.curse None)
+      ; Cursed items can't be dropped.
     None)]
 
   [set-appearance (classmethod (fn [self iapp]
@@ -74,6 +77,7 @@
     (.escape self (kwc cat :sep " " (.__format__ name np-args)
       (when (or (in "most" tags) (in "full" tags)) (kwc cat :sep " "
         (self.name-suffix)
+        (when self.curse "(cursed)")
         (when (in "full" tags)
           (.format "[${}]" (self.apparent-price))))))))]
 
@@ -86,6 +90,7 @@
           (kwc cat :sep "\n\n"
             self.info-flavor
             (when self.unique "<b>This item is unique.</b>")
+            (when self.curse "<b>This item is cursed,</b> preventing you from dropping it. The curse will eventually go away on its own.")
             (self.info-extra)
             (when self.info-apply (+ "<b>Effect when applied:</b> " self.info-apply))
             (when self.info-carry (+ "<b>Effect when carried:</b> " self.info-carry))
@@ -111,6 +116,9 @@
       self.invlet
       (.xml-symbol self)
       self))]
+
+  [mk-curse (fn [self]
+    (setv self.curse (Curse self)))]
 
   [name-suffix (fn [self]
     ; This method can be overridden to provide extra information
@@ -187,6 +195,24 @@
        (whenn (afind-or (issubclass itype it) (.keys unused-apps))
          (.set-appearance itype (randpop (get unused-apps it)))))))]])
 
+(defcls Curse [Scheduled]
+  curse-fade-time (meth []
+    (expovariate (/ 1 (dl-time-limit G.dungeon-level))))
+
+  __init__ (meth [host-item]
+    (set-self host-item)
+    (@schedule)
+    (@take-time (@curse-fade-time))
+    None)
+
+  remove-curse (meth []
+    (setv @host-item.curse None)
+    (when (in @host-item G.inventory)
+      (msg "The curse on {:your} fades." @host-item))
+    (@deschedule))
+
+  act (meth []
+    (@remove-curse)))
 
 (defn add-to-inventory [item]
   (.move item None)

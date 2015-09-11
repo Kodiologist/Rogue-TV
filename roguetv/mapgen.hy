@@ -10,7 +10,7 @@
   [roguetv.types [Generated Scheduled]]
   [roguetv.map [*]]
   [roguetv.fov [init-fov-map]]
-  [roguetv.item [Item]]
+  [roguetv.item [Item Curse]]
   [roguetv.creature [Creature]]
   [roguetv.creature.monster [Snail Spider Dog Cat]])
 
@@ -29,14 +29,28 @@
         (setv G.map-width d)
         (setv G.map-height d))))
 
-  (setv G.time-limit (+ G.current-time (int (* 60
-    (+ 3 (/ dl 2))))))
+  (setv G.time-limit (+ G.current-time (dl-time-limit dl)))
 
   (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
-  (setv Scheduled.queue (+ [G.player]
-    (filt (in it G.inventory) Scheduled.queue)))
+  (setv Scheduled.queue (filt
+    (cond
+      ; Filter out objects in Scheduled.queue that we left
+      ; behind on the previous level.
+      [(= it G.player)
+        True]
+      [(instance? Creature it)
+        False]
+      [(instance? Tile it)
+        False]
+      [(instance? Item it)
+        (in it G.inventory)]
+      [(instance? Curse it)
+        (in it.host-item G.inventory)]
+      [True
+        (raise (ValueError (.format "Weird thing in Schedule.queue: {!r}" it)))])
+    Scheduled.queue))
   (init-fov-map Tile.omap)
   ; Now that we're on a new level, the positions of old
   ; MapObjects are invalid. But that's okay because there's no
