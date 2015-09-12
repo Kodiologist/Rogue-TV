@@ -158,10 +158,10 @@
         (msg "{:The} registers your current position." self)))))
 
 (def-itemtype Gadget "hookshot"
-  :level-lo 1
+  :level-lo 4
   :info-flavor "Arfer's law of game design: any video game is improved by the addition of a grappling hook."
   :max-charges 10
-  :hookshot-dist 8
+  :hookshot-dist 30
   :hookshot-travel-speed 2
 
   :info-apply "Fire it at a solid obstacle up to {hookshot_dist} squares away to get yourself over there. Travel by hookshot is twice as fast as travel by foot, and you'll pass over unpleasant terrain along the way. Creatures will block the hookshot."
