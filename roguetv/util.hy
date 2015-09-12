@@ -78,6 +78,9 @@
 (defn player? [cr]
   (is cr G.player))
 
+(defn seen [pos]
+  (get G.seen-map pos.x pos.y))
+
 (defn msg [&rest args]
   (setv args (list args))
   (setv mtype (when (keyword? (first args))

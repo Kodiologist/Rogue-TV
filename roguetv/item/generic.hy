@@ -8,7 +8,8 @@
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [MapObject Generated Drawable Scheduled]])
+  [roguetv.types [MapObject Generated Drawable Scheduled]]
+  [roguetv.map [room-for?]])
 
 (defclass Item [MapObject Generated NounPhraseNamed Drawable] [
   [escape-xml-in-np-format True]
@@ -249,3 +250,13 @@
     (G.invlets.remove item.invlet)
     (G.invlets.append item.invlet))
   (.append G.inventory item))
+
+(defn drop-pos [p]
+  ; Try to find a position near 'p' to drop an item.
+  (afind-or (room-for? Item it) (+
+    ; Try to drop at 'p'…
+    [p]
+    ; …or at a random orthogonal neigbor…
+    (shuffle (amap (+ p it) Pos.ORTHS))
+    ; …or at a random diagonal neighbor.
+    (shuffle (amap (+ p it) Pos.DIAGS)))))

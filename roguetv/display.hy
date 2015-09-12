@@ -184,7 +184,7 @@
 (defn draw-look-legend [p]
   ; In look mode, show a legend describing the creature, item,
   ; and tile under the cursor.
-  (setv dunno (unless (get G.seen-map p.x p.y) "    ? unseen"))
+  (setv dunno (unless (seen p) "    ? unseen"))
   (setv lines [
     "At cursor: (press a key to examine)"
     (or dunno (whenn (Creature.at p)

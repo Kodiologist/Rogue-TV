@@ -40,11 +40,11 @@
   (setv (get x "Scheduled.queue") Scheduled.queue)
 
   (with [[o (gzip.open path "wb")]]
-    (o.write (kwc jsonpickle.encode x :+warn))))
+    (o.write (kwc jsonpickle.encode x :+warn :+keys))))
 
 (defn load-from-save-file [path]
   (with [[o (gzip.open path "rb")]]
-    (setv x (jsonpickle.decode (.read o))))
+    (setv x (kwc jsonpickle.decode (.read o) :+keys)))
 
   (for ([k v] (.items (get x "G")))
     (setattr G k v))

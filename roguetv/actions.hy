@@ -6,8 +6,8 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [text-screen message-log-screen inventory-loop look-mode y-or-n normal-command-keys]]
-  [roguetv.map [Tile Wall mset room-for?]]
-  [roguetv.item [Item add-to-inventory]]
+  [roguetv.map [Tile Wall mset]]
+  [roguetv.item [Item add-to-inventory drop-pos]]
   [roguetv.creature [Creature]]
   [roguetv.display [draw-inventory describe-tile]])
 
@@ -99,13 +99,7 @@
         (msg :tara "{:The} {:v:is} cursed! {p:The} can't drop {:him}."
           item item item)
         (ret))
-      (setv clear-spot (afind-or (room-for? Item it) (+
-        ; Try to drop at the player's feet…
-        [G.player.pos]
-        ; …or at a random orthogonal neigbor…
-        (shuffle (amap (+ G.player.pos it) Pos.ORTHS))
-        ; …or at a random diagonal neighbor.
-        (shuffle (amap (+ G.player.pos it) Pos.DIAGS)))))
+      (setv clear-spot (drop-pos G.player.pos))
       (unless clear-spot
         (msg :bob "There ain't room on the ground for that truck.")
         (ret))

@@ -1,7 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [random [choice]]
+  [random [choice expovariate]]
   pypaths.astar
   [heidegger.pos [Pos]]
   [kodhy.util [ret]]
@@ -9,6 +9,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.map [Tile Floor Slime Web room-for? mset on-map]]
+  [roguetv.item [drop-pos]]
   [roguetv.creature [Creature Stink]])
 
 (defclass Monster [Creature] [
@@ -193,3 +194,69 @@
       (@flee-from-stink)
       (wander @)
       (@wait))))
+
+(defcls Nymph [Monster]
+  name (NounPhrase "nymph")
+  gender :female
+  char "n"
+  color-fg :dark-green
+  info-text "A primal spirit of the forest disguised as a comely young woman. Nymphs are infatuated with man-made objects and have no compunctions about stealing, which makes sense when you consider that the typical nymph has lived in the woods for 800 years with no human contact until being dumped onto the set of a game show. Fortunately, they can only carry one thing at a time, and they tend to quickly lose interest in the objects they acquire."
+
+  detect-player-range 12
+  steal-item-time 1
+  drop-item-time 1
+
+  __init__ (meth [&optional pos item]
+    (.__init__ (super Nymph @) pos)
+    (setv @item None)
+    (when item
+      (@get-item item))
+    (setv @interested-in-item-till (dict))
+    None)
+
+  get-item (meth [item]
+    (setv @item item)
+    (setv (get @interested-in-item-till item) (long (+ G.current-time
+      (expovariate (/ 1 (/ (dl-time-limit G.dungeon-level) 3)))))))
+
+  item-attractive? (meth [item]
+    (or
+      (not-in item @interested-in-item-till)
+      (< G.current-time (get @interested-in-item-till item))))
+
+  act (meth [] (block
+    (when (@flee-from-stink)
+      (ret))
+    (when (and @item (not (@item-attractive? @item)))
+      ; We've gotten bored with this item. Drop it if we can.
+      (whenn (drop-pos @pos)
+        (@take-time @drop-item-time)
+        (.move @item it)
+        (when (seen @pos)
+          (msg "{:The} drops {:a}." @ @item))
+        (setv @item None)
+        (ret)))
+    ; If we don't have an item, and the player has an item we're
+    ; not already bored with, chase the player.
+    (setv d (- G.player.pos @pos))
+    (when (and
+        (not @item)
+        G.inventory
+        (afind-or (@item-attractive? it) G.inventory)
+        (<= (len-taxi d) @detect-player-range))
+      (when (= (len-cheb d) 1)
+        ; We're adjacent. Steal something.
+        (@take-time @steal-item-time)
+        (@get-item (choice (filt (@item-attractive? it) G.inventory)))
+        (.remove G.inventory @item)
+        (msg "{:The} stole {:your}." @ @item)
+        (ret))
+      ; If we have a path to the player, use it.
+      (setv path (find-path @pos G.player.pos @detect-player-range))
+      (when path
+        (if (room-for? @ (first path))
+          (@walk-to (first path))
+          (@wait))
+        (ret)))
+    ; Otherwise, wander.
+    (or (wander self) (.wait self)))))
