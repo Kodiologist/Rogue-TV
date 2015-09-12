@@ -8,8 +8,8 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.map [Tile Floor Slime Web room-for? mset on-map]]
-  [roguetv.item [drop-pos]]
+  [roguetv.map [Tile Floor Slime Web room-for? mset on-map disc-taxi]]
+  [roguetv.item [Item drop-pos]]
   [roguetv.creature [Creature Stink]])
 
 (defclass Monster [Creature] [
@@ -56,7 +56,9 @@
   (.walk-to cr p-to)
   True))
 
-(defn find-path [p-from p-to &optional [max-cost (int 1e6)]]
+(defn find-path [p-from p-to &optional [max-cost (int 1e6)]] (block
+  (when (= p-from p-to)
+    (ret [p-to]))
   (setv searcher (kwc pypaths.astar.pathfinder
     :neighbors (fn [p] (+ (clear-neighbors p)
       (if (adjacent? p p-to) [p-to] [])))
@@ -65,7 +67,7 @@
       ; Euclidean distance is an admissible heuristic for taxicab
       ; geometry.
     :cost dist-taxi))
-  (slice (second (searcher p-from p-to max-cost)) 1))
+  (slice (second (searcher p-from p-to max-cost)) 1)))
 
 (defn find-path-thru-creatures [p-from p-to &optional [max-cost (int 1e6)]]
   (setv searcher (kwc pypaths.astar.pathfinder
@@ -202,8 +204,8 @@
   color-fg :dark-green
   info-text "A primal spirit of the forest disguised as a comely young woman. Nymphs are infatuated with man-made objects and have no compunctions about stealing, which makes sense when you consider that the typical nymph has lived in the woods for 800 years with no human contact until being dumped onto the set of a game show. Fortunately, they can only carry one thing at a time, and they tend to quickly lose interest in the objects they acquire."
 
-  detect-player-range 12
-  steal-item-time 1
+  detect-item-range 8
+  take-item-time 1
   drop-item-time 1
 
   __init__ (meth [&optional pos item]
@@ -236,27 +238,45 @@
           (msg "{:The} drops {:a}." @ @item))
         (setv @item None)
         (ret)))
-    ; If we don't have an item, and the player has an item we're
-    ; not already bored with, chase the player.
-    (setv d (- G.player.pos @pos))
-    (when (and
-        (not @item)
-        G.inventory
-        (afind-or (@item-attractive? it) G.inventory)
-        (<= (len-taxi d) @detect-player-range))
-      (when (= (len-cheb d) 1)
-        ; We're adjacent. Steal something.
-        (@take-time @steal-item-time)
-        (@get-item (choice (filt (@item-attractive? it) G.inventory)))
-        (.remove G.inventory @item)
-        (msg "{:The} stole {:your}." @ @item)
-        (ret))
-      ; If we have a path to the player, use it.
-      (setv path (find-path @pos G.player.pos @detect-player-range))
-      (when path
-        (if (room-for? @ (first path))
-          (@walk-to (first path))
-          (@wait))
+    ; If we don't have an item, and there's an item we're not bored
+    ; with (on the floor or in the player's inventory) in range,
+    ; go to it.
+    (when (not @item)
+      (setv ps
+        (kwc sorted :key (λ (len (second it)))
+        (shuffle
+        (filt (second it)
+        (amap (, it
+          (find-path @pos it @detect-item-range))
+        (filter (fn [p] (or
+          (whenn (Item.at p) (@item-attractive? it))
+          (and (= p G.player.pos) (afind-or (@item-attractive? it) G.inventory))))
+        (disc-taxi @pos @detect-item-range)))))))
+      (when ps
+        (setv [dest path] (first ps))
+        (cond
+          [(= dest @pos) (do
+            ; Pick up the item here.
+            (@take-time @take-item-time)
+            (@get-item (Item.at @pos))
+            (.move @item None)
+            (when (seen @pos)
+              (msg "{:The} picks up {:a}." @ @item)))]
+          [(and
+              (= dest G.player.pos)
+              (= (dist-cheb @pos dest) 1)
+              (afind-or (@item-attractive? it) G.inventory)) (do
+            ; We're adjacent to the player, and they have something
+            ; we want. Steal it.
+            (@take-time @take-item-time)
+            (@get-item (choice (filt (@item-attractive? it) G.inventory)))
+            (.remove G.inventory @item)
+            (msg "{:The} stole {:your}." @ @item))]
+          [(room-for? @ (first path))
+            ; We have a usable path to an item. Take the next step.
+            (@walk-to (first path))]
+          [True
+            (@wait)])
         (ret)))
     ; Otherwise, wander.
-    (or (wander self) (.wait self)))))
+    (or (wander @) (@wait)))))
