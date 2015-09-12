@@ -98,7 +98,10 @@
 (setv (get ItemAppearance.registry Clothing) (lc
   [[name color] (.items appearances)]
   (kwc ItemAppearance
-    :name (kwc NounPhrase (+ "present labeled " name) :article "a")
+    :name (kwc NounPhrase
+      (+ "present labeled " name)
+      :plural (+ "presents labeled " name)
+      :article "a")
     :color-fg color)))
 
 (defn pair-of [s]
