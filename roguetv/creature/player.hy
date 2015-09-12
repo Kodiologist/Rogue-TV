@@ -30,6 +30,11 @@
     (.move (super Player self) p-to clobber)
     (soil-fov))]
 
+  [walk-dist (fn [self p-from p-to]
+    (if (afind-or it.carry-cheb-walk (active-inv))
+      (dist-cheb p-from p-to)
+      (.walk-dist (super Player self) p-from p-to)))]
+
   [walk-speed (fn [self]
     (product (+
       (amap (or it.carry-speed-factor 1) (active-inv))

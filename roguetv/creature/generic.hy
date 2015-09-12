@@ -73,7 +73,7 @@
     ; Okay, we're clear to move.
     (setv p-from self.pos)
     (.step-out-of (Tile.at p-from) self p-to)
-    (.take-time self (/ (dist-taxi p-from p-to) (self.walk-speed)))
+    (.take-time self (/ (.walk-dist self p-from p-to) (self.walk-speed)))
     (kwc .move self p-to :+clobber)
     (when cr
       (msg "You push past {:the}." cr)
@@ -85,6 +85,9 @@
 
   [has-effect (fn [self effect-cls]
     False)]
+
+  [walk-dist (fn [self p-from p-to]
+    (dist-taxi p-from p-to))]
 
   [walk-speed (fn [self]
     ; Return the applicable multiplier for the creature's walking

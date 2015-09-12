@@ -130,6 +130,16 @@
   :carry-speed-factor-rough-terrain .5
   :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain, but {carry_speed_factor_rough_terrain} times on rough terrain.")
 
+(def-itemtype Clothing "cheb-boots" :name (pair-of "Chebyshev boots")
+  :level-lo 11
+  :rarity :uncommon
+  :info-flavor "This vintage Russian footwear makes you feel like a king."
+    ; Pafnuty Chebyshev was Russian. Kings in chess move according
+    ; to the Chebyshev metric.
+
+  :carry-cheb-walk True
+  :info-carry "When you walk, diagonal moves take the same amount of time as orthogonal moves.")
+
 (def-itemtype Clothing "distressed-jeans" :name (pair-of "faux-distressed blue jeans")
   :price-adj :bad-flavor
   :level-lo 2

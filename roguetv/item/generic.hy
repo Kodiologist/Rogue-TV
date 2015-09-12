@@ -42,12 +42,14 @@
     ; If True, the player can't walk while carrying this item.
   [carry-ice-immunity False]
     ; If True, the player is immune to ice.
+  [carry-cheb-walk False]
+    ; If True, the player walks according to the Chebyshev metric.
   [carry-gadget-malfunction-1in None]
     ; A chance of gadgets malfunctioning when they're applied.
   [carry-instant-gadget-use False]
     ; Allows the player to apply gadgets without the usual time cost.
   [carry-instant-soda-use False]
-     ; Allows the player to apply sodas without the usual time cost.
+    ; Allows the player to apply sodas without the usual time cost.
   [carry-gen-item None]
     ; If a class, one of that type of item is generated on each
     ; new level.
