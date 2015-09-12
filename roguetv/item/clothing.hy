@@ -164,7 +164,7 @@
   :carry-gen-item Clothing
   :info-carry "Each time you enter a new level, an extra present is generated.")
 
-(def-itemtype Clothing "lab coat"
+(def-itemtype Clothing "lab-coat" :name "lab coat"
   :info-flavor "With this groovy outerwear, you'll be chugging mystery sludge in no time."
 
   :carry-instant-soda-use True
