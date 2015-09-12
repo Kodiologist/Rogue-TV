@@ -6,7 +6,9 @@
   [roguetv.globals :as G]
   roguetv.item
   [roguetv.item.gadget [Gadget]]
-  [roguetv.item.soda [Soda]])
+  [roguetv.item.soda [Soda]]
+  [roguetv.item.clothing [Clothing]]
+  [roguetv.item.burden [Burden]])
 
 (setv mode (second sys.argv))
 
@@ -27,6 +29,7 @@
   [(= mode "all")
     (show-items "All items" (λ True))]
   [(= mode "category") (do
-    (show-items "Soda" (λ (issubclass it Soda)))
-    (show-items "Gadget" (λ (issubclass it Gadget)))
-    (show-items "Other" (λ (not (or (issubclass it Soda) (issubclass it Gadget))))))])
+    (setv cs [Soda Gadget Clothing Burden])
+    (for [c cs]
+      (show-items c.__name__ (λ (issubclass it c))))
+    (show-items "Other" (fn [x] (not (afind-or (issubclass x it) cs)))))])
