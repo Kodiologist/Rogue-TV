@@ -14,6 +14,7 @@
 (def debug False)
 (def omnivision False)
 (def always-passwall False)
+(def super-speed False)
 
 (def autosave True)
 

@@ -36,7 +36,7 @@
       (.walk-dist (super Player self) p-from p-to)))]
 
   [walk-speed (fn [self]
-    (product (+
+    (if G.super-speed 1e6 (product (+
       (amap (or it.carry-speed-factor 1) (active-inv))
       (amap
         (or
@@ -47,7 +47,7 @@
         (active-inv))
       [(if (.has-effect self Haste)
         G.speedup-soda-factor
-        1)])))]
+        1)]))))]
 
   [act (fn [self]
     (for [e self.effects]
