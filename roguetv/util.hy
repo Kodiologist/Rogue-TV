@@ -4,7 +4,7 @@
   [math [sqrt exp]]
   random
   [heidegger.pos [Pos]]
-  [kodhy.util [seq keyword->str]]
+  [kodhy.util [signum seq keyword->str]]
   [roguetv.globals :as G])
 
 (defn chance [x]
@@ -71,6 +71,31 @@
 
 (defn adjacent? [p1 p2]
   (= (dist-cheb p1 p2) 1))
+
+(defn line-bresen [p1 p2]
+; Bresenham's line algorithm. Returns a list of Pos.
+  (setv steep? (> (abs (- p2.y p1.y)) (abs (- p2.x p1.x))))
+  (when steep?
+    (setv p1 (Pos p1.y p1.x))
+    (setv p2 (Pos p2.y p2.x)))
+  (setv swapped False)
+  (when (> p1.x p2.x)
+    (setv [p1 p2] [p2 p1])
+    (setv swapped True))
+  (setv dx (- p2.x p1.x))
+  (setv dy (- p2.y p1.y))
+  (setv error (// dx 2))
+  (setv y p1.y)
+  (setv out [])
+  (for [x (seq p1.x p2.x)]
+    (.append out (if steep? (Pos y x) (Pos x y)))
+    (-= error (abs dy))
+    (when (< error 0)
+      (+= y (signum dy))
+      (+= error dx)))
+  (when swapped
+    (.reverse out))
+  out)
 
 (defn dl-time-limit [dl]
   (int (* 60 (+ 3 (/ dl 2)))))

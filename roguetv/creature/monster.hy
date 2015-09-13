@@ -8,7 +8,7 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.map [Tile Floor Slime Web room-for? mset on-map disc-taxi]]
+  [roguetv.map [Tile Floor Slime Web room-for? mset on-map disc-taxi in-los?]]
   [roguetv.item [Item drop-pos]]
   [roguetv.creature [Creature Stink]])
 
@@ -238,9 +238,9 @@
           (msg "{:The} drops {:a}." @ @item))
         (setv @item None)
         (ret)))
-    ; If we don't have an item, and there's an item we're not bored
-    ; with (on the floor or in the player's inventory) in range,
-    ; go to it.
+    ; If we don't have an item, and there's an item we're not
+    ; bored with (on the floor or in the player's inventory) in
+    ; range that we can see, go to it.
     (when (not @item)
       (setv ps
         (kwc sorted :key (λ (len (second it)))
@@ -248,9 +248,11 @@
         (filt (second it)
         (amap (, it
           (find-path @pos it @detect-item-range))
-        (filter (fn [p] (or
-          (whenn (Item.at p) (@item-attractive? it))
-          (and (= p G.player.pos) (afind-or (@item-attractive? it) G.inventory))))
+        (filter (fn [p] (and
+          (or
+            (whenn (Item.at p) (@item-attractive? it))
+            (and (= p G.player.pos) (afind-or (@item-attractive? it) G.inventory)))
+          (in-los? @pos p)))
         (disc-taxi @pos @detect-item-range)))))))
       (when ps
         (setv [dest path] (first ps))

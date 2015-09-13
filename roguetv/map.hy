@@ -118,6 +118,12 @@
       dy [(- (abs dx) radius) (- radius (abs dx))]]
     (on-map (+ center (Pos dx dy)))))
 
+(defn in-los? [eye target] (block
+  (for [p (slice (line-bresen eye target) 1)]
+    (when (. (mget p) blocks-sight)
+      (ret False)))
+  True))
+
 (defclass Floor [Tile] [
   [name (kwc NounPhrase "ordinary floor" :+mass :unit "tiles")]
   [char "."]
