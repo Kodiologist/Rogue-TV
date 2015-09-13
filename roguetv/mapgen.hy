@@ -12,7 +12,7 @@
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item Curse]]
   [roguetv.creature [Creature]]
-  [roguetv.creature.monster [Snail Spider Dog Cat]])
+  [roguetv.creature.monster [Snail Spider Nymph Dog Cat]])
 
 (defn reset-level []
   (setv dl G.dungeon-level)
@@ -215,9 +215,10 @@
 
 (defcls NormalMonster [Obstacle]
   cr-cls None
+  max-to-place 3
 
   f (cmeth []
-      (setv n-to-place (randint 1 3))
+      (setv n-to-place (randint 1 @max-to-place))
       (for [_ (range n-to-place)]
         (kwc @cr-cls :pos (shift @free-floors)))))
 
@@ -227,3 +228,8 @@
 (defobst O-Spiders [NormalMonster]
   level-lo 3
   cr-cls Spider)
+
+(defobst O-Nymph [NormalMonster]
+  level-lo 6
+  cr-cls Nymph
+  max-to-place 1)
