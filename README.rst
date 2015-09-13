@@ -1,4 +1,4 @@
-Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It draws inspiration from `Smash TV`_, `Weekend Warrior`_, MXC_, `Legends of the Hidden Temple`_, `Mazeworld Catacombs`_, `Scarab of RA`_, and, of course, Rogue_. It's written in Hy_ with Python 2.7.
+Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It draws inspiration from `Smash TV`_, `Weekend Warrior`_, MXC_, `Legends of the Hidden Temple`_, `Mazeworld Catacombs`_, `Scarab of RA`_, NetHack_, and, of course, Rogue_. It's written in Hy_ with Python 2.7.
 
 Currently, the game is playable, but a lot of features remain to be implemented.
 
@@ -41,4 +41,5 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 .. _MXC: http://en.wikipedia.org/wiki/MXC
 .. _Mazeworld Catacombs: http://macintoshgarden.org/games/mazeworld-catacombs
 .. _Scarab of RA: http://macintoshgarden.org/games/scarab-of-ra
+.. _NetHack: http://nethack4.org
 .. _Rogue: http://en.wikipedia.org/wiki/Rogue_(video_game)
