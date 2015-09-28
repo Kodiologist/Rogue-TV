@@ -260,3 +260,18 @@
     (shuffle (amap (+ p it) Pos.ORTHS))
     ; …or at a random diagonal neighbor.
     (shuffle (amap (+ p it) Pos.DIAGS)))))
+
+(defn item-pos [item]
+; Find where an item is, even if it's not on the ground.
+  (cond
+    [item.pos
+      item.pos]
+    [(in item G.inventory)
+      G.player.pos]
+    [True (.
+      (afind
+        (and
+          (instance? (rtv-get creature.monster.Nymph) it)
+          (is it.item item))
+        (rtv creature.monster.extant-monsters))
+      pos)]))

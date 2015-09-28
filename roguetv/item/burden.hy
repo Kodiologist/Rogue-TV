@@ -10,7 +10,7 @@
   [roguetv.util [*]]
   [roguetv.types [Scheduled]]
   [roguetv.map [disc-taxi Tile Floor Ice mset]]
-  [roguetv.item.generic [Item def-itemtype]])
+  [roguetv.item.generic [Item def-itemtype item-pos]])
 
 (defcls Burden [Item]
   rarity :rare
@@ -66,10 +66,7 @@
     None)
 
   :act (meth []
-    (setv center (or @pos G.player.pos))
-      ; We assume that if the gem has no position, the player is
-      ; carrying it.
-    (for [p (random.sample (disc-taxi center @ice-radius) @ice-per-second)]
+    (for [p (random.sample (disc-taxi (item-pos @) @ice-radius) @ice-per-second)]
       (when (instance? Floor (Tile.at p))
         (mset p (Ice))))
     (@wait)))

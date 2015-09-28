@@ -8,6 +8,7 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
+  [roguetv.types [Scheduled]]
   [roguetv.map [Tile Floor Slime Web room-for? mset on-map disc-taxi in-los?]]
   [roguetv.item [Item drop-pos]]
   [roguetv.creature [Creature Stink]])
@@ -38,6 +39,9 @@
       (.walk-to self (first neighbors))
       (.wait self))
     True))]])
+
+(defn extant-monsters []
+  (filt (instance? Monster it) Scheduled.queue))
 
 (defn clear-neighbors [pos]
   (filt (room-for? Creature it)
