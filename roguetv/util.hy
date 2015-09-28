@@ -19,16 +19,6 @@
     (*= p (random.random)))
   k)
 
-(defn weighted-choice [l]
-; The argument should be a list of (weight, object) pairs.
-; http://stackoverflow.com/a/3679747
-  (setv r (random.uniform 0 (sum (map first l))))
-  (for [[w x] l]
-    (-= r w)
-    (when (<= r 0)
-      (break)))
-  x)
-
 (defn 1-in [n]
   (chance (/ 1 n)))
 

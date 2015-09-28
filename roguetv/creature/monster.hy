@@ -4,7 +4,7 @@
   [random [choice expovariate]]
   pypaths.astar
   [heidegger.pos [Pos]]
-  [kodhy.util [ret]]
+  [kodhy.util [ret weighted-choice]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]

@@ -4,7 +4,7 @@
   [random [choice randint]]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [concat shift ret retf]]
+  [kodhy.util [concat shift ret retf weighted-choice]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Generated Scheduled]]
