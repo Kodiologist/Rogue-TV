@@ -65,9 +65,13 @@
     (setv @clock-debt-ms 0)
     (.append @queue @))
 
+  scheduled? (meth []
+    (hasattr @ "clock_debt_ms"))
+
   deschedule (meth []
-    (.remove @queue @)
-    (setv @clock-debt-ms 0))
+    (when (@scheduled?)
+      (.remove @queue @)
+      (del @clock-debt-ms)))
 
   take-time (meth [duration]
     ; Mark the object as accumulating 'duration' seconds of clock debt.
@@ -82,23 +86,24 @@
     ; .take-time as needed.
     (raise (ValueError (.format "No .act implemented for {}" (type @)))))
 
+  destroy (meth []
+    (@deschedule))
+
   run-schedule (classmethod (meth []
     ; Give everything in the queue a chance to act, increment
     ; the game time by 1 second, and remove 1 second of clock debt.
     (while True
       (setv something-acted False)
-      (for [x (list @queue)] (block :x
-        (while (< x.clock-debt-ms @clock-factor)
-          (unless (in x @queue)
-            ; We have to check again that this object is around
-            ; in case it disappeared (particularly, if the
-            ; player went to a new level) since we started the
-            ; whole loop.
-            (retf :x))
+      (for [x (list @queue)]
+        (while (and (.scheduled? x) (< x.clock-debt-ms @clock-factor))
+            ; We have to constantly check that this object is
+            ; scheduled in case it disappeared (particularly, if
+            ; the player went to a new level) since we started
+            ; the whole loop.
           (.act x)
           (setv something-acted True)
           (when G.endgame
-            (retf :game-loop)))))
+            (retf :game-loop))))
       ; Re-loop through the scheduling queue if anything acted,
       ; in case some (.act x) has added a new object to the
       ; queue.

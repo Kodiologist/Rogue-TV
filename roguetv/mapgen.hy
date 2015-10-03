@@ -34,23 +34,23 @@
   (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
-  (setv Scheduled.queue (filt
-    (cond
-      ; Filter out objects in Scheduled.queue that we left
-      ; behind on the previous level.
-      [(= it G.player)
+  (for [x (list Scheduled.queue)]
+    ; Destroy objects that we left behind on the previous level.
+    (setv keep (cond
+      [(= x G.player)
         True]
-      [(instance? Creature it)
+      [(instance? Creature x)
         False]
-      [(instance? Tile it)
+      [(instance? Tile x)
         False]
-      [(instance? Item it)
-        (in it G.inventory)]
-      [(instance? Curse it)
-        (in it.host-item G.inventory)]
+      [(instance? Item x)
+        (in x G.inventory)]
+      [(instance? Curse x)
+        (in x.host-item G.inventory)]
       [True
-        (raise (ValueError (.format "Weird thing in Schedule.queue: {!r}" it)))])
-    Scheduled.queue))
+        (raise (ValueError (.format "Weird thing in Schedule.queue: {!r}" it)))]))
+    (unless keep
+      (.destroy x)))
   (init-fov-map Tile.omap)
   ; Now that we're on a new level, the positions of old
   ; MapObjects are invalid. But that's okay because there's no

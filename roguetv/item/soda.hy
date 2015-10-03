@@ -24,6 +24,7 @@
     (unless (afind-or it.carry-instant-soda-use (active-inv))
       (G.player.take-time self.apply-time))
     (.remove G.inventory self)
+    (.destroy self)
     (self.soda-effect)))]])
 
 (def appearances {

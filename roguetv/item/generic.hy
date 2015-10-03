@@ -11,7 +11,7 @@
   [roguetv.types [MapObject Generated Drawable Scheduled]]
   [roguetv.map [room-for?]])
 
-(defclass Item [MapObject Generated NounPhraseNamed Drawable] [
+(defclass Item [MapObject Generated Scheduled NounPhraseNamed Drawable] [
   [escape-xml-in-np-format True]
   [tid None]
     ; A string.
@@ -62,6 +62,11 @@
     (setv self.curse None)
       ; Cursed items can't be dropped.
     None)]
+
+  [destroy (fn [self]
+    (when self.curse
+      (.destroy self.curse))
+    (.destroy (super Item self)))]
 
   [set-appearance (classmethod (fn [self iapp]
     (setv self.appearance iapp)

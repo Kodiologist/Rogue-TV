@@ -9,7 +9,7 @@
   [roguetv.input [y-or-n]]
   [roguetv.types [Drawable MapObject Scheduled]])
 
-(defclass Tile [Drawable MapObject NounPhraseNamed] [
+(defclass Tile [Drawable MapObject NounPhraseNamed Scheduled] [
   [escape-xml-in-np-format True]
   [info-text "[Missing info text]"]
   [blocks-movement False]
@@ -64,6 +64,8 @@
 (defn mset [pos tile &optional [fov-adjust True]]
   (when (and fov-adjust (!= tile.blocks-sight (. (Tile.at pos) blocks-sight)))
     (soil-fov))
+  (whenn (Tile.at pos)
+    (.destroy it))
   (kwc .move tile pos :+clobber))
 
 (defn mget [pos]
@@ -221,7 +223,7 @@
     (mset self.pos (OpenDoor open-time))
     False))]])
 
-(defclass OpenDoor [Door Scheduled] [
+(defclass OpenDoor [Door] [
   [name (NounPhrase "open door")]
   [char "|"]
 

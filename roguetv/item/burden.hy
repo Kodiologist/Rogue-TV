@@ -8,7 +8,6 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [Scheduled]]
   [roguetv.map [disc-taxi Tile Floor Ice mset]]
   [roguetv.item.generic [Item def-itemtype item-pos]])
 
@@ -49,7 +48,7 @@
   char "*"
   unique True)
 
-(def-itemtype [CursedGem Scheduled] "cursedgem-ice"
+(def-itemtype CursedGem "cursedgem-ice"
   :name (kwc NounPhrase "White Ice" :+the-proper)
   :color-fg :white
   :level-lo 4
