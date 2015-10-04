@@ -3,6 +3,7 @@
 (import
   [heidegger.pos [Pos]]
   [kodhy.util [ret]]
+  [roguetv.strings [soda-cans]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -27,35 +28,13 @@
     (.destroy self)
     (self.soda-effect)))]])
 
-(def appearances {
-  "blank"                    :white
-  "foreign-language-labeled" :dark-blue
-  "polka-dot"                :orange
-  "striped"                  :dark-green
-  "garishly colored"         :purple
-  "off-white"                :dark-gray
-  "red-checked"              :red
-  "houndstooth"              :black
-  "reddish-greenish"         :green
-  "tie-dye"                  :yellow
-  "reflective"               :dark-gray
-  "cornflower-blue"          :blue
-  "chartreuse"               :green
-  "maroon"                   :red
-  "scarlet"                  :dark-red
-  "hot-pink"                 :purple})
-(setv (get ItemAppearance.registry Soda) (lc
-  [[name color] (.items appearances)]
-  (kwc ItemAppearance
-    :name (NounPhrase (+ name " soda can"))
-    :color-fg color)))
-
 (defn can-of [s &optional force-a]
   (kwc NounPhrase
     :stem (+ "can of " s)
     :article (when force-a "a")))
 
 (def-itemtype Soda "chicken-soup" :name (can-of "chicken soup")
+  :color-fg :yellow
   :level-lo 3
   :info-flavor "Tastes like the comforts of home. And it's still piping hot."
   :radius-around-upelv 5
@@ -76,6 +55,7 @@
 
 (def-itemtype Soda "heeling-potion" :name "potion of extra heeling"
   ; A pun on Rogue's potion of extra healing.
+  :color-fg :brown
   :price-adj :bad-flavor
   :level-lo 3
   :level-hi 7
@@ -100,6 +80,7 @@
 
 (def-itemtype Soda "stink-serum" :name (can-of "stink serum")
   ; Inspired by Yipe! III.
+  :color-fg :dark-green
   :level-lo 1
   :info-flavor "This refreshing beverage has an odd but tasty flavor with notes of beans, Limburger cheese, durian, and asparagus. The, ah, aftereffects are somewhat less pleasant."
   :stink-time 30
@@ -114,6 +95,7 @@
 (def-itemtype Soda "speed-soda" :name (kwc can-of "5-second ENERGY™" :+force-a)
     ; We need :+force-a because of a bug in inflect.
   ; In reference to the real dietary supplement 5-hour Energy.
+  :color-fg :red
   :level-lo 4
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, compared to its namesake, which is basically caffeine, this novel beverage is of mysterious origin, and it's got a veritably supernatural kick, for a (very, very) short time."
     ; Mid-20th-century Cheerios ads
@@ -128,6 +110,7 @@
         ; http://knowyourmeme.com/memes/intensifies
 
 (def-itemtype Soda "confusion-soda" :name (can-of "booze")
+  :color-fg :black
   :price-adj :bad-flavor
   :level-hi 5
   :info-flavor "This is a generous portion of the most popular recreational drug in history, possibly excepting caffeine. Did you know that in 2012, about 3 million deaths (6% of all deaths worldwide) were attributable to alcoholic beverages? Seriously, folks, if you must drink, drink responsibly. Anyway, back to your regularly scheduled dumb jokes."
@@ -143,6 +126,7 @@
 
 (def-itemtype Soda "strength-soda" :name (can-of "Daffy's Elixir")
   ; A name for several patent medicines.
+  :color-fg :dark-blue
   :level-hi 6
   :info-flavor "This marvelous concoction will give you the strength of a raging bull!"
   :strength-time (* 5 60)
@@ -156,6 +140,7 @@
         ; Bodybuilding slang.
 
 (def-itemtype Soda "passwall-soda" :name (can-of "pass-through punch")
+  :color-fg :dark-red
   :level-lo 7
   :info-flavor "It lets you walk through walls! Too bad it doesn't let you see through walls."
   :passwall-time 45
@@ -168,6 +153,7 @@
       (fn [] (msg "You feel more subtle.")))))
 
 (def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
+  :color-fg :dark-orange
   :price-adj :bad-flavor
   :level-lo 6
   :info-flavor (.join "\n\n" ["Here is that <b>drugless</b> way to quiet your ragged nerves so many people are asking about today. Ovaltine marks one of the most important scientific findings of its time."
@@ -183,5 +169,8 @@
       (fn [] (msg :tara "Oh no! {p:The} has fallen asleep!"))
       (fn [] (msg "You snore.")))))
 
-(assert (>= (len appearances)
+(setv (get ItemAppearance.registry Soda) (amap
+  (ItemAppearance (NounPhrase (+ it " soda can")))
+  soda-cans))
+(assert (>= (len (get ItemAppearance.registry Soda))
   (len (filt (instance? Soda it) (.values G.itypes)))))

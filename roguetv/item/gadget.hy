@@ -5,6 +5,7 @@
   [random [randrange choice]]
   [heidegger.pos [Pos]]
   [kodhy.util [ret retf]]
+  [roguetv.strings [gadget-adjectives]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -65,41 +66,8 @@
       (.take-time G.player self.apply-time))
     (-= self.charges 1))]])
 
-(def appearances {
-  "crazy"           :green
-  "cryptic"         :dark-green
-  "mysterious"      :purple
-  "enigmatic"       :red
-  "Art Deco"        :orange
-  "clockwork"       :yellow
-  "futuristic"      :purple
-  "alien"           :green
-  "modern"          :black
-  "shiny"           :blue
-  "rusty"           :orange
-  "antique"         :dark-red
-  "vintage"         :dark-blue
-  "ivory"           :white
-  "wooden"          :brown
-  "brass"           :yellow
-  "silvery"         :dark-gray
-  "stainless-steel" :dark-gray
-  "matte"           :black
-  "flimsy"          :dark-orange
-  "rugged"          :brown
-  "plastic"         :red
-  "tiny"            :white
-  "boxy"            :black
-  "sleek"           :blue
-  "bulky"           :dark-green
-  "crude"           :brown})
-(setv (get ItemAppearance.registry Gadget) (lc
-  [[name color] (.items appearances)]
-  (kwc ItemAppearance
-    :name (NounPhrase (+ name " gadget"))
-    :color-fg color)))
-
 (def-itemtype Gadget "panic-button" :name "panic button"
+  :color-fg :red
   :level-lo 5
   :info-flavor "Press it if you expect to be particularly lucky in the future, or if you are particularly unlucky in the present."
   :max-charges 3
@@ -128,6 +96,7 @@
     (msg :tara "{p:He's} teleported to another part of the level."))))
 
 (def-itemtype Gadget "warpback" :name "warpback machine"
+  :color-fg :dark-orange
   :level-lo 6
   :rarity :uncommon
   ; Has an extra instance attribute .warpback-pos.
@@ -158,6 +127,7 @@
         (msg "{:The} registers your current position." self)))))
 
 (def-itemtype Gadget "hookshot"
+  :color-fg :dark-blue
   :level-lo 4
   :info-flavor "Arfer's law of game design: any video game is improved by the addition of a grappling hook."
   :max-charges 10
@@ -199,6 +169,7 @@
     (msg "{:The} pulls you ahead." self))))
 
 (def-itemtype Gadget "chainsaw"
+  :color-fg :yellow
   :level-hi 7
   :info-flavor "Just what you need to kickstart a lucrative career in lumberjacking after winning gobs of dosh on Rogue TV. Or you could sell it for an additional gob of dosh. Whatever; I don't judge."
   :max-charges 10
@@ -221,6 +192,7 @@
         (msg "{:Your} proves ineffective against {:the}." self t)]))))
 
 (def-itemtype Gadget "hairdryer" :name "hair dryer"
+  :color-fg :black
   :level-lo 1
   :level-hi 6
   :info-flavor "Just because you're running around in a dungeon doesn't mean you can't have salon-quality hair."
@@ -237,6 +209,7 @@
     (msg "You are briefly immersed in a cloud of warm air."))))
 
 (def-itemtype Gadget "tunnel-machine" :name "tunnel-boring machine"
+  :color-fg :dark-red
   :level-lo 2
   :info-flavor "A wicked giant drill to pound through whatever solid obstacles happen to get in your way."
   :max-charges 5
@@ -261,6 +234,7 @@
         (msg "Your drill proves ineffective against {:the}." t)]))))
 
 (def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
+  :color-fg :dark-blue
   :price-adj :bad-flavor
   :level-lo 4
   :info-flavor "Tired of buying can after can of generic-brand areosol string and still running out? This cutting-edge device produces aerosol string (new &amp; improved formula, patent pending; compare with SILLY STRING Brand Spray Streamer) instantly, using chemicals already present in the air of a typical American household! Just press the button and fire away! Product is flammable. Keep mouth and eyes away from exhaust port. Replace filter regularly. Do not use if you are pregnant or nursing. Check for NWS Air Quality Alerts before and after each use."
@@ -287,6 +261,7 @@
       (msg :tara "{p:The}'s spraying hasn't come to much.")))))
 
 (def-itemtype Gadget "bee-machine" :name "personal beekeeping device"
+  :color-fg :yellow
   :price-adj :bad-flavor
   :level-hi 4
   :info-flavor "A beekeeper is you! It's stuffed with everything you need to make your own honey. Including the bees. <b>Especially</b> the bees."
@@ -316,6 +291,7 @@
         (msg "Most of them go back in.")])))
 
 (def-itemtype Gadget "microscope"
+  :color-fg :dark-green
   :level-lo 7
   :rarity :uncommon
   :info-flavor "Second only to beakers full of glowing green goo in proving one's credentials as a scientist."
@@ -354,6 +330,7 @@
     (msg "You have:  {}" (item.invstr)))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
+  :color-fg :dark-green
   :level-lo 3
   :info-flavor "They say it's unwise to use a GPS device as your only means of navigation in an unfamiliar area, but it's not as if you have lots of better options in a dungeon."
   :max-charges 5
@@ -368,7 +345,10 @@
     (soil-fov)
     (msg "{:The} reveals part of the dungeon around you." self)))
 
-(assert (>= (len appearances)
+(setv (get ItemAppearance.registry Gadget) (amap
+  (ItemAppearance (NounPhrase (+ it " gadget")))
+  gadget-adjectives))
+(assert (>= (len (get ItemAppearance.registry Gadget))
   (len (filt (instance? Gadget it) (.values G.itypes)))))
 
 (defclass Battery [Item] [
@@ -405,7 +385,7 @@
   :charge-factor .5)
 
 (def-itemtype Battery "battery-big" :name "big battery"
-  :color-fg :purple
+  :color-fg :blue
   :level-lo 4
   :info-apply "Completely restores a gadget's charges."
   :charge-factor 1)

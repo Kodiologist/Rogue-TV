@@ -68,9 +68,13 @@
       (.destroy self.curse))
     (.destroy (super Item self)))]
 
+  [get-color-fg (fn [self]
+    (if (.identified? self)
+      (.get-color-fg (super Item self))
+      G.unid-item-color))]
+
   [set-appearance (classmethod (fn [self iapp]
-    (setv self.appearance iapp)
-    (setv self.color-fg iapp.color-fg)))]
+    (setv self.appearance iapp)))]
 
   [identified? (fn [self]
     (not (and self.appearance (not self.appearance.known))))]
@@ -209,7 +213,7 @@
   ; A dictionary mapping subclasses of Item to lists of eligible
   ; appearances.
 
-  [__init__ (fn [self name color-fg]
+  [__init__ (fn [self name &optional color-fg]
     (set-self name color-fg)
     (setv self.known False)
       ; .known is true when the player has learned the type of

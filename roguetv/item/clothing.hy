@@ -2,6 +2,7 @@
 
 (import
   [kodhy.util [ret cat]]
+  [roguetv.strings [gift-box-labels]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -55,59 +56,11 @@
   carry-effects-active? (meth []
     (not @boxed)))
 
-(def appearances {
-  "1.21GW"		:blue  ; Back to the Future
-  "1729"		:blue  ; The Hardy–Ramanujan number
-  "18156248"		:blue  ; PMID of "Sex, aggression, and humour: responses to unicycling"
-  "2038019"		:blue  ; 2038-01-19 is the Unix doomsday
-  "23.36664"		:blue  ; sqrt(546), from MLP's Failure Song
-  "25212683"		:blue  ; PMID of my first published article
-  "2FA3E1B"		:blue  ; Initial commit of Rogue TV
-  "32W353Y"		:blue  ; 0xDEADBEEF in RFC 4648 Base32
-  "41421356"		:blue  ; sqrt(2)
-  "6ACCDAE13EFF7I3L"	:blue  ; First half of Newton's anagram
-  "794.8"		:blue  ; Dewey Decimal for computer games
-  "9N4O4QRR4S8T12UX"	:blue  ; Second half of Newton's anagram
-  "AA23C2187"		:blue  ; Princess Leia was in detention block AA-23, cell 2187
-  "ARGELFRASTER"	:blue  ; Enchanted Forest Chronicles
-  "BIDOOF"		:blue  ; A Pokémon
-  "BLINKENLICHTEN"	:blue  ; http://www.catb.org/jargon/html/B/blinkenlights.html
-  "CHIM"		:blue  ; http://www.uesp.net/wiki/Lore:CHIM
-  "COSMICOSMO"		:blue  ; Cosmic Osmo
-  "DOOTDOOT"		:blue  ; http://knowyourmeme.com/memes/skull-trumpet
-  "E102G"		:blue  ; E-102 Gamma
-  "FRINDLE"		:blue  ; The book of the same name
-  "GOOZACK"		:blue  ; Wayside School
-  "IDDQD"		:blue  ; Doom cheat code
-  "KBA" 		:blue  ; My initials
-  "MUGWORMGRIBLICK"	:blue  ; Wayside School
-  "OOSMNSPFRSL" 	:blue  ; Abbreviation for The Origin of Species
-  "OYGEVALT"		:blue  ; Oy gevalt
-  "PYSZCZYNSKI" 	:blue  ; Tom Pyszczynski, TMT researcher
-  "QLZQQLZUUP"		:blue  ; The Emperor Quylthulg in Angband
-  "SLITHYTOVES" 	:blue  ; Jabberwocky
-  "SPAM"		:blue
-  "SPISPOPD"		:blue  ; http://doom.wikia.com/wiki/SPISPOPD
-  "TIBYOCSPNLAAD"       :blue  ; https://www.reddit.com/r/OutOfTheLoop/comments/1w7ojb
-  "TVERSKY"		:blue  ; Amos Tversky, JDM researcher
-  "UWOTM8"		:blue  ; http://knowyourmeme.com/memes/u-wot-m8
-  "X3J13"		:blue  ; Common Lisp standardization committee
-  "YAGRUMBAGARN"	:blue  ; http://www.uesp.net/wiki/Morrowind:Yagrum_Bagarn
-  "ZOOMBINI"		:blue  ; Zoombinis video-game series
-})
-(setv (get ItemAppearance.registry Clothing) (lc
-  [[name color] (.items appearances)]
-  (kwc ItemAppearance
-    :name (kwc NounPhrase
-      (+ "present labeled " name)
-      :plural (+ "presents labeled " name)
-      :article "a")
-    :color-fg color)))
-
 (defn pair-of [s]
   (kwc NounPhrase s :+always-plural :unit "pairs"))
 
 (def-itemtype Clothing "sneakers" :name (pair-of "expensive sneakers")
+  :color-fg :white
   :level-lo 4
   :rarity :uncommon
   :info-flavor "Guaranteed to make you run faster and jump higher! Nah, I lied. They only make you run faster. But that's more than can be said for PF Flyers and Cataclysm DDA."
@@ -116,6 +69,7 @@
   :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain.")
 
 (def-itemtype Clothing "high-heels" :name (pair-of "fancy high heels")
+  :color-fg :red
   :price-adj :bad-flavor
   :level-lo 4
   :info-flavor "Unless you're Ginger Rogers, these are going to make you somewhat less graceful."
@@ -126,6 +80,7 @@
   :info-carry "You walk at {carry_speed_factor} times normal speed.")
 
 (def-itemtype Clothing "roller-skates" :name (pair-of "roller skates")
+  :color-fg :yellow
   :level-lo 7
   :info-flavor "\"Aurelia, old girl,\" said Archibald Mulliner in a clear, firm voice, \"you are the bee's roller skates.\" And at that she seemed to melt into his embrace. Her lovely face was raised to his. \"Archibald!\" she whispered."
 
@@ -134,6 +89,7 @@
   :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain, but {carry_speed_factor_rough_terrain} times on rough terrain.")
 
 (def-itemtype Clothing "cheb-boots" :name (pair-of "Chebyshev boots")
+  :color-fg :dark-orange
   :level-lo 11
   :rarity :uncommon
   :info-flavor "This vintage Russian footwear makes you feel like a king."
@@ -144,6 +100,7 @@
   :info-carry "When you walk, diagonal moves take the same amount of time as orthogonal moves.")
 
 (def-itemtype Clothing "distressed-jeans" :name (pair-of "faux-distressed blue jeans")
+  :color-fg :dark-blue
   :price-adj :bad-flavor
   :level-lo 2
   :info-flavor "These are favored by fashion fanatics, but walking around in pants full of holes and tears may also make you look like a yokel."
@@ -153,6 +110,7 @@
   :info-carry "When you apply a gadget, there's a 1 in {carry_gadget_malfunction_1in} chance that nothing will happen, wasting a charge.")
 
 (def-itemtype Clothing "fur-coat" :name "fancy fur coat"
+  :color-fg :brown
   :level-lo 3
   :rarity :uncommon
   :info-flavor "A thick, luxurious coat made from the pelts of many adorable woodland creatures. When this prize was announced, animal-welfare organizations lambasted Rogue TV, calling for a boycott of the middlingly popular game show. This gave Rogue TV's ratings a much-needed boost."
@@ -161,6 +119,7 @@
   :info-carry "You don't slip on ice.")
 
 (def-itemtype Clothing "ugly-sweater" :name "ugly Christmas sweater"
+  :color-fg :dark-green
   :rarity :uncommon
   :info-flavor "You can find this abomination in the dungeon all year round. It's your own ugly little Christmas in July. And, it's a gift that keeps on giving."
 
@@ -168,12 +127,14 @@
   :info-carry "Each time you enter a new level, an extra present is generated.")
 
 (def-itemtype Clothing "lab-coat" :name "lab coat"
+  :color-fg :white
   :info-flavor "With this groovy outerwear, you'll be chugging mystery sludge in no time."
 
   :carry-instant-soda-use True
   :info-carry "Removes the basic time cost of drinking sodas.")
 
 (def-itemtype Clothing "trenchcoat"
+  :color-fg :brown
   :level-lo 1
   :info-flavor "It's full of pockets for easy access to all your toys."
 
@@ -181,6 +142,7 @@
   :info-carry "Removes the basic time cost of using gadgets.")
 
 (def-itemtype Clothing "goggles" :name (pair-of "goggles")
+  :color-fg :dark-red
   :price 1
   :level-lo 9
   :info-flavor "The goggles do nothing!"
@@ -188,5 +150,11 @@
 
   :curse-on-unbox True)
 
-(assert (>= (len appearances)
+(setv (get ItemAppearance.registry Clothing) (amap
+  (ItemAppearance (kwc NounPhrase
+    (+ "present labeled " it)
+    :plural (+ "presents labeled " it)
+    :article "a"))
+  gift-box-labels))
+(assert (>= (get ItemAppearance.registry Clothing)
   (len (filt (instance? Clothing it) (.values G.itypes)))))
