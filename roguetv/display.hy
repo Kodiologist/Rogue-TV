@@ -33,7 +33,7 @@
   (addstr str (get-color color-fg color-bg)))
 
 (defn echo-drawable [d]
-  (echo d.char d.color-fg d.color-bg))
+  (echo (.get-char d) (.get-color-fg d) (.get-color-bg d)))
 
 ; The functions `tx->px` and `ty->py` map terminal coordinates to
 ; Pos (map coordinates). They center the view on the focus

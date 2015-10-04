@@ -11,11 +11,20 @@
   [color-fg G.fg-color]
   [color-bg None]
 
+  ; These getters are trivial in Drawable, but may be overridden
+  ; in subclasses.
+  [get-char (fn [self]
+    self.char)]
+  [get-color-fg (fn [self]
+    self.color-fg)]
+  [get-color-bg (fn [self]
+    self.color-bg)]
+
   [xml-symbol (fn [self]
     (color-xml
-      (xml.sax.saxutils.escape self.char)
-      self.color-fg
-      self.color-bg))]])
+      (xml.sax.saxutils.escape (.get-char self))
+      (.get-color-fg self)
+      (.get-color-bg self)))]])
 
 (defclass MapObject [object] [
 
