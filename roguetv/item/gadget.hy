@@ -369,7 +369,7 @@
       (msg "Your attempts to insert the battery into itself prove futile.")
       (ret))
     (unless (instance? Gadget gadget)
-      (msg "{:The} doesn't seem to have a place for batteries." gadget)
+      (msg "{:The} {:v:doesn't} seem to have a place for batteries." gadget gadget)
       (ret))
 
     (.remove G.inventory self)
