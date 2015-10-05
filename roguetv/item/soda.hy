@@ -28,10 +28,10 @@
     (.destroy self)
     (self.soda-effect)))]])
 
-(defn can-of [s &optional force-a]
+(defn can-of [s]
   (kwc NounPhrase
     :stem (+ "can of " s)
-    :article (when force-a "a")))
+    :article "a"))
 
 (def-itemtype Soda "chicken-soup" :name (can-of "chicken soup")
   :color-fg :yellow
@@ -92,8 +92,7 @@
       (fn [] (msg :aud "cries out in disgust at the pungent odor."))
       (fn [] (msg :tara "Smells like {p:the} is going to keep on smelling for a while.")))))
 
-(def-itemtype Soda "speed-soda" :name (kwc can-of "5-second ENERGY™" :+force-a)
-    ; We need :+force-a because of a bug in inflect.
+(def-itemtype Soda "speed-soda" :name (can-of "5-second ENERGY™")
   ; In reference to the real dietary supplement 5-hour Energy.
   :color-fg :red
   :level-lo 4
