@@ -58,7 +58,7 @@
 
 (defn get-direction [key &optional [pure False]]
   (setv d (get direction-keys key))
-  (if (and (not pure) (.has-effect G.player (rtv-get creature.Confusion))
+  (if (and (not pure) (.get-effect G.player (rtv-get creature.Confusion))
       (chance G.confusion-misdirect-prob))
     (choice (filt (!= it d) Pos.DIR8))
     d))

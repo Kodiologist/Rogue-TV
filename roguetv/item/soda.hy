@@ -88,7 +88,7 @@
   :info-apply (.format "You'll stink for {{stink_time}} seconds. While you stink, monsters within {} squares will run away from you." G.stink-range)
   :soda-effect (fn [self]
 
-    (.add-effect G.player Stink self.stink-time
+    (.add-to-player Stink self.stink-time
       (fn [] (msg :aud "cries out in disgust at the pungent odor."))
       (fn [] (msg :tara "Smells like {p:the} is going to keep on smelling for a while.")))))
 
@@ -104,7 +104,7 @@
   :info-apply (.format "Increases your walking speed by a factor of {} for {{haste_time}} seconds." G.speedup-soda-factor)
   :soda-effect (fn [self]
 
-    (.add-effect G.player Haste self.haste-time
+    (.add-to-player Haste self.haste-time
       (fn [] (msg "You feel extremely jittery."))
       (fn [] (msg "Your jittering intensifies.")))))
         ; http://knowyourmeme.com/memes/intensifies
@@ -120,7 +120,7 @@
   :info-apply "Confuses you for {confusion_time} seconds. While confused, you have a chance of walking or pointing in the wrong direction."
   :soda-effect (fn [self]
 
-    (.add-effect G.player Confusion self.confusion-time
+    (.add-to-player Confusion self.confusion-time
       (fn [] (msg "Wow, that'shh good shhtuff."))
       (fn [] (msg :tara "Keep your head in the game, {p}.")))))
 
@@ -134,7 +134,7 @@
   :info-apply "Allows you to instantly open doors for five minutes."
   :soda-effect (fn [self]
 
-    (.add-effect G.player Strength self.strength-time
+    (.add-to-player Strength self.strength-time
       (fn [] (msg "You feel strong."))
       (fn [] (msg "You feel ready for more gainz.")))))
         ; Bodybuilding slang.
@@ -148,7 +148,7 @@
   :info-apply "Allows you to walk through soild obstacles for {passwall_time} seconds. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
   :soda-effect (fn [self]
 
-    (.add-effect G.player Passwall self.passwall-time
+    (.add-to-player Passwall self.passwall-time
       (fn [] (msg "You feel ethereal."))
       (fn [] (msg "You feel more subtle.")))))
 
@@ -165,7 +165,7 @@
   :info-apply "Makes you fall asleep for {sleep_time} seconds."
   :soda-effect (fn [self]
 
-    (.add-effect G.player Sleep self.sleep-time
+    (.add-to-player Sleep self.sleep-time
       (fn [] (msg :tara "Oh no! {p:The} has fallen asleep!"))
       (fn [] (msg "You snore.")))))
 

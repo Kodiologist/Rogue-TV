@@ -102,9 +102,11 @@
         (when (<= time-left G.low-time-threshold) G.low-time-bg-color))
       (.ljust
         (if G.last-action-duration
-         (.format "({})" (show-round G.last-action-duration 2))
+         (.format "({})" (show-round
+           (/ G.last-action-duration G.clock-factor)
+           3))
           "")
-        (len "(1.15)"))
+        (len "(1.151)"))
       (inc G.dungeon-level)
       (+ "$" (string (sum
         (fmap (.apparent-price it) (.identified? it) G.inventory))))

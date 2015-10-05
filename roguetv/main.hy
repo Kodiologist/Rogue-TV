@@ -3,13 +3,11 @@
 (import
   os
   locale
-  [random [choice]]
   [datetime [datetime]]
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
   [kodhy.util [retf concat]]
-  [roguetv.strings :as strings]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -65,21 +63,7 @@
         G.map-width G.map-height)
       (describe-tile G.player.pos))
 
-    (block :game-loop (while True
-
-      (Scheduled.run-schedule)
-
-      (when G.time-limit
-        (setv time-left (- G.time-limit G.current-time))
-        (when (<= time-left 0)
-          (msg :tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
-          (msg :bob (choice strings.bob-too-bad))
-          (setv G.time-limit None)
-          (setv G.endgame :out-of-time)
-          (retf :game-loop))
-        (when (<= time-left G.super-low-time-threshold)
-          (msg :aud "chants \"{}!\""
-            (get [None "One" "Two" "Three" "Four" "Five"] time-left))))))
+    (Scheduled.game-loop)
 
     (assert G.endgame)
     (setv winnings (filt

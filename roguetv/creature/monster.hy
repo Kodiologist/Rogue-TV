@@ -25,7 +25,7 @@
     ; to run away (not very intelligently), and return True.
     ; Otherwise, return False.
     (unless (and
-        (.has-effect G.player Stink)
+        (.get-effect G.player Stink)
         (<= (dist-taxi self.pos G.player.pos) G.stink-range))
       (ret False))
     (setv neighbors (kwc sorted
@@ -222,8 +222,8 @@
 
   get-item (meth [item]
     (setv @item item)
-    (setv (get @interested-in-item-till item) (long (+ G.current-time
-      (expovariate (/ 1 (/ (dl-time-limit G.dungeon-level) 3)))))))
+    (setv (get @interested-in-item-till item) (+ G.current-time
+      (expovariate (/ 1 (/ (dl-time-limit G.dungeon-level) 3))))))
 
   item-attractive? (meth [item]
     (or

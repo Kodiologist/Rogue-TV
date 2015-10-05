@@ -7,7 +7,7 @@
   [kodhy.util [concat shift ret retf weighted-choice]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [Generated Scheduled]]
+  [roguetv.types [Generated Scheduled LevelTimer set-time-limit]]
   [roguetv.map [*]]
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item Curse]]
@@ -29,7 +29,7 @@
         (setv G.map-width d)
         (setv G.map-height d))))
 
-  (setv G.time-limit (+ G.current-time (dl-time-limit dl)))
+  (set-time-limit (+ G.current-time (dl-time-limit dl)))
 
   (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]
@@ -37,7 +37,9 @@
   (for [x (list Scheduled.queue)]
     ; Destroy objects that we left behind on the previous level.
     (setv keep (cond
-      [(= x G.player)
+      [(instance? LevelTimer x)
+        True]
+      [(player? x)
         True]
       [(instance? Creature x)
         False]

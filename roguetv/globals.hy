@@ -40,7 +40,7 @@
 (def unid-item-color :purple)
 (def low-time-bg-color :red)
 (def low-time-fg-color :white)
-(def low-time-threshold 60) ; In seconds
+(def low-time-threshold 60) ; In seconds; converted to internal units below.
 
 (def new-msg-highlight curses.A-BOLD)
 
@@ -66,6 +66,8 @@
   :orange 208
   :dark-orange 166
   :brown 94})
+
+(def clock-factor 1000)
 
 (defs vision-radius 20)
 (defs push-past-monster-time 1)
@@ -106,11 +108,12 @@
 (defs map-width 0)
 (defs map-height 0)
 
-; Times are in simulated seconds.
+; Times are in units of second / clock-factor.
 (defs current-time 0)
 (defs time-limit None)
 (defs last-action-duration 0)
-(def super-low-time-threshold 5)
+(*= low-time-threshold clock-factor)
+(def super-low-time-threshold (* clock-factor 5))
 
 (def fov-dirty? True)
 (defs seen-map [])

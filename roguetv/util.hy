@@ -1,7 +1,7 @@
 (require kodhy.macros)
 
 (import
-  [math [sqrt exp]]
+  [math [sqrt exp ceil]]
   random
   [heidegger.pos [Pos]]
   [kodhy.util [signum seq keyword->str]]
@@ -30,8 +30,15 @@
 (defn randpop [l]
   (l.pop (random.randrange (len l))))
 
-(defn minsec [s]
-  (.format "{}:{:02}" (// s 60) (% s 60)))
+(defn seconds [duration]
+  ; Convert seconds to the internal time representation.
+  (if duration (max 1 (long (round (* G.clock-factor duration)))) 0))
+    ; (max 1 …) ensures that no nonzero durations will be rounded
+    ; to 0.
+
+(defn minsec [x]
+  (setv x (long (ceil (/ x G.clock-factor))))
+  (.format "{}:{:02}" (// x 60) (% x 60)))
 
 (defn show-round [number ndigits]
   (setv x (round number ndigits))
@@ -88,7 +95,7 @@
   out)
 
 (defn dl-time-limit [dl]
-  (int (* 60 (+ 3 (/ dl 2)))))
+  (seconds (* 60 (+ 3 (/ dl 2)))))
 
 (defn player? [cr]
   (is cr G.player))

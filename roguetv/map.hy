@@ -215,7 +215,7 @@
     (unless cr.can-open-doors
       (ret True))
     (setv open-time (.open-time self))
-    (if (.has-effect cr (rtv-get creature.Strength))
+    (if (.get-effect cr (rtv-get creature.Strength))
       (msgp cr "You effortlessly kick the door open.")
       (do
         (msgp cr "You open the old door after a struggle.")

@@ -1,8 +1,10 @@
 (require kodhy.macros)
 
 (import
+  [random [choice]]
   xml.sax.saxutils
-  [kodhy.util [retf]]
+  [kodhy.util [mins]]
+  [roguetv.strings [bob-too-bad]]
   [roguetv.globals :as G]
   [roguetv.util [*]])
 
@@ -67,27 +69,27 @@
 
 (defcls Scheduled [object]
   queue []
-  clock-factor 1000
-    ; This should not be overridden by subclasses.
 
   schedule (meth []
-    (setv @clock-debt-ms 0)
+    ; The object will first be able to act before any time passes,
+    ; but after any previously existing objects that are currently
+    ; ready to act have acted.
+    (setv @next-turn G.current-time)
     (.append @queue @))
 
   scheduled? (meth []
-    (hasattr @ "clock_debt_ms"))
+    (hasattr @ "next_turn"))
 
   deschedule (meth []
     (when (@scheduled?)
       (.remove @queue @)
-      (del @clock-debt-ms)))
+      (del @next-turn)))
 
   take-time (meth [duration]
-    ; Mark the object as accumulating 'duration' seconds of clock debt.
-    (when duration
-      (+= @clock-debt-ms (round (* @clock-factor duration)))))
+    (+= @next-turn (seconds duration)))
 
   wait (meth []
+    ; Convenience method for waiting 1 second.
     (@take-time 1))
 
   act (meth []
@@ -98,30 +100,39 @@
   destroy (meth []
     (@deschedule))
 
-  run-schedule (classmethod (meth []
-    ; Give everything in the queue a chance to act, increment
-    ; the game time by 1 second, and remove 1 second of clock debt.
+  game-loop (classmethod (meth []
     (while True
-      (setv something-acted False)
-      (for [x (list @queue)]
-        (while (and (.scheduled? x) (< x.clock-debt-ms @clock-factor))
-            ; We have to constantly check that this object is
-            ; scheduled in case it disappeared (particularly, if
-            ; the player went to a new level) since we started
-            ; the whole loop.
-          (.act x)
-          (setv something-acted True)
-          (when G.endgame
-            (retf :game-loop))))
-      ; Re-loop through the scheduling queue if anything acted,
-      ; in case some (.act x) has added a new object to the
-      ; queue.
-      (unless something-acted
-        (break)))
-    (+= G.current-time 1)
-    (for [x @queue]
-      (-= x.clock-debt-ms @clock-factor)
-      (assert (>= x.clock-debt-ms 0))))))
+      (setv actor (first (mins @queue (λ it.next-turn))))
+        ; We use (first (mins …)) instead of just (min …) because
+        ; the behavior of Python's `min` is undefined for ties.
+      (.remove @queue actor)
+      (.append @queue actor)
+      (assert (>= actor.next-turn G.current-time))
+      (setv G.current-time actor.next-turn)
+      (.act actor)
+      (when G.endgame
+        (break))))))
+
+(defcls LevelTimer [Scheduled]
+  act (meth []
+    (setv seconds-left (// (- G.time-limit G.current-time) G.clock-factor))
+    (if seconds-left
+      (msg :aud "chants \"{}!\""
+        (get [None "One" "Two" "Three" "Four" "Five"] seconds-left))
+      (do
+        (msg :tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
+        (msg :bob (choice bob-too-bad))
+        (setv G.time-limit None)
+        (setv G.endgame :out-of-time)))
+    (@wait)))
+
+(defn set-time-limit [x]
+  (setv G.time-limit x)
+  (unless (afind-or (instance? LevelTimer it) Scheduled.queue)
+    (.insert Scheduled.queue 0 (LevelTimer)))
+  (assert (instance? LevelTimer (first Scheduled.queue)))
+  (setv (. (first Scheduled.queue) next-turn)
+    (- G.time-limit G.super-low-time-threshold)))
 
 (defcls Generated [object]
   level-lo 0
