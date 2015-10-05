@@ -235,7 +235,7 @@
   __init__ (meth [host-item]
     (set-self host-item)
     (@schedule)
-    (@take-time (@curse-fade-time))
+    (@take-time-cu (@curse-fade-time))
     None)
 
   remove-curse (meth []

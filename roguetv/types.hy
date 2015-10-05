@@ -88,6 +88,10 @@
   take-time (meth [duration]
     (+= @next-turn (seconds duration)))
 
+  take-time-cu (meth [duration]
+    ; Assumes the input is already in clock units.
+    (+= @next-turn (long duration)))
+
   wait (meth []
     ; Convenience method for waiting 1 second.
     (@take-time 1))
