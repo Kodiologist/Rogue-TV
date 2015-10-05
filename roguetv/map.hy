@@ -1,7 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [random [randint expovariate]]
+  [random [randint]]
   [kodhy.util [ret]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
@@ -229,7 +229,7 @@
 
   [smooth True]
   [close-time (fn [self]
-    (+ 5 (expovariate (/ 1 (* 60 (inc G.dungeon-level))))))]
+    (+ 5 (randexp (* 60 (inc G.dungeon-level)))))]
       ; Yes, doors take longer to close at deeper levels, even
       ; though that makes things easier rather than harder. The
       ; point is to keep the question of whether a door will

@@ -1,7 +1,7 @@
 (require kodhy.macros)
 
 (import
-  [math [sqrt exp ceil]]
+  [math [log sqrt exp ceil]]
   random
   [heidegger.pos [Pos]]
   [kodhy.util [signum seq keyword->str]]
@@ -18,6 +18,9 @@
     (+= k 1)
     (*= p (random.random)))
   k)
+
+(defn randexp [median]
+  (random.expovariate (/ (log 2) median)))
 
 (defn 1-in [n]
   (chance (/ 1 n)))

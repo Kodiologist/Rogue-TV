@@ -1,7 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [random [choice expovariate]]
+  [random [choice]]
   pypaths.astar
   [heidegger.pos [Pos]]
   [kodhy.util [ret weighted-choice]]
@@ -223,7 +223,7 @@
   get-item (meth [item]
     (setv @item item)
     (setv (get @interested-in-item-till item) (+ G.current-time
-      (expovariate (/ 1 (/ (dl-time-limit G.dungeon-level) 3))))))
+      (randexp (/ (dl-time-limit G.dungeon-level) 3)))))
 
   item-attractive? (meth [item]
     (or

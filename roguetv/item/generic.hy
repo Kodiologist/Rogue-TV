@@ -3,7 +3,6 @@
 (import
   [math [ceil]]
   re
-  [random [expovariate]]
   [kodhy.util [cat keyword->str shift]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
@@ -230,7 +229,7 @@
 
 (defcls Curse [Scheduled]
   curse-fade-time (meth []
-    (expovariate (/ 1 (dl-time-limit G.dungeon-level))))
+    (randexp (dl-time-limit G.dungeon-level)))
 
   __init__ (meth [host-item]
     (set-self host-item)
