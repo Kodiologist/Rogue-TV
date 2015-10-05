@@ -57,7 +57,7 @@
   :ice-per-second 3
 
   :info-flavor "A frost-covered diamond the size of a baseball. You shiver just looking at it."
-  :info-constant "Produces ice around itself. Each second, up to {ice_per_second} tiles of ice are generated within {ice_radius} squares."
+  :info-constant "Produces ice around itself. An ice tile is generated within {ice_radius} squares about {ice_per_second} times per second."
 
   :__init__ (meth [&kwargs kw]
     (apply CursedGem.__init__ [@] kw)
@@ -65,7 +65,7 @@
     None)
 
   :act (meth []
-    (for [p (random.sample (disc-taxi (item-pos @) @ice-radius) @ice-per-second)]
-      (when (instance? Floor (Tile.at p))
-        (mset p (Ice))))
-    (@wait)))
+    (setv p (random.choice (disc-taxi (item-pos @) @ice-radius)))
+    (when (instance? Floor (Tile.at p))
+      (mset p (Ice)))
+    (@take-time (randexp (/ 1 @ice-per-second)))))
