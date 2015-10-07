@@ -115,9 +115,9 @@
     (if e
       (do
         (lengthen-msg)
-        (setv lengthen (- (+ G.current-time (seconds durations)) e.next-turn))
+        (setv lengthen (- (+ G.current-time (seconds duration)) e.next-turn))
         (when (> lengthen 0)
-          (+= e.next-turn lengthen)))
+          (.take-time-cu e lengthen)))
       (do
         (start-msg)
         (.append G.player.effects (@ duration))))))
