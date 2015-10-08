@@ -3,7 +3,7 @@
 (import
   [math [ceil]]
   re
-  [kodhy.util [cat keyword->str shift]]
+  [kodhy.util [cat keyword->str shift ret]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -29,6 +29,9 @@
   [price-adj None]
     ; A keyword that can adjust the price set by def-itemtype.
 
+  [indestructible False]
+    ; Indestructible items can't be destroyed by, e.g., paper
+    ; shredders.
   [carry-speed-factor None]
     ; A floating-point number multiplying the player's speed
     ; when the item is carried.
@@ -63,6 +66,9 @@
     None)]
 
   [destroy (fn [self]
+    ; For cleaning up after an item that no longer exists. For
+    ; the game effect of destroying an item (which may call this
+    ; method), see the `delete` method.
     (when self.curse
       (.destroy self.curse))
     (.destroy (super Item self)))]
@@ -113,6 +119,7 @@
           (kwc cat :sep "\n\n"
             self.info-flavor
             (when self.unique "<b>This item is unique.</b>")
+            (when self.indestructible "<b>This item is indestructible.</b>")
             (when self.curse "<b>This item is cursed,</b> preventing you from dropping it. The curse will eventually go away on its own.")
             (self.info-extra)
             (when self.info-apply (+ "<b>Effect when applied:</b> " self.info-apply))
@@ -139,6 +146,21 @@
       self.invlet
       (.xml-symbol self)
       self))]
+
+  [delete (fn [self] (block
+    (when self.indestructible
+      (ret False))
+    (setv where (find-item self))
+    (cond
+      [(instance? Pos where)
+        (.move self None)]
+      [(is where G.player)
+        (.remove G.inventory self)]
+      [True (do
+        (assert (hasattr where "item"))
+        (setv where.item None))])
+    (.destroy self)
+    True))]
 
   [mk-curse (fn [self]
     (setv self.curse (Curse self)))]
@@ -269,17 +291,23 @@
     ; …or at a random diagonal neighbor.
     (shuffle (amap (+ p it) Pos.DIAGS)))))
 
-(defn item-pos [item]
+(defn find-item [item]
 ; Find where an item is, even if it's not on the ground.
   (cond
     [item.pos
       item.pos]
     [(in item G.inventory)
-      G.player.pos]
-    [True (.
+      G.player]
+    [True
       (afind
         (and
           (instance? (rtv-get creature.monster.Nymph) it)
           (is it.item item))
-        (rtv creature.monster.extant-monsters))
-      pos)]))
+        (rtv creature.monster.extant-monsters))]))
+
+(defn item-pos [item]
+  (setv where (find-item item))
+  (if (instance? Pos where)
+    where
+    ; Otherwise, 'where' should be a creature.
+    where.pos))

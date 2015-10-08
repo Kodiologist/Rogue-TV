@@ -12,7 +12,8 @@
   :info-carry "Allows you to take the final down elevator. In fact, the rules of Rogue TV stipulate that you're only granted the Amulet's <b>fabulous</b> cash prize if you take that down elevator. So, try not to run out of time."
   :price 300
   :unique True
-  :rarity :nongen)
+  :rarity :nongen
+  :indestructible True)
 
 (def-itemtype Item "test-item"
   :name "test item" :name-suffix (fn [self] "(testy)")

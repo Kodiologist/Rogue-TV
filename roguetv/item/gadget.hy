@@ -290,6 +290,27 @@
       [(< summoned (// self.bees-to-summon 2))
         (msg "Most of them go back in.")])))
 
+(defn get-other-item [self unid verb] (block
+  (setv other-items (filt (is-not it self) G.inventory))
+  (unless other-items
+    (if unid
+      (do
+         (.use-time-and-charge self)
+         (msg "Nothing happens."))
+      (msg "You don't have anything to {}." verb))
+    (ret False))
+  (setv item (if unid
+    (choice other-items)
+    (do
+      (setv i (inventory-loop (.format "What do you want to {}?" verb)))
+      (when (none? i)
+        (ret False))
+      (get G.inventory i))))
+  (when (is item self)
+    (msg :bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
+    (ret False))
+  item))
+
 (def-itemtype Gadget "microscope"
   :color-fg :dark-green
   :level-lo 7
@@ -300,27 +321,7 @@
   :info-apply "Identifies an item."
   :gadget-effect (fn [self unid] (block
 
-    (setv other-items (filt (is-not it self) G.inventory))
-    (unless other-items
-      (if unid
-        (do
-           (.use-time-and-charge self)
-           (msg "Nothing happens."))
-        (msg "You don't have anything to identify."))
-      (ret))
-
-    (setv item (if unid
-      (choice other-items)
-      (do
-        (setv i (inventory-loop "What do you want to identify?"))
-        (when (none? i)
-          (ret))
-        (get G.inventory i))))
-
-    (when (is item self)
-      (msg :bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
-      (ret))
-
+    (setv item (or (get-other-item self unid "identify") (ret)))
     (.use-time-and-charge self)
     (when (.identified? item)
       (msg "You admire the details of {:your} under the microscope." item)
@@ -328,6 +329,23 @@
     (msg "You inspect {:the}." item)
     (.identify item)
     (msg "You have:  {}" (item.invstr)))))
+
+(def-itemtype Gadget "shredder" :name "paper shredder"
+  :color-fg :brown
+  :price-adj :bad-flavor
+  :level-lo 3
+  :info-flavor "Tired of paper shredders that jam, turn off, or spontaneously combust when asked to cope with a slightly thicker piece of paper than usual? This super-durable model will tear up just about anything and keep on chugging."
+  :max-charges 3
+
+  :info-apply "Permanently destroys an item."
+  :gadget-effect (fn [self unid] (block
+
+    (setv item (or (get-other-item self unid "shred") (ret)))
+
+    (.use-time-and-charge self)
+    (if (.delete item)
+      (msg "{:Your} {:v:is} shred to bits." item item)
+      (msg "Miraculously, {:the} {:v:jams} on {:your}, leaving {:him} unharmed." self self item item)))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
   :color-fg :dark-green
