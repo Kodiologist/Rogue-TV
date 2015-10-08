@@ -2,6 +2,8 @@
 
 (import
   sys
+  re
+  subprocess
   [kodhy.util [keyword->str]]
   [roguetv.globals :as G]
   roguetv.item
@@ -17,12 +19,15 @@
   (print title (len items))
   (print "--------------------------------------------------")
   (for [item (kwc sorted items :key (λ (, (- (it.generation-weight 0)) (- it.level-hi) it.price it.tid)))]
-    (print (.format "{:20} {:3} {:.3} {:2} {:2} {}"
-      item.tid item.price
+    (setv s (.format "{:20} {:3} {:.3} {:2} {:2} {:5.5} {}"
+      item.tid
+      item.price
       (keyword->str item.rarity)
       (if (= item.level-lo 0) "" (+ 1 item.level-lo))
       (if (= item.level-hi G.max-dungeon-level) "" (+ 1 item.level-hi))
-      item.name.stem)))
+      (re.sub r"\Adark-" "D" (keyword->str item.color-fg))
+      item.name.stem))
+    (print (slice s 0 (int (subprocess.check-output ["tput" "cols"])))))
   (print))
 
 (cond
