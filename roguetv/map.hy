@@ -6,7 +6,7 @@
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [y-or-n]]
+  [roguetv.input [user-confirms]]
   [roguetv.types [Drawable MapObject Scheduled]])
 
 (defclass Tile [Drawable MapObject NounPhraseNamed Scheduled] [
@@ -160,7 +160,8 @@
   [use-tile (fn [self cr]
     (when (player? cr)
       (msg :tara "Beware, there will be no return!")
-      (when (y-or-n "Take the elevator up?" :+require-uppercase)
+      (msg "Do you really want to take the elevator up?")
+      (when (user-confirms)
         (setv G.endgame :used-up-elevator))))]])
 
 (defn upelevator-pos [] (block

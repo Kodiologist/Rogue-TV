@@ -9,19 +9,11 @@
 
 (setv cancel-keys [" " "\n" G.key-escape])
 
-(defn y-or-n [prompt &optional [require-uppercase False]] (block
-  (msg "{} {}" prompt
-    (if require-uppercase "(Y/N; case-sensitive)" "(y/n)"));
+(defn user-confirms []
+  (msg "(Hit \"!\" to confirm or any other key to cancel.)")
   (rtv display.full-redraw)
   (setv G.last-new-message-number (dec (len G.message-log)))
-  (while True
-    (setv key (G.T.getkey))
-    (unless require-uppercase
-      (setv key (.upper key)))
-    (when (= key "Y")
-      (ret True))
-    (when (= key "N")
-      (ret False)))))
+  (= (G.T.getkey) "!"))
 
 (defn hit-key-to-continue [keys]
   (while True

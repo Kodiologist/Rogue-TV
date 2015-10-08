@@ -5,7 +5,7 @@
   [kodhy.util [ret retf]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [text-screen message-log-screen inventory-loop look-mode y-or-n normal-command-keys]]
+  [roguetv.input [text-screen message-log-screen inventory-loop look-mode user-confirms normal-command-keys]]
   [roguetv.map [Tile Wall mset]]
   [roguetv.item [Item add-to-inventory drop-pos]]
   [roguetv.creature [Creature]]
@@ -37,8 +37,10 @@
     [(= cmd :resign-game)
       (if G.debug
          (retf :curses-wrapper :fast-quit)
-         (when (y-or-n "Resign this game?" :+require-uppercase)
-           (setv G.endgame :resigned)))]
+         (do
+           (msg "Do you really want to resign this game?")
+           (when (user-confirms)
+             (setv G.endgame :resigned))))]
 
     [(= cmd :save-and-quit)
       (retf :curses-wrapper :save-and-quit)]

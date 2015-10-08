@@ -86,9 +86,9 @@
         (amap (list (combinations winnings it))
         (range (inc (len winnings))))))))
       (setv gross (total winnings)))
-    (msg "Game over. Your total winnings are ${}. Press Escape to quit." gross)
+    (msg "Game over. Your total winnings are ${}. Hit \"!\" to quit." gross)
     (full-redraw)
-    (hit-key-to-continue [G.key-escape])
+    (hit-key-to-continue "!")
     :game-over))))
 
   (when (= exit-reason :save-and-quit)
