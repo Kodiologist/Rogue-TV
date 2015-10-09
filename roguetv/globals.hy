@@ -18,8 +18,8 @@
 
 (def autosave True)
 
-(defs inventory-limit 10)
-(defs max-dungeon-level 19)
+(def inventory-limit 10)
+(def max-dungeon-level 19)
 
 (def message-lines 3)
 (def map-border-width 2)
@@ -69,12 +69,12 @@
 
 (def clock-factor 1000)
 
-(defs vision-radius 20)
-(defs push-past-monster-time 1)
-(defs stink-range 20)
-(defs speedup-soda-factor 10)
-(defs confusion-misdirect-prob .25)
-(defs confusion-bump-time 1)
+(def vision-radius 20)
+(def push-past-monster-time 1)
+(def stink-range 20)
+(def speedup-soda-factor 10)
+(def confusion-misdirect-prob .25)
+(def confusion-bump-time 1)
 
 ;; * Declarations
 
