@@ -85,7 +85,7 @@
   :info-flavor "This refreshing beverage has an odd but tasty flavor with notes of beans, Limburger cheese, durian, and asparagus. The, ah, aftereffects are somewhat less pleasant."
   :stink-time 30
 
-  :info-apply (.format "You'll stink for {{stink_time}} seconds. While you stink, monsters within {} squares will run away from you." G.stink-range)
+  :info-apply (.format "You'll stink for {{stink_time}} seconds. While you stink, monsters within {} squares will run away from you." G.repulsed-from-player-range)
   :soda-effect (fn [self]
 
     (.add-to-player Stink self.stink-time

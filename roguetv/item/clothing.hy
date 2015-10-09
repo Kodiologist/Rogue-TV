@@ -6,7 +6,8 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.item.generic [Item ItemAppearance def-itemtype]])
+  [roguetv.item.generic [Item ItemAppearance def-itemtype]]
+  [roguetv.creature.monster [Nymph]])
 
 (defcls Clothing [Item]
   char "["
@@ -149,6 +150,15 @@
     ; http://knowyourmeme.com/memes/the-goggles-do-nothing
 
   :curse-on-unbox True)
+
+(def-itemtype Clothing "trilby"
+  :color-fg :black
+  :level-lo 12
+  :info-flavor "This refined article of haberdashery may be referred to as a \"fedora\" by uneducated riff-raff. Not the type fit to associate with you, m'lady."
+    ; http://knowyourmeme.com/memes/fedora-shaming
+
+  :carry-repel-monster Nymph
+  :info-carry "Repels nymphs.")
 
 (setv (get ItemAppearance.registry Clothing) (amap
   (ItemAppearance (kwc NounPhrase

@@ -71,7 +71,7 @@
 
 (def vision-radius 20)
 (def push-past-monster-time 1)
-(def stink-range 20)
+(def repulsed-from-player-range 20)
 (def speedup-soda-factor 10)
 (def confusion-misdirect-prob .25)
 (def confusion-bump-time 1)

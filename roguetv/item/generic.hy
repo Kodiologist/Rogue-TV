@@ -56,6 +56,9 @@
   [carry-gen-item None]
     ; If a class, one of that type of item is generated on each
     ; new level.
+  [carry-repel-monster None]
+    ; If a class, monsters of that type will flee from the
+    ; player.
 
   [__init__ (fn [self &optional pos invlet]
     (Generated.__init__ self)

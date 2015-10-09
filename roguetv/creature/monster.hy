@@ -20,13 +20,19 @@
     (unless (.walk-to (super Monster self) p-to)
       (raise (ValueError (.format "{} tried to walk where it couldn't: {}" self p-to)))))]
 
-  [flee-from-stink (fn [self] (block
-    ; If the player stinks and we're in range of the stench, try
-    ; to run away (not very intelligently), and return True.
+  [player-repulsive? (fn [self]
+    (or
+      (.get-effect G.player Stink)
+      (afind-or (instance? it.carry-repel-monster self)
+        (filt it.carry-repel-monster (active-inv)))))]
+
+  [flee-from-player (fn [self] (block
+    ; If the player is repulsive to us and we're in range, try to
+    ; run away (not very intelligently), and return True.
     ; Otherwise, return False.
     (unless (and
-        (.get-effect G.player Stink)
-        (<= (dist-taxi self.pos G.player.pos) G.stink-range))
+        (.player-repulsive? self)
+        (<= (dist-taxi self.pos G.player.pos) G.repulsed-from-player-range))
       (ret False))
     (setv neighbors (kwc sorted
       (shuffle (clear-neighbors self.pos))
@@ -101,7 +107,7 @@
 
   [act (fn [self]
     (or
-      (.flee-from-stink self)
+      (.flee-from-player self)
       (wander self)
       (.wait self)))]])
 
@@ -114,7 +120,7 @@
   [move-chance (/ 1 30)]
 
   [act (fn [self] (block
-    (when (.flee-from-stink self)
+    (when (.flee-from-player self)
       (ret))
     ; Usually just sit there. Occasionally, wander in a random
     ; direction. Avoid unpleasant tiles.
@@ -134,7 +140,7 @@
   [detect-player-range 12]
 
   [act (fn [self] (block
-    (when (.flee-from-stink self)
+    (when (.flee-from-player self)
       (ret))
     ; If the player is close, try to chase after them, not very
     ; intelligently.
@@ -181,7 +187,7 @@
     (when (instance? Floor (Tile.at @pos))
       (mset @pos (Slime)))
     (or
-      (@flee-from-stink)
+      (@flee-from-player)
       (wander @)
       (@wait))))
 
@@ -197,7 +203,7 @@
     (when (instance? Floor (Tile.at @pos))
       (mset @pos (Web)))
     (or
-      (@flee-from-stink)
+      (@flee-from-player)
       (wander @)
       (@wait))))
 
@@ -231,7 +237,7 @@
       (< G.current-time (get @interested-in-item-till item))))
 
   act (meth [] (block
-    (when (@flee-from-stink)
+    (when (@flee-from-player)
       (ret))
     (when (and @item (not (@item-attractive? @item)))
       ; We've gotten bored with this item. Drop it if we can.
@@ -255,7 +261,8 @@
         (filter (fn [p] (and
           (or
             (whenn (Item.at p) (@item-attractive? it))
-            (and (= p G.player.pos) (afind-or (@item-attractive? it) G.inventory)))
+            (and (= p G.player.pos) (not (@player-repulsive?))
+              (afind-or (@item-attractive? it) G.inventory)))
           (in-los? @pos p)))
         (disc-taxi @pos @detect-item-range)))))))
       (when ps
@@ -270,6 +277,7 @@
               (msg "{:The} picks up {:a}." @ @item)))]
           [(and
               (= dest G.player.pos)
+              (not (@player-repulsive?))
               (= (dist-cheb @pos dest) 1)
               (afind-or (@item-attractive? it) G.inventory)) (do
             ; We're adjacent to the player, and they have something

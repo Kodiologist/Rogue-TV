@@ -20,12 +20,12 @@ roguetv.item
 roguetv.item.generic
 roguetv.creature
 roguetv.creature.generic
+roguetv.creature.monster
 roguetv.item.misc
 roguetv.item.gadget
 roguetv.item.soda
 roguetv.item.clothing
 roguetv.item.burden
-roguetv.creature.monster
 roguetv.mapgen
 roguetv.attrstr
 roguetv.display
