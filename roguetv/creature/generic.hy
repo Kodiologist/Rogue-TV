@@ -98,6 +98,8 @@
 ; Despite that this class is in creature.generic instead of
 ; creature.player, only the player can have effects.
 
+  queue-priority -2
+
   status "???"
     ; Text shown in the status bar.
   end-msg None

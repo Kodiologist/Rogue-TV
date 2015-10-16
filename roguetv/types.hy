@@ -69,13 +69,17 @@
 
 (defcls Scheduled [object]
   queue []
+  queue-priority 0
+    ; Should be an integer. Lower means acting sooner.
 
   schedule (meth []
-    ; The object will first be able to act before any time passes,
-    ; but after any previously existing objects that are currently
-    ; ready to act have acted.
+    ; The object will first be able to act before any time
+    ; passes, but after any previously existing objects (of the
+    ; same or lesser .queue-priority) that are currently ready to
+    ; act have acted.
     (setv @next-turn G.current-time)
-    (.append @queue @))
+    (.append @queue @)
+    (kwc .sort @queue :key (λ it.queue-priority)))
 
   scheduled? (meth []
     (hasattr @ "next_turn"))
@@ -109,8 +113,6 @@
       (setv actor (first (mins @queue (λ it.next-turn))))
         ; We use (first (mins …)) instead of just (min …) because
         ; the behavior of Python's `min` is undefined for ties.
-      (.remove @queue actor)
-      (.append @queue actor)
       (assert (>= actor.next-turn G.current-time))
       (setv G.current-time actor.next-turn)
       (.act actor)
@@ -118,6 +120,8 @@
         (break))))))
 
 (defcls LevelTimer [Scheduled]
+  queue-priority -3
+
   act (meth []
     (setv seconds-left (// (- G.time-limit G.current-time) G.clock-factor))
     (if seconds-left
