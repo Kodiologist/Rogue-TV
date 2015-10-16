@@ -44,9 +44,13 @@
       (ret (.applied (super Clothing @))))
     (.take-time G.player @open-present-time)
     (setv was-id? (@identified?))
-    (msg "You tear open {}." (if was-id?
-      (.format "the box containing {:the}" @)
-      (.format "{:the}" @)))
+    (msg "You tear open {}.{}"
+      (if was-id?
+        (.format "the box containing {:the}" @)
+        (.format "{:the}" @))
+      (if (and was-id? @curse-on-unbox)
+        (.format " {:He's} cursed." @)
+        ""))
     (@identify)
     (setv @boxed False)
     (when @curse-on-unbox
