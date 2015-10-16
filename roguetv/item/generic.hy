@@ -56,6 +56,11 @@
   [carry-gen-item None]
     ; If a class, one of that type of item is generated on each
     ; new level.
+  [carry-gen-monster None]
+    ; If a type, one of that type of monster is generated on
+    ; each new level. Unlike carry-gen-item, the type is used
+    ; directly as the constructor, rather than filtering the
+    ; types that could be generated for this level.
   [carry-repel-monster None]
     ; If a class, monsters of that type will flee from the
     ; player.

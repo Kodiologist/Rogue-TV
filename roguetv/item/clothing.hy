@@ -160,6 +160,16 @@
   :carry-repel-monster Nymph
   :info-carry "Repels nymphs.")
 
+(def-itemtype Clothing "fedora"
+  :color-fg :orange
+  :price-adj :bad-flavor
+  :level-lo 12
+  :info-flavor "This classy hat will get you allll the ladies, yow! Regardless of your gender and sexual orientation. Sorry, rules are rules."
+
+  :curse-on-unbox True
+  :carry-gen-monster Nymph
+  :info-carry "Each time you enter a new level, an extra nymph is generated.")
+
 (setv (get ItemAppearance.registry Clothing) (amap
   (ItemAppearance (kwc NounPhrase
     (+ "present labeled " it)
