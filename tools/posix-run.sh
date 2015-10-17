@@ -14,5 +14,6 @@ if [ "$V" = 3 ] ; then
     PYTHON_CMD=python2
 fi
 
+export ROGUETV_BUNDLE_INFO="$(cat VERSION)"
 cd lib
 "$PYTHON_CMD" run.pyc "$@"

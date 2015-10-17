@@ -9,9 +9,9 @@ kodhy.util
 roguetv.macros
 roguetv.strings
 roguetv.english
-roguetv.cmdline
 roguetv.globals
 roguetv.util
+roguetv.cmdline
 roguetv.input
 roguetv.types
 roguetv.map

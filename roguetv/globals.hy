@@ -84,9 +84,13 @@
 (defs save-file-path None)
 (defs scores-file-path None)
 (defs dates {
+  "bundle_created" None
   "started" None
   "saved" None
   "loaded" None})
+(defs bundle-os None)
+(defs bundle-git None)
+(def version-info None)
 
 (def look-mode-legend-height 4)
 

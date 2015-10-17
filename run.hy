@@ -5,10 +5,11 @@
 (import
   os
   os.path
-  roguetv.cmdline
   [roguetv.globals :as G]
+  roguetv.cmdline
   roguetv.main)
 
+(roguetv.cmdline.parse-env)
 (setv p (roguetv.cmdline.parse-args))
 
 (setv G.save-file-path p.save)

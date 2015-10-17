@@ -10,9 +10,20 @@
   argparse
   appdirs
   [kodhy.util [keyword->str str->keyword]]
-  [roguetv.english [genders NounPhrase]])
+  [roguetv.english [genders NounPhrase]]
+  [roguetv.globals :as G])
 
-(setv pronouns->genders (OrderedDict [
+(defn parse-env []
+  (setv G.version-info "Not a bundled version")
+  (whenn (os.getenv "ROGUETV_BUNDLE_INFO")
+    (setv [l1 l2 l3] (.split it "\n"))
+    (setv G.bundle-os l1)
+    (setv G.bundle-git (slice l2 (len "Git commit ")))
+    (setv (get G.dates "bundle_created") (slice l3 (len "Packaged at ")))
+    (setv G.version-info (.format "Bundle version {}-{} ({})"
+      (slice G.bundle-git 0 12) G.bundle-os (get G.dates "bundle_created")))))
+
+(def pronouns->genders (OrderedDict [
   (, "he" :male)
   (, "she" :female)
   (, "it" :neuter)]))
@@ -20,34 +31,42 @@
 (defn uni [s]
   (.decode s (sys.getfilesystemencoding)))
 
-(def parameters [
-  ["name" :type uni
-    :metavar "TEXT"
-    :help "name of your character (new game only)"]
-  ["pronouns" :type uni
-    :help "pronouns for your character (new game only)"
-    :choices (amap (str it) (.keys pronouns->genders))]
-  ["save" :type uni
-    :metavar "FILEPATH"
-    :help "where to read saved games and write saved games to"]
-  ["no-autosave"
-    :help "don't automatically save at the end of each level"
-    :action "store_true"]
-  ["scores" :type uni
-    :metavar "FILEPATH"
-    :help "where to store scores"]
-  ["show-scores"
-    :help "instead of starting a game, show scores"
-    :action "store_true"]
-  ["show-all-scores"
-    :help "like --show-scores, but show every game"
-    :action "store_true"]
-  ["debug"
-    :help "enable debug mode"
-    :action "store_true"]])
-
 (defn parse-args [&optional args]
-  (setv parser (argparse.ArgumentParser))
+  (setv desc (+ "Rogue TV by Kodi Arfer\n" G.version-info))
+
+  (setv parser (kwc argparse.ArgumentParser
+    :formatter-class argparse.RawDescriptionHelpFormatter
+    :description desc))
+
+  (setv parameters [
+    ["version"
+      :action "version"
+      :version desc]
+    ["name" :type uni
+      :metavar "TEXT"
+      :help "name of your character (new game only)"]
+    ["pronouns" :type uni
+      :help "pronouns for your character (new game only)"
+      :choices (amap (str it) (.keys pronouns->genders))]
+    ["save" :type uni
+      :metavar "FILEPATH"
+      :help "where to read saved games and write saved games to"]
+    ["no-autosave"
+      :help "don't automatically save at the end of each level"
+      :action "store_true"]
+    ["scores" :type uni
+      :metavar "FILEPATH"
+      :help "where to store scores"]
+    ["show-scores"
+      :help "instead of starting a game, show scores"
+      :action "store_true"]
+    ["show-all-scores"
+      :help "like --show-scores, but show every game"
+      :action "store_true"]
+    ["debug"
+      :help "enable debug mode"
+      :action "store_true"]])
+
   (for [x parameters]
     (apply .add-argument
       [parser (+ "--" (first x))]
