@@ -150,17 +150,32 @@
     (apply G.T.move focus-t-coords))
   (G.T.refresh))
 
-(defn draw-text-screen [text-xml]
+(defn render-text-screen [text-xml]
   (curses.curs-set 0)
-  (G.T.erase)
   (setv w (- G.screen-width G.text-screen-left-margin))
-  (for [[i line] (enumerate (slice
-      (concat (amap
-        (if it (.wrap (AttrStr.from-xml it) w) [(AttrStr)])
-        (.split text-xml "\n")))
-      0 (dec G.screen-height)))]
+  (setv lines (concat (amap
+    (if it (.wrap (AttrStr.from-xml it) w) [(AttrStr)])
+    (.split text-xml "\n"))))
+  (setv pages [])
+  (setv i 0)
+  (while True
+    (.append pages {"text" (slice lines i (+ i G.screen-height))})
+    (when (>= (+ i G.screen-height) (len lines))
+      (break))
+    ; Remove the bottom line to make room for a "more" prompt.
+    (setv (get pages -1 "text") (slice (get pages -1 "text") None -1))
+    (setv (get pages -1 "more") True)
+    (+= i (+ G.screen-height -1 (- G.text-screen-page-overlap))))
+  pages)
+
+(defn draw-text-screen-page [page]
+  (G.T.erase)
+  (for [[i line] (enumerate (get page "text"))]
     (G.T.move i G.text-screen-left-margin)
-    (.draw line)))
+    (.draw line))
+  (when (.get page "more")
+    (G.T.move (len (get page "text")) 0)
+    (.draw (AttrStr.from-xml (color-xml "-- more --" G.bg-color G.fg-color)))))
 
 (defn draw-inventory [prompt]
   (setv names (amap (.format "{:a:most}" it) G.inventory))

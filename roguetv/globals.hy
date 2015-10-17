@@ -24,6 +24,7 @@
 (def message-lines 3)
 (def map-border-width 2)
 (def text-screen-left-margin 1)
+(def text-screen-page-overlap 2)
 
 (def fg-color :black)
 (def bg-color :white)

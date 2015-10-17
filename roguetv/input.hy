@@ -99,12 +99,11 @@
 
 (defn text-screen [text]
 
-  (rtv display.draw-text-screen text)
-  (G.T.refresh)
-
-  (while True
-    (when (in (G.T.getkey) cancel-keys)
-      (break))))
+  (for [page (rtv display.render-text-screen text)]
+    (rtv display.draw-text-screen-page page)
+    (while True
+      (when (in (G.T.getkey) cancel-keys)
+        (break)))))
 
 (defn message-log-screen []
 
