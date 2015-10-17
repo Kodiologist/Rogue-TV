@@ -4,6 +4,7 @@
   [math [floor ceil]]
   [itertools [groupby]]
   json
+  errno
   [kodhy.util [ret ucfirst keyword->str]]
   [roguetv.english [english-list]]
   [roguetv.globals :as G]
@@ -14,7 +15,9 @@
   (try
     (with [[o (open path "rb")]]
       (setv scores (get (json.load o) "scores")))
-    (catch [_ IOError]
+    (catch [e OSError]
+      (unless (= e.errno errno.EEXIST)
+        (raise))
       (setv scores [])))
   scores)
 
@@ -65,7 +68,7 @@
       (ret))
 
     (defn print-latest []
-      (out "<b>• Last game</b> ({} quantile)" (no-leading-0
+      (out "<b>• Last score</b> ({} quantile)" (no-leading-0
         (kwc round :ndigits 3 (/ (inc (.index scores latest)) (len scores)))))
       (out (show-character latest latest)))
     (setv printed-latest False)
@@ -73,9 +76,9 @@
     (setv low-quantile (/ (- 1 G.score-interval) 2))
     (setv high-quantile (- 1 low-quantile))
     (for [[text q f] [
-        ["High game" high-quantile ceil]
-        ["Median game" .5 round]
-        ["Low game" low-quantile floor]]]
+        ["High score" high-quantile ceil]
+        ["Median score" .5 round]
+        ["Low score" low-quantile floor]]]
       (setv target-gross (get scores
         (min (dec (len scores)) (int (f (* (len scores) q))))
         "gross"))
@@ -85,7 +88,7 @@
         (setv printed-latest True))
       (out (.format "<b>• {}</b> ({} quantile)" text (no-leading-0 q)))
       (when (= character latest)
-        (out "is also the last game")
+        (out "is also the last score")
         (setv printed-latest True))
       (out (show-character character latest)))
 

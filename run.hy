@@ -12,6 +12,7 @@
 (setv p (roguetv.cmdline.parse-args))
 
 (setv G.save-file-path p.save)
+(setv G.scores-file-path p.scores)
 (setv G.autosave (not p.no-autosave))
 (setv G.debug p.debug)
 

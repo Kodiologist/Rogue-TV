@@ -22,15 +22,20 @@
 
 (def parameters [
   ["name" :type uni
+    :metavar "TEXT"
     :help "name of your character (new game only)"]
   ["pronouns" :type uni
     :help "pronouns for your character (new game only)"
     :choices (amap (str it) (.keys pronouns->genders))]
   ["save" :type uni
-    :help "filepath to read a saved game from or write saved games to"]
+    :metavar "FILEPATH"
+    :help "where to read saved games and write saved games to"]
   ["no-autosave"
     :help "don't automatically save at the end of each level"
     :action "store_true"]
+  ["scores" :type uni
+    :metavar "FILEPATH"
+    :help "where to store scores"]
   ["debug"
     :help "enable debug mode"
     :action "store_true"]])
@@ -44,13 +49,10 @@
   (setv p (.parse-args parser args))
 
   (unless p.save
-    (setv d (appdirs.user-data-dir "Rogue TV" "Kodiologist"))
-    (try
-      (os.makedirs d)
-      (catch [e OSError]
-        (unless (= e.errno errno.EEXIST)
-          (raise))))
-    (setv p.save (os.path.join d "saved-game.json.gz")))
+    (setv p.save (os.path.join (default-dir) "saved-game.json.gz")))
+
+  (unless p.scores
+    (setv p.scores (os.path.join (default-dir) "scores.json")))
 
   (unless p.pronouns
     (setv p.pronouns (random.choice ["he" "she"])))
@@ -73,3 +75,12 @@
   (setv p.name (kwc NounPhrase p.name :+bare-proper :gender p.gender))
 
   p)
+
+(defn default-dir []
+  (setv d (appdirs.user-data-dir "Rogue TV" "Kodiologist"))
+  (try
+    (os.makedirs d)
+    (catch [e OSError]
+      (unless (= e.errno errno.EEXIST)
+        (raise))))
+  d)

@@ -81,6 +81,7 @@
 ;; * Declarations
 
 (defs save-file-path None)
+(defs scores-file-path None)
 (defs dates {
   "started" None
   "saved" None

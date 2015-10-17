@@ -67,7 +67,7 @@
       (ret None)))))
 
 (setv normal-command-keys [
-  ["?" :show-controls "Show these controls"]
+  ["?" :help "Show this help screen"]
   ["S" :save-and-quit "Save your game and quit the program"]
   ["Q" :resign-game "Resign the game"]
   ["m" :message-log "See old messages"]

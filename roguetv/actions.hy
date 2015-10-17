@@ -25,14 +25,16 @@
 
   (block (cond
 
-    [(= cmd :show-controls)
+    [(= cmd :help)
       (text-screen (+
         "<b>Controls</b>\n\n"
-        "Use the arrows keys, the number pad, or the vi keys to move. Use \".\" or numpad \"5\" to wait 1 second.\n\n"
+        "Use the arrow keys, the number pad, or the vi keys to move. Use \".\" or numpad \"5\" to wait 1 second.\n\n"
         (.join "\n"
           (amap (.format "  <b>{}</b>  {}" (first it) (get it 2))
           (filt (!= (get it 2) :debug)
-          normal-command-keys)))))]
+          normal-command-keys)))
+        "\n\nSave path: " G.save-file-path
+        "\nScores path: " G.scores-file-path))]
 
     [(= cmd :resign-game)
       (if G.debug
