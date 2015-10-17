@@ -25,6 +25,8 @@
   (setv x (kwc dict
     :name (.format "{:a}" G.player)
     :dates G.dates
+    :bundle-os G.bundle-os
+    :bundle-git G.bundle-git
     :dungeon-level G.dungeon-level
     :time G.current-time
     :endgame (keyword->str G.endgame)
