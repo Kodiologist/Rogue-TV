@@ -3,7 +3,6 @@
 (import
   os
   locale
-  [datetime [datetime]]
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
@@ -19,7 +18,8 @@
   [roguetv.attrstr [default-color]]
   [roguetv.display [full-redraw describe-tile]]
   [roguetv.creature.player [Player]]
-  [roguetv.saves [write-save-file]])
+  [roguetv.saves [write-save-file]]
+  [roguetv.scores [add-current-game-to-scores show-scores]])
 
 (defn new-game [parsed-cmdline-args]
   (setv p parsed-cmdline-args)
@@ -32,7 +32,7 @@
   (setv G.dungeon-level 0)
   (reset-level)
 
-  (setv (get G.dates "started") (.isoformat (datetime.utcnow))))
+  (setv (get G.dates "started") (real-timestamp)))
 
 (defn main-loop []
 
@@ -66,6 +66,7 @@
     (Scheduled.game-loop)
 
     (assert G.endgame)
+    (setv (get G.dates "ended") (real-timestamp))
     (setv winnings (filt
       (or (= G.endgame :won) (not (instance? (get G.itypes "aoy") it)))
       G.inventory))
@@ -79,13 +80,15 @@
       ;
       ; Yes, we're brute-forcing the knapsack problem here.
       ; This should be fine so long as the inventory is small.
-      (setv winnings
+      (setv winnings (list
         (kwc max :key total
         (filt (<= (total it) (/ gross 2))
         (concat
         (amap (list (combinations winnings it))
-        (range (inc (len winnings))))))))
+        (range (inc (len winnings)))))))))
       (setv gross (total winnings)))
+    (kwc .sort winnings :key (λ (- it.price)))
+    (add-current-game-to-scores "/tmp/scores.json" winnings gross)
     (msg "Game over. Your total winnings are ${}. Hit \"!\" to quit." gross)
     (full-redraw)
     (hit-key-to-continue "!")

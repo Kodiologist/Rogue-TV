@@ -32,4 +32,5 @@ roguetv.display
 roguetv.actions
 roguetv.creature.player
 roguetv.saves
+roguetv.scores
 roguetv.main

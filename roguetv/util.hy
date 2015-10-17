@@ -3,9 +3,15 @@
 (import
   [math [log sqrt exp ceil]]
   random
+  datetime
   [heidegger.pos [Pos]]
-  [kodhy.util [signum seq keyword->str]]
+  [kodhy.util [signum seq keyword->str cat]]
   [roguetv.globals :as G])
+
+(defn real-timestamp []
+  ; "Real" in the sense that this uses real time, not the game's
+  ; simulated time.
+  (.isoformat (datetime.datetime.utcnow)))
 
 (defn chance [x]
   (<= (random.random) x))
@@ -42,6 +48,17 @@
 (defn minsec [x]
   (setv x (long (ceil (/ x G.clock-factor))))
   (.format "{}:{:02}" (// x 60) (% x 60)))
+
+(defn hour-min-sec-elapsed [x]
+  (//= x G.clock-factor)
+  (setv h (// x (* 60 60)))
+  (%= x (* 60 60))
+  (setv mins (// x 60))
+  (%= mins 60)
+  (kwc cat :sep " "
+    (when h    (.format "{} h"   h))
+    (when mins (.format "{} min" mins))
+    (when x    (.format "{} s"   x))))
 
 (defn show-round [number ndigits]
   (setv x (round number ndigits))

@@ -8,6 +8,8 @@
   [roguetv.globals :as G])
 
 (defn get-color [fg &optional bg]
+  (when (none? fg)
+    (setv fg G.fg-color))
   (when (none? bg)
     (setv bg (G.pick-bg-color fg)))
   (curses.color-pair (try

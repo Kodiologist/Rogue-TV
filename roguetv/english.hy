@@ -177,3 +177,6 @@
 
   [__format__ (fn [self formatstr]
     (.escape self (.__format__ self.name formatstr)))]])
+
+(defn english-list [l]
+  (.join -inflect l))

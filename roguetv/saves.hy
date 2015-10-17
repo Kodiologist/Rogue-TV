@@ -2,11 +2,11 @@
 
 (import
   random
-  [datetime [datetime]]
   gzip
   jsonpickle
   [kodhy.util [concat]]
   [roguetv.globals :as G]
+  [roguetv.util [*]]
   [roguetv.types [MapObject Scheduled]]
   [roguetv.map [Tile mset]]
   [roguetv.fov [init-fov-map]]
@@ -19,7 +19,7 @@
 
   (setv (get x "random_state") (random.getstate))
 
-  (setv (get G.dates "saved") (.isoformat (datetime.utcnow)))
+  (setv (get G.dates "saved") (real-timestamp))
   (setv (get x "G") (dict (amap
     (, it (getattr G it))
     G.globals-to-save)))
@@ -69,4 +69,4 @@
 
   (random.setstate (get x "random_state"))
 
-  (setv (get G.dates "loaded") (.isoformat (datetime.utcnow))))
+  (setv (get G.dates "loaded") (real-timestamp)))
