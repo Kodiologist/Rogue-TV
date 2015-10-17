@@ -61,6 +61,9 @@
     (setv p.scores (os.path.join (default-dir) "scores.json")))
 
   (unless p.pronouns
+    (when p.name
+      (print "You set --name, so you probably want to set --pronouns, too.")
+      (exit))
     (setv p.pronouns (random.choice ["he" "she"])))
   (setv p.gender (get pronouns->genders p.pronouns))
 
