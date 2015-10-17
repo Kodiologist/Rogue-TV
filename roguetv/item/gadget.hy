@@ -330,11 +330,12 @@
     (.identify item)
     (msg "You have:  {}" (item.invstr)))))
 
-(def-itemtype Gadget "shredder" :name "paper shredder"
+(def-itemtype Gadget "food-proc" :name "food processor"
   :color-fg :brown
   :price-adj :bad-flavor
   :level-lo 3
-  :info-flavor "Tired of paper shredders that jam, turn off, or spontaneously combust when asked to cope with a slightly thicker piece of paper than usual? This super-durable model will tear up just about anything and keep on chugging."
+  :info-flavor "It slices! It dices! This advanced model runs on batteries and can julienne just about anything."
+    ; The Popeil Veg-O-Matic.
   :max-charges 3
 
   :info-apply "Permanently destroys an item."
@@ -344,7 +345,7 @@
 
     (.use-time-and-charge self)
     (if (.delete item)
-      (msg "{:Your} {:v:is} shred to bits." item item)
+      (msg "{:Your} {:v:is} sliced and diced to bits." item item)
       (msg "Miraculously, {:the} {:v:jams} on {:your}, leaving {:him} unharmed." self self item item)))))
 
 (def-itemtype Gadget "gps" :name "GPS device"
