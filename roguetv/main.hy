@@ -6,7 +6,7 @@
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
-  [kodhy.util [retf concat]]
+  [kodhy.util [ret concat]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -34,7 +34,7 @@
 
   (setv (get G.dates "started") (real-timestamp)))
 
-(defn main-loop []
+(defn main-loop [&optional special]
 
   (unless (in "ESCDELAY" os.environ)
     (setv (get os.environ "ESCDELAY") "10"))
@@ -52,6 +52,12 @@
     (G.T.bkgd (ord " ") (default-color)) ; Set the background color.
 
     (setv G.screen-mode :normal)
+
+    (when special
+      (kwc show-scores G.scores-file-path :show-all (ecase special
+        [:show-scores False]
+        [:show-all-scores True]))
+      (ret :just-showing-scores))
 
     (unless (get G.dates "loaded")
       (unless G.debug

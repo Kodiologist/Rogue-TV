@@ -16,6 +16,10 @@
 (setv G.autosave (not p.no-autosave))
 (setv G.debug p.debug)
 
+(when (or p.show-scores p.show-all-scores)
+  (roguetv.main.main-loop (if p.show-all-scores :show-all-scores :show-scores))
+  (exit))
+
 (if (os.path.exists p.save)
   (do
     (import roguetv.saves)

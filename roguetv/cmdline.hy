@@ -36,6 +36,12 @@
   ["scores" :type uni
     :metavar "FILEPATH"
     :help "where to store scores"]
+  ["show-scores"
+    :help "instead of starting a game, show scores"
+    :action "store_true"]
+  ["show-all-scores"
+    :help "like --show-scores, but show every game"
+    :action "store_true"]
   ["debug"
     :help "enable debug mode"
     :action "store_true"]])
