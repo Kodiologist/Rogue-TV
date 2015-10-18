@@ -1,5 +1,10 @@
 Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It draws inspiration from `Smash TV`_, `Weekend Warrior`_, MXC_, `Legends of the Hidden Temple`_, `Mazeworld Catacombs`_, `Scarab of RA`_, NetHack_, and, of course, Rogue_. It's written in Hy_ with Python 2.7.
 
+.. figure:: http://i.imgur.com/vcPgIAK.png
+  :alt: Screenshot of an ASCII roguelike
+
+  Running in GNOME Terminal on Linux.
+
 Currently, the game is playable, but a lot of features remain to be implemented.
 
 Dependencies include Hy_ (0.10.1, and no later), Kodhy_, and Heidegger_. Currently, curses is also a requirement. (All dependencies not already included with Python are in pure Python or Hy.) You can download the game and its dependencies as a self-contained bundle at http://arfer.net/downloads/roguetv-posix.tar.gz . The bundle has been tested on Linux, Mac OS X, and Windows (via Cygwin_), and should also work in other Unix-like environments. I will probably provide a self-contained Windows port eventually.
