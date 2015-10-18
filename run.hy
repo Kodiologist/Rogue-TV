@@ -2,6 +2,8 @@
 
 ;(import sys) (setv sys.path ["." "/usr/lib/python2.7" "/usr/lib/python2.7/lib-dynload"])
 
+(require kodhy.macros)
+
 (import
   os
   os.path
@@ -28,7 +30,7 @@
   (do
     (roguetv.main.new-game p)))
 
-(when (or (os.path.exists "roguetv_init.hy") (os.path.exists "roguetv_init.py"))
+(when (afind-or (os.path.exists (+ "roguetv_init." it)) (qw hy py pyc))
   (import roguetv-init))
 
 (setv exit-reason (roguetv.main.main-loop))
