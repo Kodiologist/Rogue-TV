@@ -15,8 +15,8 @@
   (try
     (with [[o (open path "rb")]]
       (setv scores (get (json.load o) "scores")))
-    (catch [e OSError]
-      (unless (= e.errno errno.EEXIST)
+    (catch [e IOError]
+      (unless (= e.errno errno.ENOENT)
         (raise))
       (setv scores [])))
   scores)
