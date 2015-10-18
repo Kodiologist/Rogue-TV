@@ -21,16 +21,6 @@ In the status bar, the number in parenthesis next to the time remaining is the a
 
 The object of the game is to maximize your winnings. Your winnings are the sum of the monetary values of the items you're carrying. More broadly, the goal is to maximize your *average* winnings across many games of Rogue TV. If you take an up elevator, or you win the game (by taking the final down elevator with the Amulet of Yendor), you get to keep all your winnings. But if you run out of time or resign, prizes are taken away from you until you have half your original winnings or less. So, it's sometimes wiser to take an up elevator than to press your luck in pursuit of the Amulet.
 
-License
-============================================================
-
-This program is copyright 2015 Kodi Arfer.
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the `GNU General Public License`_ for more details.
-
-.. _`GNU General Public License`: http://www.gnu.org/licenses/
 .. _Hy: http://hylang.org
 .. _Kodhy: https://github.com/Kodiologist/Kodhy
 .. _Heidegger: https://github.com/Kodiologist/Heidegger
