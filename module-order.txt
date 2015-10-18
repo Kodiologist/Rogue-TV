@@ -9,6 +9,7 @@ kodhy.util
 roguetv.macros
 roguetv.strings
 roguetv.english
+roguetv.xterm_colors
 roguetv.globals
 roguetv.util
 roguetv.cmdline

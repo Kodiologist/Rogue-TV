@@ -5,7 +5,8 @@
   xml.etree.ElementTree
   curses
   [kodhy.util [str->keyword keyword->str]]
-  [roguetv.globals :as G])
+  [roguetv.globals :as G]
+  roguetv.xterm-colors)
 
 (defn get-color [fg &optional bg]
   (when (none? fg)
@@ -16,6 +17,15 @@
     (get G.color-pairs (, fg bg))
     (catch [_ KeyError]
       ; This color pair hasn't been initialized yet. So do that.
+      ; First ensure each color is defined correctly to have its
+      ; usual value under xterm.
+      (when (curses.can-change-color)
+        (for [c [fg bg]]
+          (setv cn (get G.color-numbers c))
+          (apply curses.init-color (+ [cn] (amap
+            (int (* it (/ 1000 256)))
+            (get roguetv.xterm-colors.table cn))))))
+      ; Now create the color pair.
       (setv i (+ 2 (len G.color-pairs)))
       (curses.init-pair i (get G.color-numbers fg) (get G.color-numbers bg))
       (setv (get G.color-pairs (, fg bg)) i)
