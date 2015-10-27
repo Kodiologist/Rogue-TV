@@ -16,4 +16,4 @@ fi
 
 export ROGUETV_BUNDLE_INFO="$(cat VERSION)"
 cd lib
-"$PYTHON_CMD" run.pyc "$@"
+exec "$PYTHON_CMD" run.pyc "$@"
