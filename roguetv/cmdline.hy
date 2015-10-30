@@ -105,10 +105,13 @@
   p)
 
 (defn default-dir []
-  (setv d (appdirs.user-data-dir "Rogue TV" "Kodiologist"))
-  (try
-    (os.makedirs d)
-    (catch [e OSError]
-      (unless (= e.errno errno.EEXIST)
-        (raise))))
-  d)
+  (if (= G.bundle-os "windows")
+    ".." ; This should be the bundle directory.
+    (do
+      (setv d (appdirs.user-data-dir "Rogue TV" "Kodiologist"))
+      (try
+        (os.makedirs d)
+        (catch [e OSError]
+          (unless (= e.errno errno.EEXIST)
+            (raise))))
+      d)))

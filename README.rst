@@ -7,9 +7,18 @@ Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguel
 
 Currently, the game is playable, but a lot of features remain to be implemented.
 
-Dependencies include Hy_ (0.10.1, and no later), Kodhy_, and Heidegger_. Currently, curses is also a requirement. (All dependencies not already included with Python are in pure Python or Hy.) You can download the game and its dependencies as a self-contained bundle at http://arfer.net/downloads/roguetv-posix.tar.gz . The bundle has been tested on Linux, Mac OS X, and Windows (via Cygwin_), and should also work in other Unix-like environments. I will probably provide a self-contained Windows port eventually.
+Dependencies include Hy_ (0.10.1, and no later), Kodhy_, Heidegger_, and curses. (All dependencies not already included with Python are in pure Python or Hy.) You can download the game and its dependencies as a self-contained bundle for `Unix-likes (POSIX-compliant systems)`_ or Windows_. The POSIX bundle has been tested with Linux and Mac OS X, as well as Windows with Cygwin_ and Cygwin's Python installed. The Windows bundle includes a subset of Cygwin and Python so you don't have to install these first.
 
-Start the game with ``sh run.sh`` (if you're using the bundle) or ``hy run.hy`` (if you're using the source code). Use the ``--help`` argument to see command-line options. Currently, the game requires a terminal emulator that supports 256 colors and Unicode, such as GNOME Terminal, Konsole, LXTerminal, or Terminal.app. It works fine over SSH or in screen or tmux.
+.. _Unix-likes (POSIX-compliant systems): http://arfer.net/downloads/roguetv-posix.tar.gz
+.. _Windows: http://arfer.net/downloads/roguetv-windows.tar.gz
+
+To start the game:
+
+- From the POSIX bundle, type ``sh run.sh``.
+- From the Windows bundle, double-click ``run.bat`` (its name may appear as ``run`` if you have file extensions hidden) to get a command window, then type ``sh run.sh`` and hit Enter.
+- From the source code, type ``hy run.hy``.
+
+Use the ``--help`` argument to see command-line options. The game requires a terminal emulator that supports 256 colors and Unicode, such as GNOME Terminal, Konsole, LXTerminal, Terminal.app, or Mintty. It works fine over SSH or in screen or tmux.
 
 Please `send me`__ bug reports and patches. Feature suggestions are also welcome, but I've got a lot planned already.
 
