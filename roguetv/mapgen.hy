@@ -11,7 +11,7 @@
   [roguetv.map [*]]
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item Curse]]
-  [roguetv.creature [Creature]]
+  [roguetv.creature [Creature Effect]]
   [roguetv.creature.monster [Snail Spider Nymph Dog Cat]])
 
 (defn reset-level []
@@ -41,6 +41,10 @@
         True]
       [(player? x)
         True]
+      [(instance? Effect x)
+        ; Effects only apply to the player, so they're going
+        ; with the player.
+        True]
       [(instance? Creature x)
         False]
       [(instance? Tile x)
@@ -50,7 +54,7 @@
       [(instance? Curse x)
         (in x.host-item G.inventory)]
       [True
-        (raise (ValueError (.format "Weird thing in Schedule.queue: {!r}" it)))]))
+        (raise (ValueError (.format "Weird thing in Schedule.queue: {!r}" x)))]))
     (unless keep
       (.destroy x)))
   (init-fov-map Tile.omap)
