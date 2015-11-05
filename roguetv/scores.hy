@@ -109,7 +109,7 @@
       "0")
     ["started" "ended"]))
   (.join "\n" [
-    (.format "{} ({})"
+    (.format "<b>{}</b> ({})"
       (kwc color-xml (ucfirst (get x "name"))
         :bg (when (and latest (= x latest)) :yellow))
       (if (= d1 d2)
