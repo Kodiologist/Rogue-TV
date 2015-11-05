@@ -93,7 +93,7 @@
         (amap (list (combinations winnings it))
         (range (inc (len winnings)))))))))
       (setv gross (total winnings)))
-    (kwc .sort winnings :key (λ (- it.price)))
+    (kwc .sort winnings :key (λ (, (- it.price) it.tid)))
     (add-current-game-to-scores G.scores-file-path winnings gross)
     (msg "Game over. Your total winnings are ${}. Hit \"!\" to quit." gross)
     (full-redraw)
