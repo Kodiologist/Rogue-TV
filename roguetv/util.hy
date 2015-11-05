@@ -54,7 +54,7 @@
   (setv h (// x (* 60 60)))
   (%= x (* 60 60))
   (setv mins (// x 60))
-  (%= mins 60)
+  (%= x 60)
   (kwc cat :sep " "
     (when h    (.format "{} h"   h))
     (when mins (.format "{} min" mins))
