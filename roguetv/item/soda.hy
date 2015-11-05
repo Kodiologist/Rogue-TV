@@ -112,7 +112,7 @@
   :color-fg :black
   :price-adj :bad-flavor
   :level-hi 5
-  :info-flavor "This is a generous portion of the most popular recreational drug in history, possibly excepting caffeine. Did you know that in 2012, about 3 million deaths (6% of all deaths worldwide) were attributable to alcoholic beverages? Seriously, folks, if you must drink, drink responsibly. Anyway, back to your regularly scheduled dumb jokes."
+  :info-flavor "This is a generous portion of the most popular recreational drug in history, possibly excepting caffeine. Did you know that in 2012, about 3 million deaths (6% of all deaths worldwide) were attributable to alcoholic beverages? Seriously, folks, if you must drink, be very careful about how much you drink and what you do while intoxicated. Anyway, back to your regularly scheduled dumb jokes."
     ; World Health Organization. (2014). Global status report on alcohol and health 2014. Retrieved from http://www.who.int/substance_abuse/publications/global_alcohol_report
   :confusion-time 45
 
