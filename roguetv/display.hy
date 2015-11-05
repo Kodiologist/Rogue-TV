@@ -1,6 +1,7 @@
 (require kodhy.macros)
 
 (import
+  [math [ceil]]
   textwrap
   curses
   [heidegger.pos [Pos]]
@@ -54,6 +55,8 @@
     [True
       (+ (- tx (// G.screen-width 2)) focus-px)]))
 (defn ty->py [ty focus-py]
+  (-= focus-py (int (ceil (/ G.bottom-border 2))))
+    ; Adjust the focus so the player usually appears centered.
   (setv bottom (- focus-py (// G.screen-height 2)))
   (setv top (+ focus-py (// G.screen-height 2)))
   (cond
