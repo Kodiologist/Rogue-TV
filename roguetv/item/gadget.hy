@@ -359,10 +359,16 @@
   :gadget-effect (fn [self unid]
 
     (.use-time-and-charge self)
+    (setv did-something False)
     (for [p (disc-taxi G.player.pos self.gps-range)]
-      (setv (get G.seen-map p.x p.y) True))
-    (soil-fov)
-    (msg "{:The} reveals part of the dungeon around you." self)))
+      (unless (seen p)
+        (setv did-something True)
+        (setv (get G.seen-map p.x p.y) True)))
+    (when did-something
+      (soil-fov))
+    (if did-something
+      (msg "{:The} reveals part of the dungeon around you." self)
+      (msg "{:The} reminds you of what you already know." self))))
 
 (setv (get ItemAppearance.registry Gadget) (amap
   (ItemAppearance (NounPhrase (+ it " gadget")))
