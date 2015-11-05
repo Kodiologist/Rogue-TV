@@ -341,7 +341,7 @@
   :info-apply "Permanently destroys an item."
   :gadget-effect (fn [self unid] (block
 
-    (setv item (or (get-other-item self unid "shred") (ret)))
+    (setv item (or (get-other-item self unid "pulverize") (ret)))
 
     (.use-time-and-charge self)
     (if (.delete item)
