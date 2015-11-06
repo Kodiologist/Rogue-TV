@@ -270,7 +270,7 @@
   remove-curse (meth []
     (setv @host-item.curse None)
     (when (in @host-item G.inventory)
-      (msg "The curse on {:your} fades." @host-item))
+      (msg :tara "{p:}, the curse on {:your} has faded." @host-item))
     (@deschedule))
 
   act (meth []
