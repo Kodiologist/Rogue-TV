@@ -12,7 +12,7 @@
 (defn user-confirms []
   (msg "(Hit \"!\" to confirm or any other key to cancel.)")
   (rtv display.full-redraw)
-  (setv G.last-new-message-number (dec (len G.message-log)))
+  (update-msg-highlighting)
   (= (G.T.getkey) "!"))
 
 (defn hit-key-to-continue [keys]
@@ -58,7 +58,7 @@
 (defn input-direction [] (block
   (msg "In what direction?")
   (rtv display.full-redraw)
-  (setv G.last-new-message-number (dec (len G.message-log)))
+  (update-msg-highlighting)
   (while True
     (setv key (G.T.getkey))
     (when (in key direction-keys)

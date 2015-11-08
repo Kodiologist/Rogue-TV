@@ -125,13 +125,18 @@
     (G.T.erase))
   (setv height (if fullscreen G.screen-height G.message-lines))
   (setv lines (concat
-    (lc [[mn text-xml] (slice G.message-log (- height))]
-      (amap (, mn it)
-        (.wrap (AttrStr.from-xml text-xml) G.screen-width)))))
+    (lc [[mn [count text-xml]] (slice (list (enumerate G.message-log)) (- height))]
+      (amap (, mn count it) (.wrap
+        (AttrStr.from-xml (cat text-xml (when (> count 1)
+          (.format " [× {}]" count))))
+        G.screen-width)))))
   (setv lines (slice lines (- height)))
-  (for [[i [mn astr]] (enumerate lines)]
+  (for [[i [mn count astr]] (enumerate lines)]
     (G.T.move (+ i (- G.screen-height height)) 0)
-    (.draw astr (if (> mn G.last-new-message-number)
+    (.draw astr (if (or
+        (> mn G.last-new-message-number)
+        (and (= mn G.last-new-message-number)
+          (> count G.last-message-count)))
       G.new-msg-highlight
       0))))
 

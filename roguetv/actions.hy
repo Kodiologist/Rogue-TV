@@ -18,7 +18,7 @@
 
 (defn do-normal-command [inp]
 
-  (setv G.last-new-message-number (dec (len G.message-log)))
+  (update-msg-highlighting)
 
   (setv cmd (if (coll? inp) (first inp) inp))
   (setv arg (when (coll? inp) (second inp)))

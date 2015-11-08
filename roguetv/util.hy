@@ -133,13 +133,23 @@
         (get {:tara "Tara:" :bob "Bob:" :aud "The audience"} mtype)
         (get G.announcer-colors mtype))
       (get args 0))))
-  (.append G.message-log (,
-    (len G.message-log)
-    (apply .format args {"p" G.player}))))
+  (setv text
+    (apply .format args {"p" G.player}))
+  (if (and G.message-log (= (get G.message-log -1 1) text))
+    (+= (get G.message-log -1 0) 1)
+    (.append G.message-log [1 text])))
 
 (defn msgp [cr &rest args]
   (when (player? cr)
     (apply msg args)))
+
+(defn update-msg-highlighting []
+  ; This saves the number of the last message and its repeat
+  ; count. When more messages are printed, we'll highlight them
+  ; if they're new messages or if the last message had its count
+  ; increased.
+  (setv G.last-new-message-number (dec (len G.message-log)))
+  (setv G.last-message-count (get G.message-log -1 0)))
 
 (defn color-xml [text &optional fg bg]
 ; Formats a colored string for AttrStr. (It should already be

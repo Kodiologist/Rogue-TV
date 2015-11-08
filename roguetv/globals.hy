@@ -102,8 +102,9 @@
 (def screen-height None)
 (def color-pairs {})
 (def locale-encoding None)
-(defs message-log [])
+(defs message-log []) ; List of (count, text) tuples.
 (defs last-new-message-number -1)
+(defs last-message-count 0)
 
 (def screen-mode None)
 
