@@ -229,7 +229,7 @@
   get-item (meth [item]
     (setv @item item)
     (setv (get @interested-in-item-till item) (+ G.current-time
-      (randexp (/ (dl-time-limit G.dungeon-level) 3)))))
+      (int (randexp (/ (dl-time-limit G.dungeon-level) 3))))))
 
   item-attractive? (meth [item]
     (or
