@@ -220,7 +220,7 @@
       (msgp cr "You effortlessly kick the door open.")
       (do
         (msgp cr "You open the old door after a struggle.")
-        (cr.take-time open-time)))
+        (.take-time cr open-time)))
     (mset self.pos (OpenDoor open-time))
     False))]])
 
@@ -268,7 +268,7 @@
 
   [step-out-of (fn [self cr p-to]
     (unless (or cr.flying cr.slime-immune)
-      (cr.take-time (randint (.min-exit-time self) (.max-exit-time self)))))]])
+      (.take-time cr (randint (.min-exit-time self) (.max-exit-time self)))))]])
 
 (defclass Web [Tile HasExitTime] [
   [name (NounPhrase "spiderweb")]
@@ -287,7 +287,7 @@
 
   [step-out-of (fn [self cr p-to]
     (unless cr.web-immune
-      (cr.take-time (randint (.min-exit-time self) (.max-exit-time self)))))]])
+      (.take-time cr (randint (.min-exit-time self) (.max-exit-time self)))))]])
 
 (defclass Ice [Tile] [
   [name (kwc NounPhrase "patch of ice"
