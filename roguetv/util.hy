@@ -115,7 +115,19 @@
   out)
 
 (defn dl-time-limit [dl]
-  (seconds (* 60 (+ 3 (/ dl 2)))))
+  (* 60 (+ 3 (/ dl 2))))
+(defn dl-time-limit-cu [dl]
+  ; "cu" stands for "clock units".
+  (seconds (dl-time-limit dl)))
+
+(defn randexp-dl-div-cu [divisor]
+  (int (randexp (/ (dl-time-limit-cu G.dungeon-level) divisor))))
+(defn randexp-dl-div-s [divisor]
+  ; Notice that, unlike dl-time-limit, this returns only whole
+  ; seconds (but still in floating point). The intended use is to
+  ; keep extraneous sig figs out of durations that the player can
+  ; see.
+  (round (randexp (/ (dl-time-limit G.dungeon-level) divisor))))
 
 (defn player? [cr]
   (is cr G.player))

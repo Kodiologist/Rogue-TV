@@ -251,6 +251,20 @@
         (mset self.pos (ClosedDoor))
         (.deschedule self))))]])
 
+(defcls Chest [Tile]
+  name (NounPhrase "chest")
+  char "■"
+  color-fg :brown
+  info-text "something"
+
+  open-time (meth []
+    (+ 3 (randexp-dl-div-s 20)))
+
+  use-tile (meth [cr]
+    (msgp cr "With difficulty, you break the chest's lock.")
+    (.take-time cr (@open-time))
+    (mset self.pos (Floor))))
+
 (defclass HasExitTime [object] [
 
   [min-exit-time (fn [self] 1)]

@@ -259,7 +259,7 @@
 
 (defcls Curse [Scheduled]
   curse-fade-time (meth []
-    (randexp (dl-time-limit G.dungeon-level)))
+    (randexp-dl-div-cu 1))
 
   __init__ (meth [host-item]
     (set-self host-item)
