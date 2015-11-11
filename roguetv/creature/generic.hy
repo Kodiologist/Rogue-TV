@@ -45,6 +45,9 @@
     (when (or (not t.container) (.can-see-contents self t))
       (or (Item.at p) 0)))]
 
+  [gettable-item-at (fn [self p]
+    (and (not (. (Tile.at p) container)) (Item.at p)))]
+
   [information (fn [self]
     (.format "\n  {} {:a}\n\n{}"
       (.xml-symbol self)
