@@ -144,7 +144,7 @@
 
 (defcls Generated [object]
   level-lo 0
-  level-hi G.max-dungeon-level
+  level-hi None
   rarity :common
   unique False
 
@@ -156,15 +156,21 @@
       (.append G.uniques-generated tname))
     None)
 
-  generation-weight (cmeth [dl]
+  generation-weight (cmeth [dl &optional [in-chest False]]
+    (when in-chest
+      ; Chests generate deeper items.
+      (+= dl 3))
     (if (or (= @rarity :nongen) (and @unique (in @__name__ G.uniques-generated)))
       0
       (*
         (/ 1 (ecase @rarity
-          [:common    1]
-          [:uncommon  4]
-          [:rare     16]))
+          ; Chests make uncommon and rare items more common.
+          [:common   1]
+          [:uncommon (if in-chest 2  4)]
+          [:rare     (if in-chest 8 16)]))
         (/ 1 (cond
-          [(< dl @level-lo) (inc (- @level-lo dl))]
-          [(> dl @level-hi) (inc (- dl @level-hi))]
+          [(< dl @level-lo)
+            (inc (- @level-lo dl))]
+          [(and (not (none? @level-hi)) (> dl @level-hi))
+            (inc (- dl @level-hi))]
           [True 1]))))))

@@ -7,14 +7,19 @@
   [roguetv.util [*]]
   roguetv.item
     ; To ensure G.itypes is filled.
-  [roguetv.mapgen [Obstacle]])
+  [roguetv.mapgen [Obstacle]]
+  [kodhy.util [shift weighted-choice]])
 
-(setv [_ mode dl] sys.argv)
+(shift sys.argv)
+(setv mode (shift sys.argv))
+(setv dl (shift sys.argv))
+(setv chest? (and sys.argv (shift sys.argv)))
+
 (setv dl (int dl))
 
 (for [round [0 1]]
   (setv l (kwc sorted :+reverse
-    (amap (, (it.generation-weight dl) it)
+    (amap (, (it.generation-weight dl chest?) it)
     (filt (!= it.rarity :nongen)
     (get [Obstacle.types (.values G.itypes)] round)))))
   (cond
