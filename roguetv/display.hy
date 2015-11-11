@@ -88,7 +88,7 @@
           ; Seen by the player.
           (echo-drawable (let [[p (Pos px py)]] (or
             (Creature.at p)
-            (Item.at p)
+            (.visible-item-at G.player p)
             (Tile.at p))))]
         [True
           ; Unseen.
@@ -214,8 +214,11 @@
     "At cursor: (press a key to examine)"
     (or dunno (whenn (Creature.at p)
       (.format "  {} {} {:a}" (get look-at-keys :creature) (.xml-symbol it) it)))
-    (or dunno (whenn (Item.at p)
-      (.format "  {} {} {:a:full}" (get look-at-keys :item) (.xml-symbol it) it)))
+    (or dunno
+      (when (none? (.visible-item-at G.player p))
+        "    ? can't tell")
+      (whenn (Item.at p)
+        (.format "  {} {} {:a:full}" (get look-at-keys :item) (.xml-symbol it) it)))
     (or dunno
       (.format "  {} {} {:a}" (get look-at-keys :tile) (.xml-symbol (Tile.at p)) (Tile.at p)))])
   (setv lines (amap (AttrStr.from-xml (or it "      ---")) lines))
@@ -228,7 +231,7 @@
 (defn describe-tile [pos &optional verbose]
   (setv tile (Tile.at pos))
   (cond
-    [(Item.at pos) (do
+    [(.visible-item-at G.player pos) (do
       (msg "You see here {} {:a:full}." (.xml-symbol (Item.at pos)) (Item.at pos))
       (unless (instance? Floor tile)
         ; This triggers even when 'verbose' is false because

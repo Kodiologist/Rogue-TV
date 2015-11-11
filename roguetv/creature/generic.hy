@@ -6,7 +6,8 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject Scheduled]]
-  [roguetv.map [Tile on-map mget room-for? circ-taxi]])
+  [roguetv.map [Tile on-map mget room-for? circ-taxi]]
+  [roguetv.item [Item]])
 
 (defclass Creature [Drawable MapObject Scheduled NounPhraseNamed] [
   [escape-xml-in-np-format True]
@@ -31,6 +32,18 @@
 
   [ice-immune (fn [self]
     False)]
+
+  [can-see-contents (fn [self container-tile]
+    (not container-tile.opaque-container))]
+
+  [visible-item-at (fn [self p]
+    ; Returns 0 for being able to see there's no item, and None
+    ; if the creature can't see whether there is one or not.
+    ; N.B. This does *not* check whether the creature can see the
+    ; tile in the first place.
+    (setv t (Tile.at p))
+    (when (or (not t.container) (.can-see-contents self t))
+      (or (Item.at p) 0)))]
 
   [information (fn [self]
     (.format "\n  {} {:a}\n\n{}"

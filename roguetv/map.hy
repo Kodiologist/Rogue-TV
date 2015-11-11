@@ -18,6 +18,11 @@
     ; `unpleasant` is a flag meaning that monsters tend not to
     ; want to be on this kind of tile.
   [smooth False]
+  [container False]
+    ; Whether the tile prevents items from being added to or
+    ; removed from it.
+  [opaque-container False]
+    ; Whether the player can see what item is on the tile.
 
   [information (fn [self]
     (.format "\n  {} {:a}\n\n{}"
@@ -256,14 +261,27 @@
   char "■"
   color-fg :brown
   info-text "something"
+  container True
+  opaque-container True
 
   open-time (meth []
     (+ 3 (randexp-dl-div-s 20)))
 
   use-tile (meth [cr]
-    (msgp cr "With difficulty, you break the chest's lock.")
+    (msgp cr "With difficulty, you open the chest.")
     (.take-time cr (@open-time))
-    (mset self.pos (Floor))))
+    (setv p self.pos)
+    (mset p (Floor))
+    (when (player? cr)
+      (if (.at (rtv-get item.Item) p)
+        (rtv display.describe-tile p)
+        (msg "The chest was empty.")))))
+
+(defcls GlassChest [Chest]
+  name (NounPhrase "glass chest")
+  char "□"
+  info-text "something2"
+  opaque-container False)
 
 (defclass HasExitTime [object] [
 

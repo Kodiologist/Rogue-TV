@@ -260,7 +260,7 @@
           (find-path @pos it @detect-item-range))
         (filter (fn [p] (and
           (or
-            (whenn (Item.at p) (@item-attractive? it))
+            (whenn (@visible-item-at p) (@item-attractive? it))
             (and (= p G.player.pos) (not (@player-repulsive?))
               (afind-or (@item-attractive? it) G.inventory)))
           (in-los? @pos p)))

@@ -76,9 +76,16 @@
       (text-screen (.information (get G.inventory i))))]
 
     [(= cmd :pick-up) (do
+      (setv t (Tile.at G.player.pos))
+      (when (and t.container (not (.can-see-contents G.player t)))
+        (msg "{:The} {:v:is} closed. You can't even see if there's anything in {:him}." t t t)
+        (ret))
       (setv item (Item.at G.player.pos))
       (when (nil? item)
         (msg "There's nothing here to pick up.")
+        (ret))
+      (when t.container
+        (msg "{:The} {:v:is} inside {:the}, which {:v:is} closed." item item t t)
         (ret))
       (when (= (len G.inventory) G.inventory-limit)
         (msg :tara "{p:The} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."

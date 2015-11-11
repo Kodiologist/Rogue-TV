@@ -170,10 +170,12 @@
           [(get look-at-keys :creature)
             (rtv-get creature.Creature)]
           [(get look-at-keys :item)
-            (rtv-get item.Item)]
+            (when (.visible-item-at G.player focus)
+              (rtv-get item.Item))]
           [(get look-at-keys :tile)
             (rtv-get map.Tile)]))
-        (when (and (mapobject-class.at focus)
+        (when (and mapobject-class
+            (mapobject-class.at focus)
             (get G.seen-map focus.x focus.y))
           (text-screen (.information (mapobject-class.at focus)))))]))
 

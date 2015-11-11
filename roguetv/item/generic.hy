@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [MapObject Generated Drawable Scheduled]]
-  [roguetv.map [room-for?]])
+  [roguetv.map [Tile room-for?]])
 
 (defclass Item [MapObject Generated Scheduled NounPhraseNamed Drawable] [
   [escape-xml-in-np-format True]
@@ -291,7 +291,7 @@
 
 (defn drop-pos [p]
   ; Try to find a position near 'p' to drop an item.
-  (afind-or (room-for? Item it) (+
+  (afind-or (and (room-for? Item it) (not (. (Tile.at it) container))) (+
     ; Try to drop at 'p'…
     [p]
     ; …or at a random orthogonal neigbor…
