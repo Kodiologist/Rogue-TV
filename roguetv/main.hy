@@ -94,11 +94,13 @@
         (range (inc (len winnings)))))))))
       (setv gross (total winnings)))
     (kwc .sort winnings :key (λ (, (- it.price) it.tid)))
-    (add-current-game-to-scores G.scores-file-path winnings gross)
+    (unless G.debug
+      (add-current-game-to-scores G.scores-file-path winnings gross))
     (msg "Game over. Your total winnings are ${}. Hit \"!\" to quit." gross)
     (full-redraw)
     (hit-key-to-continue "!")
-    (show-scores G.scores-file-path)
+    (unless G.debug
+      (show-scores G.scores-file-path))
     :game-over))))
 
   (when (= exit-reason :save-and-quit)
