@@ -128,12 +128,12 @@
   :color-fg :dark-blue
   :level-hi 6
   :info-flavor "This marvelous concoction will give you the strength of a raging bull!"
-  :strength-time (* 5 60)
+  :strength-minutes 3
 
-  :info-apply "Allows you to instantly open doors for five minutes."
+  :info-apply "Allows you to instantly open doors and chests for {strength_minutes} minutes."
   :soda-effect (fn [self]
 
-    (.add-to-player Strength self.strength-time
+    (.add-to-player Strength (* 60 self.strength-minutes)
       (fn [] (msg "You feel strong."))
       (fn [] (msg "You feel ready for more gainz.")))))
         ; Bodybuilding slang.

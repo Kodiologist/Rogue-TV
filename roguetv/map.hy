@@ -268,8 +268,11 @@
     (+ 3 (randexp-dl-div-s 20)))
 
   use-tile (meth [cr]
-    (msgp cr "With difficulty, you open the chest.")
-    (.take-time cr (@open-time))
+    (if (.get-effect cr (rtv-get creature.Strength))
+      (msgp cr "You effortlessly tear the lid off the chest.")
+      (do
+        (msgp cr "With difficulty, you open the chest.")
+        (.take-time cr (@open-time))))
     (@open-chest cr))
 
   open-chest (meth [cr]
