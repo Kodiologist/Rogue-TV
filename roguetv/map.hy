@@ -270,12 +270,16 @@
   use-tile (meth [cr]
     (msgp cr "With difficulty, you open the chest.")
     (.take-time cr (@open-time))
+    (@open-chest cr))
+
+  open-chest (meth [cr]
     (setv p self.pos)
     (mset p (Floor))
-    (when (player? cr)
-      (if (.at (rtv-get item.Item) p)
-        (rtv display.describe-tile p)
-        (msg "The chest was empty.")))))
+    (setv item (.at (rtv-get item.Item) p))
+    (if item
+      (msgp cr "You found {} {:a:full}." (.xml-symbol item) item)
+      (msgp cr "The chest was empty."))
+    item))
 
 (defcls GlassChest [Chest]
   name (NounPhrase "glass chest")

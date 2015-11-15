@@ -10,7 +10,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction inventory-loop]]
-  [roguetv.map [Tile Floor Door Wall Ice Web on-map room-for? mset mget ray-taxi disc-taxi]]
+  [roguetv.map [Tile Floor Wall Door Chest Ice Web on-map room-for? mset mget ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature]])
 
@@ -172,9 +172,10 @@
   :color-fg :yellow
   :level-hi 7
   :info-flavor "Just what you need to kickstart a lucrative career in lumberjacking after winning gobs of dosh on Rogue TV. Or you could sell it for an additional gob of dosh. Whatever; I don't judge."
-  :max-charges 10
+  :max-charges 8
+  :destroy-item-1in 3
 
-  :info-apply "Instantly destroys an adjacent door."
+  :info-apply "Instantly destroys an adjacent door or chest. But if a chest contains an item, the item has a 1 in {destroy_item_1in} chance of also being destroyed."
   :gadget-effect (fn [self unid] (block
 
     (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
@@ -186,6 +187,12 @@
       [(instance? Door t) (do
         (msg "Bzzt! The door is no more.")
         (mset p (Floor)))]
+      [(instance? Chest t) (do
+        (msg "Bzzt! You put the chest to rest.")
+        (whenn (.open-chest t G.player) (when (1-in self.destroy-item-1in)
+          (if (.delete it)
+            (msg "Oops! {:Your} destroyed {:him}." self it)
+            (msg "{:He} miraculously {:v:avoids} being destroyed by {:the}." it it self)))))]
       [(and (on-map p) (Creature.at p))
         (msg :bob "This is Rogue TV, not DoomRL!")]
       [True
