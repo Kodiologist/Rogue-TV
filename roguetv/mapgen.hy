@@ -178,9 +178,10 @@
             (ret)))))))
 
 (defobst O-EmptyChest [Obstacle]
- rarity :uncommon
- f (cmeth []
-   (mset (shift @free-floors) (Chest))))
+  level-lo 5
+  rarity :uncommon
+  f (cmeth []
+    (mset (shift @free-floors) (Chest))))
 
 (defcls MudlikeObstacle [Obstacle]
   max-cheb-radius None
