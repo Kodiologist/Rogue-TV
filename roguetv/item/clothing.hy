@@ -111,7 +111,7 @@
   :info-flavor "These are favored by fashion fanatics, but walking around in pants full of holes and tears may also make you look like a yokel."
 
   :curse-on-unbox True
-  :carry-gadget-malfunction-1in 20
+  :carry-gadget-malfunction-1in 3
   :info-carry "When you apply a gadget, there's a 1 in {carry_gadget_malfunction_1in} chance that nothing will happen, wasting a charge.")
 
 (def-itemtype Clothing "fur-coat" :name "fancy fur coat"
