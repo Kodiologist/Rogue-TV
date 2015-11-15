@@ -212,7 +212,6 @@
         (mset p (@make-tile)))))
 
 (defobst O-Slime [MudlikeObstacle]
-  level-lo 0
   max-cheb-radius (cmeth []
     (+ 2 (// @dl 4)))
   make-tile (cmeth [] (Slime)))
