@@ -37,7 +37,9 @@
         (.format "{} {:num:true}" (len g) (first g))))))
   (setv scores (get-scores path))
   (.append scores x)
-  (kwc .sort scores :key (λ (,
+  ; Sort the highest-scoring characters first, breaking ties with
+  ; newer characters first.
+  (kwc .sort scores :+reverse :key (λ (,
     (get it "gross")
     (get it "dates" "ended"))))
   (with [[o (open path "wb")]]
@@ -65,26 +67,26 @@
     (setv latest (kwc max scores :key (λ (get it "dates" "ended"))))
 
     (when (or (< (len scores) 3) show-all)
-      (for [character (reversed scores)]
+      (for [character scores]
         (out (show-character character latest)))
       (ret))
 
     (defn print-latest []
       (out "<b>• Last score</b> ({} quantile)" (no-leading-0
-        (kwc round :ndigits 3 (/ (inc (.index scores latest)) (len scores)))))
+        (kwc round :ndigits 3 (- 1 (/ (inc (.index scores latest)) (len scores))))))
       (out (show-character latest latest)))
     (setv printed-latest False)
 
     (setv low-quantile (/ (- 1 G.score-interval) 2))
     (setv high-quantile (- 1 low-quantile))
     (for [[text q f] [
-        ["High score" high-quantile ceil]
+        ["High score" high-quantile floor]
         ["Median score" .5 round]
-        ["Low score" low-quantile floor]]]
+        ["Low score" low-quantile ceil]]]
       (setv target-gross (get scores
-        (min (dec (len scores)) (int (f (* (len scores) q))))
+        (min (dec (len scores)) (int (f (* (len scores) (- 1 q)))))
         "gross"))
-      (setv character (get (filt (= (get it "gross") target-gross) scores) -1))
+      (setv character (afind (= (get it "gross") target-gross) scores))
       (when (and (not printed-latest) (> (get latest "gross") (get character "gross")))
         (print-latest)
         (setv printed-latest True))
