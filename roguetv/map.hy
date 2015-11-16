@@ -66,11 +66,12 @@
   [bump-into (fn [self cr] True)]])
 (setv LevelBoundary (LevelBoundary))
 
-(defn mset [pos tile &optional [fov-adjust True]]
-  (when (and fov-adjust (!= tile.blocks-sight (. (Tile.at pos) blocks-sight)))
-    (soil-fov))
-  (whenn (Tile.at pos)
-    (.destroy it))
+(defn mset [pos tile &optional [initializing-map False]]
+  (unless initializing-map
+    (setv old-tile (Tile.at pos))
+    (when (!= tile.blocks-sight old-tile.blocks-sight)
+      (soil-fov))
+    (.destroy old-tile))
   (kwc .move tile pos :+clobber))
 
 (defn mget [pos]

@@ -74,9 +74,9 @@
     (lc [[k v] (.items tile-save-shorthand)] (, v k))))
   (for [[yt row] (enumerate (reversed (get x "map")))]
     (for [[xt t] (enumerate row)]
-      (if (string? t)
-        ((get inverted-tile-save-shorthand t) (Pos xt yt))
-        (mset (Pos xt yt) t False))))
+      (mset (Pos xt yt)
+        (if (string? t) ((get inverted-tile-save-shorthand t)) t)
+        True)))
   (for [o (+ (get x "omaps" "Item") (get x "omaps" "Creature"))]
     (MapObject.__init__ o o.pos))
   (setv Scheduled.queue (get x "Scheduled.queue"))

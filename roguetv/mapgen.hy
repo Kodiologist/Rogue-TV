@@ -80,7 +80,7 @@
       (setv floor? (not (get dugout "map" (inc x) (inc y))))
       (when floor?
         (.append free-floors p))
-      (mset p (if floor? (Floor) (Wall)) False)))
+      (mset p (if floor? (Floor) (Wall)) True)))
   (setv free-floors (shuffle free-floors))
 
   ; Add elevators.
