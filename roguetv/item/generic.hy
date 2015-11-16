@@ -242,8 +242,8 @@
   ; A dictionary mapping subclasses of Item to lists of eligible
   ; appearances.
 
-  [__init__ (fn [self name &optional color-fg]
-    (set-self name color-fg)
+  [__init__ (fn [self name]
+    (set-self name)
     (setv self.known False)
       ; .known is true when the player has learned the type of
       ; item that goes with this appearance.
