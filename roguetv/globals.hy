@@ -26,6 +26,8 @@
 (def text-screen-left-margin 1)
 (def text-screen-page-overlap 2)
 
+(def max-message-log-len 200)
+
 (def fg-color :black)
 (def bg-color :white)
 (def pick-bg-color (fn [fg]
