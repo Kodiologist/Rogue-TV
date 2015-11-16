@@ -10,7 +10,7 @@
   [roguetv.types [MapObject Scheduled]]
   [roguetv.map [Tile mset tile-save-shorthand]]
   [roguetv.fov [init-fov-map]]
-  [roguetv.item [Item]]
+  [roguetv.item [Item ItemAppearance]]
   [roguetv.creature [Creature]]
   [roguetv.creature.player [Player]])
 
@@ -27,10 +27,12 @@
   (setv (get x "Player") {
     "name" Player.name})
 
-  (setv (get x "item_appearances") (dict (fmap
-    (, it (. (get G.itypes it) appearance))
-    (. (get G.itypes it) appearance)
-    (.keys G.itypes))))
+  (setv (get x "item_appearances") (dict
+    (amap (do
+      (setv ap (. (get G.itypes it) appearance))
+      (, it [ap.apid ap.known]))
+    (filt (. (get G.itypes it) appearance)
+    (.keys G.itypes)))))
 
   (setv (get x "omaps") (dict (amap
     (, it.__name__
@@ -57,8 +59,11 @@
   (for ([k v] (.items (get x "Player")))
     (setattr Player k v))
 
-  (for ([k v] (.items (get x "item_appearances")))
-    (.set-appearance (get G.itypes k) v))
+  (for ([tid [apid known]] (.items (get x "item_appearances")))
+    (setv itype (get G.itypes tid))
+    (.set-appearance itype (afind
+      (= it.apid apid)
+      (get ItemAppearance.registry (afind (issubclass itype it) (.keys ItemAppearance.registry))))))
 
   ; A bit of extra explicit initialization is necessary here
   ; because the omaps, FOV map, and G.player are redundant with

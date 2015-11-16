@@ -242,8 +242,10 @@
   ; A dictionary mapping subclasses of Item to lists of eligible
   ; appearances.
 
-  [__init__ (fn [self name]
-    (set-self name)
+  [__init__ (fn [self apid name]
+    ; `apid` is a short string identifying the appearance, whereas
+    ; `name` is a NounPhrase.
+    (set-self apid name)
     (setv self.known False)
       ; .known is true when the player has learned the type of
       ; item that goes with this appearance.

@@ -169,7 +169,7 @@
       (fn [] (msg "You snore.")))))
 
 (setv (get ItemAppearance.registry Soda) (amap
-  (ItemAppearance (NounPhrase (+ it " soda can")))
+  (ItemAppearance it (NounPhrase (+ it " soda can")))
   soda-cans))
 (assert (>= (len (get ItemAppearance.registry Soda))
   (len (filt (instance? Soda it) (.values G.itypes)))))

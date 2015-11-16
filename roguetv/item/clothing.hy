@@ -175,10 +175,10 @@
   :info-carry "Each time you enter a new level, an extra nymph is generated.")
 
 (setv (get ItemAppearance.registry Clothing) (amap
-  (ItemAppearance (kwc NounPhrase
+  (ItemAppearance it (kwc NounPhrase
     (+ "present labeled " it)
     :plural (+ "presents labeled " it)
     :article "a"))
   gift-box-labels))
-(assert (>= (get ItemAppearance.registry Clothing)
+(assert (>= (len (get ItemAppearance.registry Clothing))
   (len (filt (instance? Clothing it) (.values G.itypes)))))

@@ -378,7 +378,7 @@
       (msg "{:The} reminds you of what you already know." self))))
 
 (setv (get ItemAppearance.registry Gadget) (amap
-  (ItemAppearance (NounPhrase (+ it " gadget")))
+  (ItemAppearance it (NounPhrase (+ it " gadget")))
   gadget-adjectives))
 (assert (>= (len (get ItemAppearance.registry Gadget))
   (len (filt (instance? Gadget it) (.values G.itypes)))))
