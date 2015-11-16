@@ -353,3 +353,27 @@
     ; get here, it doesn't slip.
     (when (= (- p-to self.pos) cr.ice-slip-towards)
       (cr.reset-ice-slipping)))]])
+
+; Below, we create a dictionary tile-save-shorthand which
+; holds unambiguous single-character abbreviations for tiles.
+; This is used in roguetv.saves for more concise serialization.
+(setv tile-save-shorthand ((fn []
+  (setv d {})
+  ; Match each tile subclass to its char.
+  (for [cls (.values (globals))]
+    (try
+      (unless (issubclass cls Tile)
+        (continue))
+      (catch [_ TypeError]
+        (continue)))
+    (setv (get d cls) cls.char))
+  ; Remove ambiguous entries (for which a single char has more than
+  ; one associated tile).
+  (import [collections [Counter]])
+  (setv counts (Counter (.values d)))
+  (for [[cls char] (list (.items d))]
+    (unless (in cls d)
+      (continue))
+    (when (> (get counts char) 1)
+      (del (get d cls))))
+  d)))

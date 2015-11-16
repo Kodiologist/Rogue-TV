@@ -8,7 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [MapObject Scheduled]]
-  [roguetv.map [Tile mset]]
+  [roguetv.map [Tile mset tile-save-shorthand]]
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item]]
   [roguetv.creature [Creature]]
@@ -35,7 +35,12 @@
   (setv (get x "omaps") (dict (amap
     (, it.__name__
       (filt (not (none? it)) (concat it.omap)))
-    [Tile Item Creature])))
+    [Item Creature])))
+  (setv (get x "map") (list (reversed (amap (list it) (apply zip (amap
+    (amap (if (and (in (type it) tile-save-shorthand) (= (.keys it.__dict__) ["pos"]))
+      (get tile-save-shorthand (type it))
+      it) it)
+    Tile.omap))))))
 
   (setv (get x "Scheduled.queue") Scheduled.queue)
 
@@ -58,10 +63,15 @@
   ; A bit of extra explicit initialization is necessary here
   ; because the omaps, FOV map, and G.player are redundant with
   ; MapObject fields.
-  (for [t [Tile Item Creature]]
-    (.init-omap t G.map-width G.map-height))
-  (for [o (get x "omaps" "Tile")]
-    (mset o.pos o False))
+  (for [cls [Tile Item Creature]]
+    (.init-omap cls G.map-width G.map-height))
+  (setv inverted-tile-save-shorthand (dict
+    (lc [[k v] (.items tile-save-shorthand)] (, v k))))
+  (for [[yt row] (enumerate (reversed (get x "map")))]
+    (for [[xt t] (enumerate row)]
+      (if (string? t)
+        ((get inverted-tile-save-shorthand t) (Pos xt yt))
+        (mset (Pos xt yt) t False))))
   (for [o (+ (get x "omaps" "Item") (get x "omaps" "Creature"))]
     (MapObject.__init__ o o.pos))
   (setv Scheduled.queue (get x "Scheduled.queue"))
@@ -70,3 +80,6 @@
   (random.setstate (get x "random_state"))
 
   (setv (get G.dates "loaded") (real-timestamp)))
+
+(defn transpose [l]
+  (amap (list it) (apply zip l)))
