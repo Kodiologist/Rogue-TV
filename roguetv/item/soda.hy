@@ -144,7 +144,7 @@
   :info-flavor "It lets you walk through walls! Too bad it doesn't let you see through walls."
   :passwall-time 45
 
-  :info-apply "Allows you to walk through soild obstacles for {passwall_time} seconds. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
+  :info-apply "Allows you to walk through solid obstacles for {passwall_time} seconds. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
   :soda-effect (fn [self]
 
     (.add-to-player Passwall self.passwall-time
