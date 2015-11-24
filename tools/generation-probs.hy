@@ -2,12 +2,13 @@
 
 (import
   sys
+  [itertools [groupby]]
   [random [randint]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   roguetv.item
     ; To ensure G.itypes is filled.
-  [roguetv.mapgen [Obstacle]]
+  [roguetv.mapgen [Obstacle select-items select-obstacles]]
   [kodhy.util [shift weighted-choice]])
 
 (shift sys.argv)
@@ -17,22 +18,21 @@
 
 (setv dl (int dl))
 
-(for [round [0 1]]
-  (setv l (kwc sorted :+reverse
-    (amap (, (it.generation-weight dl chest?) it)
-    (filt (!= it.rarity :nongen)
-    (get [Obstacle.types (.values G.itypes)] round)))))
-  (cond
-    [(= mode "probs") (do
+(cond
+  [(= mode "probs")
+    (for [ition [0 1]]
+      (setv l (kwc sorted :+reverse
+        (amap (, (it.generation-weight dl chest?) it)
+        (filt (!= it.rarity :nongen)
+        (get [Obstacle.types (.values G.itypes)] ition)))))
       (setv total (sum (map first l)))
       (for [[w c] l]
-        (print (.format "{:1.03f} {.__name__}" (/ w total) c))))]
-    [(= mode "sample") (do
-      (setv n (get
-        [
-          (randint (+ dl 3) (* 2 (+ dl 3)))
-          (inc (randpois (+ 3 (/ dl 5))))]
-        round))
-      (for [x (sorted (replicate n (weighted-choice l)))]
-        (print x.__name__)))])
-  (print))
+        (print (.format "{:1.03f} {.__name__}" (/ w total) c)))
+      (print))]
+  [(= mode "sample") (do
+    (for [[_ obs] (groupby (sorted (select-obstacles dl)))]
+      (setv obs (list obs))
+      (print (len obs) "×" (. (first obs) __name__)))
+    (print)
+    (for [[in-chest? itype] (sorted (select-items dl))]
+      (print itype.tid (if in-chest? "(chest)" ""))))])
