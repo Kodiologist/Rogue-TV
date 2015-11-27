@@ -25,6 +25,7 @@
   (setv x (kwc dict
     :name (.format "{:a}" G.player)
     :dates G.dates
+    :seeds G.seeds
     :bundle-os G.bundle-os
     :bundle-git G.bundle-git
     :dungeon-level G.dungeon-level

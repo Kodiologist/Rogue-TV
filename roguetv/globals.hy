@@ -94,6 +94,9 @@
 (defs bundle-git None)
 (def version-info None)
 
+(defs seeds None)
+(defs map-rng-state None)
+
 (def look-mode-legend-height 4)
 
 (def bottom-border (max look-mode-legend-height (+ message-lines 1)))

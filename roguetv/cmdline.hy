@@ -6,10 +6,11 @@
   os.path
   errno
   random
+  struct
   [collections [OrderedDict]]
   argparse
   appdirs
-  [kodhy.util [keyword->str str->keyword]]
+  [kodhy.util [ret by-ns concat keyword->str str->keyword]]
   [roguetv.english [genders NounPhrase]]
   [roguetv.globals :as G])
 
@@ -27,6 +28,9 @@
   (, "he" :male)
   (, "she" :female)
   (, "it" :neuter)]))
+
+(def max-seed sys.maxint)
+(def min-seed (- (- sys.maxint) (int 1)))
 
 (defn uni [s]
   (.decode s (sys.getfilesystemencoding)))
@@ -48,6 +52,12 @@
     ["pronouns" :type uni
       :help "pronouns for your character (new game only)"
       :choices (amap (str it) (.keys pronouns->genders))]
+    ["map-seed" :type int
+      :metavar "INTEGER"
+      :help "RNG seed for generating the dungeon (new game only)"]
+    ["general-seed" :type int
+      :metavar "INTEGER"
+      :help "RNG seed for all other events (new game only)"]
     ["save" :type uni
       :metavar "FILEPATH"
       :help "where to read saved games and write saved games to"]
@@ -79,10 +89,17 @@
   (unless p.scores
     (setv p.scores (os.path.join (default-dir) "scores.json")))
 
+  (for [a ["map_seed" "general_seed"]]
+    (unless (getattr p a)
+      (setattr p a (random.randrange min-seed (+ max-seed 1))))
+    (unless (<= min-seed (getattr p a) max-seed)
+      (sys.exit (.format "Seeds must between {} and {} inclusive." min-seed max-seed)))
+    (unless (is (type (getattr p a)) int)
+      (raise (ValueError (.format "Weird seed type: {!r}" (getattr p a))))))
+
   (unless p.pronouns
     (when p.name
-      (print "You set --name, so you probably want to set --pronouns, too.")
-      (exit))
+      (sys.exit "You set --name, so you probably want to set --pronouns, too."))
     (setv p.pronouns (random.choice ["he" "she"])))
   (setv p.gender (get pronouns->genders p.pronouns))
 

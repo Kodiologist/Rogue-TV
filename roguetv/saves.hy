@@ -17,7 +17,7 @@
 (defn write-save-file [path]
   (setv x {})
 
-  (setv (get x "random_state") (random.getstate))
+  (setv (get x "general_rng_state") (random.getstate))
 
   (setv (get G.dates "saved") (real-timestamp))
   (setv (get x "G") (dict (amap
@@ -82,7 +82,7 @@
   (setv Scheduled.queue (get x "Scheduled.queue"))
   (init-fov-map Tile.omap)
 
-  (random.setstate (get x "random_state"))
+  (random.setstate (get x "general_rng_state"))
 
   (setv (get G.dates "loaded") (real-timestamp)))
 

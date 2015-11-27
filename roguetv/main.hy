@@ -29,6 +29,13 @@
   (setv G.player (Player))
   (setv Player.name p.name)
 
+  (setv G.seeds {"map" p.map-seed "general" p.general-seed})
+  (print (.format "Using map seed {}, general seed {}"
+    (get G.seeds "map") (get G.seeds "general")))
+  (random.seed (get G.seeds "map"))
+  (setv G.map-rng-state (random.getstate))
+  (random.seed (get G.seeds "general"))
+
   (setv G.dungeon-level 0)
   (reset-level)
 
