@@ -16,17 +16,12 @@
 (defn chance [x]
   (<= (random.random) x))
 
-(defn randpois [mean]
-; Poisson-distributed random variate.
-  (setv k -1)
-  (setv p 1)
-  (while (> p (exp (- mean)))
-    (+= k 1)
-    (*= p (random.random)))
-  k)
-
 (defn randexp [median]
   (random.expovariate (/ (log 2) median)))
+
+(defn randgeom [mean]
+  (setv p (/ 1 (+ mean 1)))
+  (int (ceil (- (/ (log (- 1 (random.random))) (log (- 1 p))) 1))))
 
 (defn 1-in [n]
   (chance (/ 1 n)))

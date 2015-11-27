@@ -140,9 +140,13 @@
   (setv weighted-otypes (amap
     (, (it.generation-weight dl) it)
     Obstacle.types))
-  (replicate (randint (+ dl 3) (* 2 (+ dl 3)))
-      ; So 3 to 6 obstacles on level 0,
-      ; and 12 to 24 on level 9.
+  (replicate (+ 1 (randgeom (+ 10 (* 2 dl))))
+       ; This yields:
+       ; level         quantiles
+       ;      .025  .25   .5  .75 .975
+       ; 1       1    3    8   15   39
+       ; 10      1    9   20   40  106
+       ; 20      2   14   34   68  179
     (weighted-choice weighted-otypes)))
 
 (defn select-items [dl]
@@ -152,13 +156,13 @@
   (setv weighted-itypes-chest (amap
     (, (kwc it.generation-weight dl :+in-chest) it)
     (.values G.itypes)))
-  (replicate (inc (randpois (+ 3 (/ dl 5)))) (do
+  (replicate (+ 1 (randgeom (+ 5 dl))) (do
        ; This yields:
        ; level         quantiles
-       ;         .025  .25 .5 .75 .975
-       ; 0        1     3   4   5    8
-       ; 9        2     4   6   7   11
-       ; 19       3     6   8   9   13
+       ;      .025  .25   .5  .75 .975
+       ; 1       1    2    4    8   21
+       ; 10      1    5   11   21   54
+       ; 20      1    8   17   34   91
     (setv in-chest (1-in 8))
     (, in-chest (weighted-choice (if in-chest
       weighted-itypes-chest
