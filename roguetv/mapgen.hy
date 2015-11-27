@@ -189,7 +189,7 @@
             (ret)))))))
 
 (defobst O-EmptyChest [Obstacle]
-  level-lo 5
+  level-lo 9
   rarity :uncommon
   f (cmeth []
     (mset (shift @free-floors) (Chest))))
