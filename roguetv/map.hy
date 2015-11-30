@@ -261,7 +261,7 @@
   name (NounPhrase "chest")
   char "■"
   color-fg :brown
-  info-text "This is a treasure chest. How exciting! On average, chests contain better items than are found on the floor of the same dungeon level. You're not one of those goody-two-shoes video-game heroes who only opens locks with the proper keys, and these locks aren't very good, so given enough time, you can bust a chest open."
+  info-text "This is a treasure chest. How exciting! On average, chests contain better items than are found on the floor of the same dungeon level. You aren't one of those goody-two-shoes video-game heroes who only open locks with the proper key, and these locks aren't very good, so given enough time, you can bust a chest open."
   container True
   opaque-container True
 
