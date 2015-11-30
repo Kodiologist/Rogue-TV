@@ -85,8 +85,9 @@
   "CHIM"                ; http://www.uesp.net/wiki/Lore:CHIM
   "COSMICOSMO"          ; Cosmic Osmo
   "DOOTDOOT"            ; http://knowyourmeme.com/memes/skull-trumpet
-  "E102G"               ; E-102 Gamma
+  "E102G"               ; E-102 Gamma (Sonic Adventure)
   "FRINDLE"             ; The book of the same name
+  "GIPEMOS"             ; "Some pig" (Charlotte's Web) backwards
   "GOOZACK"             ; Wayside School
   "IDDQD"               ; Doom cheat code
   "KBA"                 ; My initials
@@ -95,9 +96,11 @@
   "OYGEVALT"            ; Oy gevalt
   "PYSZCZYNSKI"         ; Tom Pyszczynski, TMT researcher
   "QLZQQLZUUP"          ; The Emperor Quylthulg in Angband
+  "RETSAMTRAFNEGEL"     ; "Legend[ary] fartmaster" (Undertale) backwards
   "SLITHYTOVES"         ; Jabberwocky
   "SPAM"
   "SPISPOPD"            ; http://doom.wikia.com/wiki/SPISPOPD
+  "THREEPWOOD"          ; Guybrush Threepwood, of the Monkey Island series
   "TIBYOCSPNLAAD"       ; https://www.reddit.com/r/OutOfTheLoop/comments/1w7ojb
   "TVERSKY"             ; Amos Tversky, JDM researcher
   "UWOTM8"              ; http://knowyourmeme.com/memes/u-wot-m8
