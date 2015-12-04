@@ -6,7 +6,7 @@
   [roguetv.util [*]]
   [roguetv.input [get-normal-command]]
   [roguetv.map [Tile]]
-  [roguetv.creature [Creature Haste Sleep]]
+  [roguetv.creature [Creature Haste]]
   [roguetv.display [full-redraw]]
   [roguetv.actions [do-normal-command]])
 
@@ -23,6 +23,7 @@
   [__init__ (fn [self &optional pos]
     (Creature.__init__ self pos)
     (setv self.effects [])
+    (setv self.just-slept False)
     None)]
 
   [ice-immune (fn [self]
@@ -52,12 +53,17 @@
         1)]))))]
 
   [act (fn [self]
+    (when self.just-slept
+      (setv self.just-slept False)
+      (msg "You wake up."))
     (full-redraw)
-    (if (.get-effect self Sleep)
-      (.wait self)
-      (do-normal-command (get-normal-command)))
+    (do-normal-command (get-normal-command))
     (setv G.last-action-duration
       (- self.next-turn G.current-time)))]
 
   [get-effect (fn [self effect-cls]
-    (afind-or (instance? effect-cls it) self.effects))]])
+    (afind-or (instance? effect-cls it) self.effects))]
+
+  [fall-asleep (fn [self sleep-time]
+    (.take-time self sleep-time)
+    (setv self.just-slept True))]])

@@ -183,7 +183,3 @@
               (ret))))
         ; There's no room anywhere on the level!
         (msg :tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at G.player.pos))))))
-
-(defcls Sleep [Effect]
-  status "Zzz"
-  end-msg "You wake up.")

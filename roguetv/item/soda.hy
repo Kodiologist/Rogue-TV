@@ -9,7 +9,7 @@
   [roguetv.util [*]]
   [roguetv.map [Tile upelevator-pos room-for? disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
-  [roguetv.creature [Creature Stink Haste Confusion Strength Sleep Passwall]])
+  [roguetv.creature [Creature Stink Haste Confusion Strength Passwall]])
 
 (defclass Soda [Item] [
   [apply-time 1]
@@ -164,9 +164,8 @@
   :info-apply "Makes you fall asleep for {sleep_time} seconds."
   :soda-effect (fn [self]
 
-    (.add-to-player Sleep self.sleep-time
-      (fn [] (msg :tara "Oh no! {p:The} has fallen asleep!"))
-      (fn [] (msg "You snore.")))))
+    (.fall-asleep G.player self.sleep-time)
+    (msg :tara "Oh no! {p:The} has fallen asleep!")))
 
 (setv (get ItemAppearance.registry Soda) (amap
   (ItemAppearance it (NounPhrase (+ it " soda can")))
