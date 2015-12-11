@@ -30,12 +30,11 @@
       self
       (apply .format [self.info-text] (. (type self) __dict__))))]
 
-  [use-tile (fn [self cr]
-    ; A creature has tried to do something with this tile. (For
-    ; the player, that would be using the command :use-tile.)
+  [use-tile (fn [self]
+    ; The player has used the command :use-tile on this tile.
     ;
     ; The default implementaton does nothing.
-    (msgp cr "There's nothing special you can do at this tile."))]
+    (msg "There's nothing special you can do at this tile."))]
 
   [use-item-while-here (fn [self]
     ; The player has tried to use (i.e., apply or drop) an item
@@ -163,12 +162,11 @@
   [char "<"]
   [info-text "Taking the elevator back up will immediately end your game of Rogue TV, but you'll be able to keep whatever winnings you're carrying."]
 
-  [use-tile (fn [self cr]
-    (when (player? cr)
-      (msg :tara "Beware, there will be no return!")
-      (msg "Do you really want to take the elevator up?")
-      (when (user-confirms)
-        (setv G.endgame :used-up-elevator))))]])
+  [use-tile (fn [self]
+    (msg :tara "Beware, there will be no return!")
+    (msg "Do you really want to take the elevator up?")
+    (when (user-confirms)
+      (setv G.endgame :used-up-elevator)))]])
 
 (defn upelevator-pos [] (block
   (for [l Tile.omap]
@@ -181,28 +179,27 @@
   [char ">"]
   [info-text "This elevator leads to a new, unexplored level. The time limit will be reset, but you won't be able to return to this level, so make sure you're carrying whatever you intend to keep."]
 
-  [use-tile (fn [self cr]
-    (when (player? cr)
-      (if (= G.dungeon-level G.max-dungeon-level)
-        (if (afind-or (instance? (get G.itypes "aoy") it) G.inventory)
-          (do
-            (msg :aud "goes wild! You won the game!")
-            (setv G.endgame :won))
-          (msg :tara "Sorry, {p}, you'll need the Amulet of Yendor to finish the game."))
+  [use-tile (fn [self]
+    (if (= G.dungeon-level G.max-dungeon-level)
+      (if (afind-or (instance? (get G.itypes "aoy") it) G.inventory)
         (do
-          (when G.autosave
-            (rtv saves.write-save-file G.save-file-path))
-          (when (<= (- G.time-limit G.current-time) G.super-low-time-threshold)
-            ; The audience was counting down when the player got
-            ; to the down elevator.
-            (msg :aud "cheers. You made it!"))
-          (+= G.dungeon-level 1)
-          (rtv mapgen.reset-level)
-          (msg :tara
-            (if (= G.dungeon-level G.max-dungeon-level)
-              "{p} has reached level {}, the final level. It's {} by {} squares. {p} must now find the mystical Amulet of Yendor and take the final down elevator to win Rogue TV!"
-              "And {p:he's} on to level {}. It spans {} by {} squares.")
-            (inc G.dungeon-level) G.map-width G.map-height)))))]])
+          (msg :aud "goes wild! You won the game!")
+          (setv G.endgame :won))
+        (msg :tara "Sorry, {p}, you'll need the Amulet of Yendor to finish the game."))
+      (do
+        (when G.autosave
+          (rtv saves.write-save-file G.save-file-path))
+        (when (<= (- G.time-limit G.current-time) G.super-low-time-threshold)
+          ; The audience was counting down when the player got
+          ; to the down elevator.
+          (msg :aud "cheers. You made it!"))
+        (+= G.dungeon-level 1)
+        (rtv mapgen.reset-level)
+        (msg :tara
+          (if (= G.dungeon-level G.max-dungeon-level)
+            "{p} has reached level {}, the final level. It's {} by {} squares. {p} must now find the mystical Amulet of Yendor and take the final down elevator to win Rogue TV!"
+            "And {p:he's} on to level {}. It spans {} by {} squares.")
+          (inc G.dungeon-level) G.map-width G.map-height))))]])
 
 (defclass Door [Tile] [
   [color-fg :brown]
@@ -268,13 +265,13 @@
   open-time (meth []
     (+ 3 (randexp-dl-div-s 20)))
 
-  use-tile (meth [cr]
-    (if (.get-effect cr (rtv-get creature.Strength))
-      (msgp cr "You effortlessly tear the lid off the chest.")
+  use-tile (meth []
+    (if (.get-effect G.player (rtv-get creature.Strength))
+      (msg "You effortlessly tear the lid off the chest.")
       (do
-        (msgp cr "With difficulty, you open the chest.")
-        (.take-time cr (@open-time))))
-    (@open-chest cr))
+        (msg "With difficulty, you open the chest.")
+        (.take-time G.player (@open-time))))
+    (@open-chest G.player))
 
   open-chest (meth [cr]
     (setv p self.pos)
