@@ -27,10 +27,14 @@
     (when @curse-on-unbox
       "<b>This item becomes cursed when it is unboxed.</b>")))
 
-  __init__ (meth [&optional [boxed True] &kwargs rest]
-    (apply Item.__init__ [@] rest)
-    (set-self boxed)
+  __init__ (meth [&kwargs kw]
+    (apply Item.__init__ [@] kw)
+    (setv @boxed (.get kw "boxed" True))
     None)
+
+  clone-setup (meth [orig]
+    (.clone-setup (super Clothing @) orig)
+    (setv @boxed orig.boxed))
 
   identified? (meth []
     ; Unboxed items count as identified, whether or not you've

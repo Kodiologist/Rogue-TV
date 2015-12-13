@@ -21,10 +21,14 @@
 
   [info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges. If the gadget can be aimed or otherwise controlled, you'll only be able to control it once you know what it is."]
 
-  [__init__ (fn [self &optional charges &kwargs rest]
-    (apply Item.__init__ [self] rest)
-    (setv self.charges (if (none? charges) self.max-charges charges))
+  [__init__ (fn [self &kwargs kw]
+    (apply Item.__init__ [self] kw)
+    (setv self.charges (.get kw "charges" self.max-charges))
     None)]
+
+  [clone-setup (fn [self orig]
+    (.clone-setup (super Gadget self) orig)
+    (setv self.charges orig.charges))]
 
   [name-suffix (fn [self]
     (when (.identified? self)
@@ -103,13 +107,23 @@
   :info-flavor "It's deja vu all over again."
   :max-charges 3
 
+  :__init__ (fn [self &kwargs kw]
+    (apply (. (super (get G.itypes "warpback") self) __init__) [] kw)
+    (setv self.warpback-pos None))
+
+  ; No clone-setup is provided because we don't want warpback-pos
+  ; to be copied, anyway.
+
   :on-reset-level (fn [self]
     (setv self.warpback-pos None))
 
   :info-apply "Use it once to register a warpback point (for you, sir, no charge). Use it again to teleport back to the warpback point. This will clear the warpback point, as will going to another dungeon level."
   :gadget-effect (fn [self unid]
 
-    (if (getattr self "warpback_pos" None)
+    (if (none? self.warpback-pos)
+      (do
+        (setv self.warpback-pos G.player.pos)
+        (msg "{:The} registers your current position." self))
       (do
         (.use-time-and-charge self)
         (cond
@@ -121,10 +135,7 @@
             (.move G.player self.warpback-pos)
             (setv self.warpback-pos None))]
           [True
-            (msg "{:The} beeps at you accusingly." self)]))
-      (do
-        (setv self.warpback-pos G.player.pos)
-        (msg "{:The} registers your current position." self)))))
+            (msg "{:The} beeps at you accusingly." self)])))))
 
 (def-itemtype Gadget "hookshot"
   :color-fg :dark-blue

@@ -65,13 +65,22 @@
     ; If a class, monsters of that type will flee from the
     ; player.
 
-  [__init__ (fn [self &optional pos invlet]
+  [__init__ (fn [self &kwargs kw]
     (Generated.__init__ self)
-    (MapObject.__init__ self pos)
-    (set-self invlet)
+    (MapObject.__init__ self (.get kw "pos"))
+    (setv self.invlet None)
     (setv self.curse None)
       ; Cursed items can't be dropped.
     None)]
+
+  [clone-setup (fn [self orig]
+    (when orig.curse
+      (setv self.curse (.clone orig.curse self))))]
+
+  [clone (fn [self &optional pos]
+    (setv new (kwc (type self) :pos pos))
+    (.clone-setup new self)
+    new)]
 
   [destroy (fn [self]
     ; For cleaning up after an item that no longer exists. For
@@ -268,6 +277,11 @@
     (@schedule)
     (@take-time-cu (@curse-fade-time))
     None)
+
+  clone (meth [new-host-item]
+    ; Ignore the curse-fade-time of the original. Just make
+    ; a new curse.
+    (Curse new-host-item))
 
   remove-curse (meth []
     (setv @host-item.curse None)
