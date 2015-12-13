@@ -6,7 +6,7 @@
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.input [user-confirms]]
+  [roguetv.input [user-confirms inventory-loop]]
   [roguetv.types [Drawable MapObject Scheduled]])
 
 (defclass Tile [Drawable MapObject NounPhraseNamed Scheduled] [
@@ -287,6 +287,39 @@
   char "□"
   info-text "Implemented, but doesn't spawn currently, because it's too annoying. (An item in a glass chest looks like an item just sitting on the floor unless the player uses look mode.)"
   opaque-container False)
+
+(defcls DoublingMachine [Tile]
+  name (NounPhrase "double-or-nothing machine")
+  char "⁑"
+  color-fg :red
+  info-text "This gambling game doubles as an altar to Missingno, the patron deity of item-duplication glitches. Insert an item to receive, with even odds, two of the same item or nothing. Either way, the machine will then rotate into the floor, so you can only use it once."
+
+  usage-time 1
+
+  use-tile (meth [] (block
+    (unless (room-for? (rtv-get item.Item) @pos)
+      (msg "The machine makes a high-pitched beep. A message on a tiny screen reads: CLEAR OUTPUT BAY.")
+      (ret))
+    (setv i (inventory-loop "What do you want to try doubling?"))
+    (when (none? i)
+      (ret))
+    (setv item (get G.inventory i))
+    (.take-time G.player @usage-time)
+    (when (or item.indestructible item.unique)
+      (msg "The machine makes a high-pitched beep and spits {:your} back out. A message on a tiny screen reads: {}."
+        item
+        (cond
+          [item.indestructible "OBJECT INSOLUABLE"]
+          [item.unique "OBJECT PATENT-ENCUMBERED"]))
+      (ret))
+    (if (1-in 2)
+      (do
+        (msg "The machine plays a jolly little tune. It spits {:the} back out and leaves a copy on the floor." item)
+        (.clone item @pos))
+      (do
+        (msg "The machine plays a sad little tune. You lost {:the}." item)
+        (.delete item)))
+    (mset @pos (Floor)))))
 
 (defclass HasExitTime [object] [
 
