@@ -341,10 +341,11 @@
 
     (setv item (or (get-other-item self unid "identify") (ret)))
     (.use-time-and-charge self)
+    (msg "You inspect {:the} under {:the}." item self)
     (when (.identified? item)
-      (msg "You admire the details of {:your} under the microscope." item)
+      (msg "Yep, {:he's} {:a}." item item)
+        ; http://knowyourmeme.com/memes/identifying-wood
       (ret))
-    (msg "You inspect {:the}." item)
     (.identify item)
     (msg "You have:  {}" (item.invstr)))))
 
