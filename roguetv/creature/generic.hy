@@ -128,14 +128,11 @@
   add-to-player (classmethod (meth [duration start-msg lengthen-msg]
     (setv e (.get-effect G.player @))
     ; If the player already has an effect of this kind,
-    ; refresh the duration to the maximum of the old one and the
-    ; new one.
+    ; the new duration is added to the old one.
     (if e
       (do
         (lengthen-msg)
-        (setv lengthen (- (+ G.current-time (seconds duration)) e.next-turn))
-        (when (> lengthen 0)
-          (.take-time-cu e lengthen)))
+        (.take-time e duration))
       (do
         (start-msg)
         (.append G.player.effects (@ duration))))))
