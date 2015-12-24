@@ -8,7 +8,7 @@
   [roguetv.util [*]]
   roguetv.item
     ; To ensure G.itypes is filled.
-  [roguetv.mapgen [Obstacle select-items select-obstacles]]
+  [roguetv.mapgen [Obstacle select-items select-obstacles select-benefits]]
   [kodhy.util [shift weighted-choice]])
 
 (shift sys.argv)
@@ -30,9 +30,12 @@
         (print (.format "{:1.03f} {.__name__}" (/ w total) c)))
       (print))]
   [(= mode "sample") (do
-    (for [[_ obs] (groupby (sorted (select-obstacles dl)))]
-      (setv obs (list obs))
-      (print (len obs) "×" (. (first obs) __name__)))
-    (print)
+    (for [[s f] [["Obstacles" select-obstacles] ["Benefits" select-benefits]]]
+      (print "---" s "---")
+      (for [[_ l] (groupby (sorted (f dl)))]
+        (setv l (list l))
+        (print (len l) "×" (. (first l) __name__)))
+      (print))
+    (print "--- Items ---")
     (for [[in-chest? itype] (sorted (select-items dl))]
       (print itype.tid (if in-chest? "(chest)" ""))))])

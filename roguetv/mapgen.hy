@@ -113,6 +113,12 @@
   (for [o-type (select-obstacles dl)]
     (.f o-type))
 
+  ; Add benefits.
+  (setv Benefit.dl dl)
+  (setv Benefit.free-floors free-floors)
+  (for [b-type (select-benefits dl)]
+    (.f b-type))
+
   ; Add items.
   (for [[in-chest itype] (select-items dl)]
     (setv p (shift free-floors))
@@ -162,6 +168,19 @@
        ; 10      1    9   20   40  106
        ; 20      2   14   34   68  179
     (weighted-choice weighted-otypes)))
+
+(defn select-benefits [dl]
+  (setv weighted-btypes (amap
+    (, (it.generation-weight dl) it)
+    Benefit.types))
+  (replicate (randgeom (+ 1 (/ dl 5)))
+       ; This yields:
+       ; level         quantiles
+       ;      .025  .25   .5  .75 .975
+       ;  1      0    0    0    1    5
+       ; 10      0    0    2    4   12
+       ; 20      0    1    3    7   19
+    (weighted-choice weighted-btypes)))
 
 (defn select-items [dl]
   (setv weighted-itypes (amap
@@ -283,3 +302,16 @@
   level-lo 6
   cr-cls Nymph
   max-to-place 1)
+
+(defcls Benefit [Generated]
+  types [])
+
+(defmacro defben [name inherit &rest body]
+  `(do
+    (defcls ~name ~inherit ~@body)
+    ; Add this benefit type to the list.
+    (.append Benefit.types ~name)))
+
+(defben B-DoublingMachine [Benefit]
+  f (cmeth []
+    (mset (shift @free-floors) (DoublingMachine))))
