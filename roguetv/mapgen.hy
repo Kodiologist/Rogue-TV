@@ -35,7 +35,7 @@
         (setv G.map-width d)
         (setv G.map-height d))))
 
-  (set-time-limit (+ G.current-time (dl-time-limit-cu dl)))
+  (set-time-limit (+ G.current-time (dl-time-limit dl)))
 
   (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]

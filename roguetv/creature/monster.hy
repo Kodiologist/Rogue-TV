@@ -215,8 +215,8 @@
   info-text "A primal spirit of the forest disguised as a comely young woman. Nymphs are infatuated with man-made objects and have no compunctions about stealing, which makes sense when you consider that the typical nymph has lived in the woods for 800 years with no human contact until being dumped onto the set of a game show. Fortunately, they can only carry one thing at a time, and they tend to quickly lose interest in the objects they acquire."
 
   detect-item-range 8
-  take-item-time 1
-  drop-item-time 1
+  take-item-time (seconds 1)
+  drop-item-time (seconds 1)
 
   __init__ (meth [&optional pos item]
     (.__init__ (super Nymph @) pos)
@@ -228,8 +228,8 @@
 
   get-item (meth [item]
     (setv @item item)
-    (setv (get @interested-in-item-till item) (+ G.current-time
-      (randexp-dl-div-cu 3))))
+    (setv (get @interested-in-item-till item)
+      (+ G.current-time (randexp-dl-div 3))))
 
   item-attractive? (meth [item]
     (or

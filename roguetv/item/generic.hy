@@ -143,7 +143,9 @@
             (when self.info-carry (+ "<b>Effect when carried:</b> " self.info-carry))
             (when self.info-constant (+ "<b>Constant effect:</b> " self.info-constant)))
           self.info-unidentified)]
-        (. (type self) __dict__))))]
+        (dict (lc [[k v] (.items (. (type self) __dict__))] (,
+          (.replace k "_" "-")
+          (if (.endswith k "_time") (show-duration v) v)))))))]
 
   [info-extra (fn [self]
     None)]
@@ -270,12 +272,12 @@
 
 (defcls Curse [Scheduled]
   curse-fade-time (meth []
-    (randexp-dl-div-cu 1))
+    (randexp-dl-div 1))
 
   __init__ (meth [host-item]
     (set-self host-item)
     (@schedule)
-    (@take-time-cu (@curse-fade-time))
+    (@take-time (@curse-fade-time))
     None)
 
   clone (meth [new-host-item]

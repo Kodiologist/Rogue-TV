@@ -1,7 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [random [randint]]
+  [random [randint uniform]]
   [kodhy.util [ret]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
@@ -213,7 +213,7 @@
   [blocks-sight True]
 
   [open-time (fn [self]
-    (+ 2 G.dungeon-level (randint 1 8)))]
+    (seconds (+ 2 G.dungeon-level (randint 1 8))))]
 
   [bump-into (fn [self cr] (block
     (unless cr.can-open-doors
@@ -233,7 +233,7 @@
 
   [smooth True]
   [close-time (fn [self]
-    (+ 5 (randexp (* 60 (inc G.dungeon-level)))))]
+    (seconds (+ 5 (randexp (* 60 (inc G.dungeon-level))))))]
       ; Yes, doors take longer to close at deeper levels, even
       ; though that makes things easier rather than harder. The
       ; point is to keep the question of whether a door will
@@ -263,7 +263,7 @@
   opaque-container True
 
   open-time (meth []
-    (+ 3 (randexp-dl-div-s 20)))
+    (+ (seconds 3) (round-to-second (randexp-dl-div 20))))
 
   use-tile (meth []
     (if (.get-effect G.player (rtv-get creature.Strength))
@@ -294,7 +294,7 @@
   color-fg :red
   info-text "This gambling game doubles as an altar to Missingno, the patron deity of item-duplication glitches. Insert an item to receive, with even odds, two of the same item or nothing. Either way, the machine will then rotate into the floor, so you can only use it once."
 
-  usage-time 1
+  usage-time (seconds 1)
 
   use-tile (meth [] (block
     (unless (room-for? (rtv-get item.Item) @pos)
@@ -323,8 +323,12 @@
 
 (defclass HasExitTime [object] [
 
-  [min-exit-time (fn [self] 1)]
-  [max-exit-time (fn [self] (inc (* 2 G.dungeon-level)))]])
+  [min-exit-time (fn [self] (seconds 1))]
+  [max-exit-time (fn [self] (seconds (inc (* 2 G.dungeon-level))))]
+  
+  [do-time-penalty (fn [self cr]
+    (.take-time cr (round-to-second
+      (uniform (.min-exit-time self) (.max-exit-time self)))))]])
 
 (defclass Slime [Tile HasExitTime] [
   [name (kwc NounPhrase "slime" :+mass :unit "puddles")]
@@ -338,7 +342,7 @@
 
   [step-out-of (fn [self cr p-to]
     (unless (or cr.flying cr.slime-immune)
-      (.take-time cr (randint (.min-exit-time self) (.max-exit-time self)))))]])
+      (.do-time-penalty self cr)))]])
 
 (defclass Web [Tile HasExitTime] [
   [name (NounPhrase "spiderweb")]
@@ -357,7 +361,7 @@
 
   [step-out-of (fn [self cr p-to]
     (unless cr.web-immune
-      (.take-time cr (randint (.min-exit-time self) (.max-exit-time self)))))]])
+      (.do-time-penalty self cr)))]])
 
 (defclass Ice [Tile] [
   [name (kwc NounPhrase "patch of ice"
@@ -370,14 +374,15 @@
   [unpleasant True]
   [smooth True]
 
-  [min-slip-time (fn [self] 1)]
-  [max-slip-time (fn [self] (inc (* 2 G.dungeon-level)))]
+  [min-slip-time (fn [self] (seconds 1))]
+  [max-slip-time (fn [self] (seconds (inc (* 2 G.dungeon-level))))]
 
   [after-step-onto (fn [self cr p-from]
     (unless (or cr.flying (.ice-immune cr))
       ; Set up the creature to slip.
       (setv cr.ice-slip-towards (- self.pos p-from))
-      (setv cr.ice-slip-time (randint (.min-slip-time self) (.max-slip-time self)))))]
+      (setv cr.ice-slip-time (round-to-second
+        (uniform (.min-slip-time self) (.max-slip-time self))))))]
 
   [step-out-of (fn [self cr p-to]
     ; If the creature moves in the same direction it moved to

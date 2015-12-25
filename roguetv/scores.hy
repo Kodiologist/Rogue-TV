@@ -127,7 +127,8 @@
       (inc (get x "dungeon_level"))
       (if (< (get x "time") G.clock-factor)
         "in less than a second"
-        (+ "after " (hour-min-sec-elapsed (get x "time")))))
+        (+ "after " (kwc show-duration (get x "time")
+          :+trunc-to-sec :+abbreviate))))
     (if (get x "prizes")
       (.format "with {} worth <b>${}</b>: {}."
         (if (= (len (get x "prizes")) 1) "a prize" "prizes")

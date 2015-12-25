@@ -34,26 +34,39 @@
 (defn randpop [l]
   (l.pop (random.randrange (len l))))
 
-(defn seconds [duration]
+(defn seconds [x]
   ; Convert seconds to the internal time representation.
-  (if duration (max 1 (long (round (* G.clock-factor duration)))) 0))
+  (if x (max 1 (long (round (* G.clock-factor x)))) 0))
     ; (max 1 …) ensures that no nonzero durations will be rounded
     ; to 0.
+(defn minutes [x]
+  (seconds (* 60 x)))
+(defn round-to-second [duration]
+  ; Rounds a duration (in the internal time representation)
+  ; to the nearest second.
+  (* (long (round (/ duration G.clock-factor))) G.clock-factor))
 
 (defn minsec [x]
   (setv x (long (ceil (/ x G.clock-factor))))
   (.format "{}:{:02}" (// x 60) (% x 60)))
 
-(defn hour-min-sec-elapsed [x]
-  (//= x G.clock-factor)
-  (setv h (// x (* 60 60)))
-  (%= x (* 60 60))
-  (setv mins (// x 60))
-  (%= x 60)
-  (kwc cat :sep " "
-    (when h    (.format "{} h"   h))
-    (when mins (.format "{} min" mins))
-    (when x    (.format "{} s"   x))))
+(defn show-duration [x &optional [trunc-to-sec False] [abbreviate False]]
+  (setv parts [])
+  (.append parts ["h" "hour" (// x (* 60 60 G.clock-factor))])
+  (%= x (* 60 60 G.clock-factor))
+  (.append parts ["min" "minute" (// x (* 60 G.clock-factor))])
+  (%= x (* 60 G.clock-factor))
+  (.append parts ["s" "second" (// x G.clock-factor)])
+  (%= x G.clock-factor)
+  (when trunc-to-sec
+    (setv x 0))
+  (.append parts [G.clock-unit-abbr G.clock-unit-name x])
+  (.join " " (lc [[abbr name n] parts]
+    n
+    (.format "{} {}{}"
+      n
+      (if abbreviate abbr name)
+      (if (and (not abbreviate) (!= n 1)) "s" "")))))
 
 (defn show-round [number ndigits]
   (setv x (round number ndigits))
@@ -110,19 +123,10 @@
   out)
 
 (defn dl-time-limit [dl]
-  (* 60 (+ 3 (/ dl 2))))
-(defn dl-time-limit-cu [dl]
-  ; "cu" stands for "clock units".
-  (seconds (dl-time-limit dl)))
+  (minutes (+ 3 (/ dl 2))))
 
-(defn randexp-dl-div-cu [divisor]
-  (int (randexp (/ (dl-time-limit-cu G.dungeon-level) divisor))))
-(defn randexp-dl-div-s [divisor]
-  ; Notice that, unlike dl-time-limit, this returns only whole
-  ; seconds (but still in floating point). The intended use is to
-  ; keep extraneous sig figs out of durations that the player can
-  ; see.
-  (round (randexp (/ (dl-time-limit G.dungeon-level) divisor))))
+(defn randexp-dl-div [divisor]
+  (long (randexp (/ (dl-time-limit G.dungeon-level) divisor))))
 
 (defn player? [cr]
   (is cr G.player))

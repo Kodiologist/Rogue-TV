@@ -20,6 +20,11 @@
 
   [can-open-doors True]
 
+  [push-past-monster-time (seconds 1)]
+  [confusion-bump-time (seconds 1)]
+  [take-item-time (seconds 1)]
+  [drop-item-time (seconds 1)]
+
   [__init__ (fn [self &optional pos]
     (Creature.__init__ self pos)
     (setv self.effects [])

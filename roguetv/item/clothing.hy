@@ -12,7 +12,7 @@
 (defcls Clothing [Item]
   char "["
 
-  open-present-time 1
+  open-present-time (seconds 1)
   curse-on-unbox False
 
   info-unidentified "This festively wrapped gift box contains an item of clothing. Your only clue as to what's inside is a cryptic product code. Clothing has a special effect on you so long you carry it, but the effect is suppressed while it's in a box. 'a'pply the box to open it."
@@ -75,7 +75,7 @@
   :info-flavor "Guaranteed to make you run faster and jump higher! Nah, I lied. They only make you run faster. But that's more than can be said for PF Flyers and Cataclysm DDA."
 
   :carry-speed-factor-smooth-terrain 1.25
-  :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain.")
+  :info-carry "You walk at {carry-speed-factor-smooth-terrain} times normal speed on smooth terrain.")
 
 (def-itemtype Clothing "high-heels" :name (pair-of "fancy high heels")
   :color-fg :red
@@ -86,7 +86,7 @@
 
   :curse-on-unbox True
   :carry-speed-factor .8
-  :info-carry "You walk at {carry_speed_factor} times normal speed.")
+  :info-carry "You walk at {carry-speed-factor} times normal speed.")
 
 (def-itemtype Clothing "roller-skates" :name (pair-of "roller skates")
   :color-fg :yellow
@@ -95,7 +95,7 @@
 
   :carry-speed-factor-smooth-terrain 2
   :carry-speed-factor-rough-terrain .5
-  :info-carry "You walk at {carry_speed_factor_smooth_terrain} times normal speed on smooth terrain, but {carry_speed_factor_rough_terrain} times on rough terrain.")
+  :info-carry "You walk at {carry-speed-factor-smooth-terrain} times normal speed on smooth terrain, but {carry-speed-factor-rough-terrain} times on rough terrain.")
 
 (def-itemtype Clothing "cheb-boots" :name (pair-of "Chebyshev boots")
   :color-fg :dark-orange
@@ -116,7 +116,7 @@
 
   :curse-on-unbox True
   :carry-gadget-malfunction-1in 3
-  :info-carry "When you apply a gadget, there's a 1 in {carry_gadget_malfunction_1in} chance that nothing will happen, wasting a charge.")
+  :info-carry "When you apply a gadget, there's a 1 in {carry-gadget-malfunction-1in} chance that nothing will happen, wasting a charge.")
 
 (def-itemtype Clothing "fur-coat" :name "fancy fur coat"
   :color-fg :brown

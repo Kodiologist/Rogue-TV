@@ -12,7 +12,7 @@
   [roguetv.creature [Creature Stink Haste Confusion Strength Passwall]])
 
 (defclass Soda [Item] [
-  [apply-time 1]
+  [apply-time (seconds 1)]
   [char "!"]
 
   [info-unidentified "A Rogue TV-branded insulated miniature aluminum can of some unidentifiable beverage. 'a'pply it to chug it and find out what it is."]
@@ -23,7 +23,7 @@
     (unless was-id?
       (msg "You had:  {}" (self.invstr)))
     (unless (afind-or it.carry-instant-soda-use (active-inv))
-      (G.player.take-time self.apply-time))
+      (.take-time G.player self.apply-time))
     (.remove G.inventory self)
     (.destroy self)
     (self.soda-effect)))]])
@@ -39,7 +39,7 @@
   :info-flavor "Tastes like the comforts of home. And it's still piping hot."
   :radius-around-upelv 5
 
-  :info-apply "Teleports you back to the up elevator. You'll appear at a random available tile within {radius_around_upelv} squares of the up elevator."
+  :info-apply "Teleports you back to the up elevator. You'll appear at a random available tile within {radius-around-upelv} squares of the up elevator."
   :soda-effect (fn [self] (block
 
     (for [p (shuffle (disc-taxi (upelevator-pos) self.radius-around-upelv))]
@@ -63,7 +63,7 @@
   :dog-summoning-range 3
   :dogs-to-summon 5
 
-  :info-apply "Creates {dogs_to_summon} dogs within {dog_summoning_range} squares of you."
+  :info-apply "Creates {dogs-to-summon} dogs within {dog-summoning-range} squares of you."
   :soda-effect (fn [self]
 
     (setv summoned 0)
@@ -83,9 +83,9 @@
   :color-fg :dark-green
   :level-lo 1
   :info-flavor "This refreshing beverage has an odd but tasty flavor with notes of beans, Limburger cheese, durian, and asparagus. The, ah, aftereffects are somewhat less pleasant."
-  :stink-time 30
+  :stink-time (seconds 30)
 
-  :info-apply (.format "You'll stink for {{stink_time}} seconds. While you stink, monsters within {} squares will run away from you." G.repulsed-from-player-range)
+  :info-apply (.format "You'll stink for {{stink-time}}. While you stink, monsters within {} squares will run away from you." G.repulsed-from-player-range)
   :soda-effect (fn [self]
 
     (.add-to-player Stink self.stink-time
@@ -98,9 +98,9 @@
   :level-lo 4
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, compared to its namesake, which is basically caffeine, this novel beverage is of mysterious origin, and it's got a veritably supernatural kick, for a (very, very) short time."
     ; Mid-20th-century Cheerios ads
-  :haste-time 5
+  :haste-time (seconds 5)
 
-  :info-apply (.format "Increases your walking speed by a factor of {} for {{haste_time}} seconds." G.speedup-soda-factor)
+  :info-apply (.format "Increases your walking speed by a factor of {} for {{haste-time}}." G.speedup-soda-factor)
   :soda-effect (fn [self]
 
     (.add-to-player Haste self.haste-time
@@ -114,9 +114,9 @@
   :level-hi 5
   :info-flavor "This is a generous portion of the most popular recreational drug in history, possibly excepting caffeine. Did you know that in 2012, about 3 million deaths (6% of all deaths worldwide) were attributable to alcoholic beverages? Seriously, folks, if you must drink, be very careful about how much you drink and what you do while intoxicated. Anyway, back to your regularly scheduled dumb jokes."
     ; World Health Organization. (2014). Global status report on alcohol and health 2014. Retrieved from http://www.who.int/substance_abuse/publications/global_alcohol_report
-  :confusion-time 45
+  :confusion-time (seconds 45)
 
-  :info-apply "Confuses you for {confusion_time} seconds. While confused, you have a chance of walking or pointing in the wrong direction."
+  :info-apply "Confuses you for {confusion-time}. While confused, you have a chance of walking or pointing in the wrong direction."
   :soda-effect (fn [self]
 
     (.add-to-player Confusion self.confusion-time
@@ -128,12 +128,12 @@
   :color-fg :dark-blue
   :level-hi 6
   :info-flavor "This marvelous concoction will give you the strength of a raging bull!"
-  :strength-minutes 3
+  :strength-time (minutes 3)
 
-  :info-apply "Allows you to instantly open doors and chests for {strength_minutes} minutes."
+  :info-apply "Allows you to instantly open doors and chests for {strength-time}."
   :soda-effect (fn [self]
 
-    (.add-to-player Strength (* 60 self.strength-minutes)
+    (.add-to-player Strength self.strength-time
       (fn [] (msg "You feel strong."))
       (fn [] (msg "You feel ready for more gainz.")))))
         ; Bodybuilding slang.
@@ -142,9 +142,9 @@
   :color-fg :dark-red
   :level-lo 7
   :info-flavor "It lets you walk through walls! Too bad it doesn't let you see through walls."
-  :passwall-time 45
+  :passwall-time (seconds 45)
 
-  :info-apply "Allows you to walk through solid obstacles for {passwall_time} seconds. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
+  :info-apply "Allows you to walk through solid obstacles for {passwall-time}. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
   :soda-effect (fn [self]
 
     (.add-to-player Passwall self.passwall-time
@@ -159,9 +159,9 @@
     "(No, seriously, those are exact quotes from Ovaltine ads from the 20s and 30s. So, the questionable claims ads make about dietary supplements these days are not so new. Ovaltine, at least, has cleaned up its act by limiting its claims to the observation that it's micronutrient-foritifed and that these micronutrients are essential for health.)"])
     ; - Collier's, 8 October 1932, p. 29 - http://web.archive.org/http://i.imgur.com/zX4Axys.jpg
     ; - Milwaukee Sentinel, 13 Oct 1928, p. 21 - http://web.archive.org/http://i.imgur.com/Q132P5l.png
-  :sleep-time 30
+  :sleep-time (seconds 30)
 
-  :info-apply "Makes you fall asleep for {sleep_time} seconds."
+  :info-apply "Makes you fall asleep for {sleep-time}."
   :soda-effect (fn [self]
 
     (.fall-asleep G.player self.sleep-time)

@@ -16,7 +16,7 @@
 
 (defclass Gadget [Item] [
   [max-charges None]
-  [apply-time 1]
+  [apply-time (seconds 1)]
   [char "/"]
 
   [info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges. If the gadget can be aimed or otherwise controlled, you'll only be able to control it once you know what it is."]
@@ -145,7 +145,7 @@
   :hookshot-dist 30
   :hookshot-travel-speed 2
 
-  :info-apply "Fire it at a solid obstacle up to {hookshot_dist} squares away to get yourself over there. Travel by hookshot is twice as fast as travel by foot, and you'll pass over unpleasant terrain along the way. Creatures will block the hookshot."
+  :info-apply "Fire it at a solid obstacle up to {hookshot-dist} squares away to get yourself over there. Travel by hookshot is twice as fast as travel by foot, and you'll pass over unpleasant terrain along the way. Creatures will block the hookshot."
   :gadget-effect (fn [self unid] (block :gadget
 
     (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
@@ -175,7 +175,9 @@
       (retf :gadget))
 
     ; And away we go.
-    (.take-time G.player (/ (len-taxi (- p-to G.player.pos)) self.hookshot-travel-speed))
+    (.take-time G.player (seconds (/
+      (len-taxi (- p-to G.player.pos))
+      self.hookshot-travel-speed)))
     (.move G.player p-to)
     (msg "{:The} pulls you ahead." self))))
 
@@ -186,7 +188,7 @@
   :max-charges 8
   :destroy-item-1in 3
 
-  :info-apply "Instantly destroys an adjacent door or chest. But if a chest contains an item, the item has a 1 in {destroy_item_1in} chance of also being destroyed."
+  :info-apply "Instantly destroys an adjacent door or chest. But if a chest contains an item, the item has a 1 in {destroy-item-1in} chance of also being destroyed."
   :gadget-effect (fn [self unid] (block
 
     (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
@@ -217,7 +219,7 @@
   :max-charges 8
   :melt-range 10
 
-  :info-apply "Melts all ice within {melt_range} squares."
+  :info-apply "Melts all ice within {melt-range} squares."
   :gadget-effect (fn [self unid] (block
 
     (.use-time-and-charge self)
@@ -231,9 +233,9 @@
   :level-lo 2
   :info-flavor "A wicked giant drill to pound through whatever solid obstacles happen to get in your way."
   :max-charges 5
-  :drill-time 3
+  :drill-time (seconds 3)
 
-  :info-apply "Destroys an adjacent wall or door. This takes {drill_time} seconds."
+  :info-apply "Destroys an adjacent wall or door. This takes {drill-time}."
   :gadget-effect (fn [self unid] (block
 
     (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
@@ -259,7 +261,7 @@
   :max-charges 10
   :web-machine-range 8
 
-  :info-apply "Creates webs in a line up to {web_machine_range} squares long."
+  :info-apply "Creates webs in a line up to {web-machine-range} squares long."
   :gadget-effect (fn [self unid] (block
 
     (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
@@ -290,7 +292,7 @@
   :bee-summoning-range 3
   :bees-to-summon 10
 
-  :info-apply "Creates {bees_to_summon} bees within {bee_summoning_range} squares of you."
+  :info-apply "Creates {bees-to-summon} bees within {bee-summoning-range} squares of you."
   :gadget-effect (fn [self unid]
 
     (.use-time-and-charge self)
@@ -374,7 +376,7 @@
   :max-charges 5
   :gps-range 20
 
-  :info-apply "Reveals the map in a radius of {gps_range} squares around you."
+  :info-apply "Reveals the map in a radius of {gps-range} squares around you."
   :gadget-effect (fn [self unid]
 
     (.use-time-and-charge self)
@@ -398,7 +400,7 @@
 (defclass Battery [Item] [
   [price 1]
   [char "="]
-  [apply-time 1]
+  [apply-time (seconds 1)]
   [charge-factor None]
 
   [info-flavor "This generic battery can restore charges to any gadget. 'a'pply it to charge up a gadget."]

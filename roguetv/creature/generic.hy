@@ -77,7 +77,7 @@
             G.always-passwall)))))
       (when (and (player? self) (.get-effect self Confusion))
         (msg "You bump into {:the}." (mget p-to))
-        (.take-time self G.confusion-bump-time))
+        (.take-time self self.confusion-bump-time))
       (ret False))
     (setv cr (Creature.at p-to))
     ; The player can push past other creatures, but other creatures
@@ -85,11 +85,15 @@
     (when cr
       (unless (player? self)
         (ret False))
-      (.take-time self G.push-past-monster-time))
+      (.take-time self self.push-past-monster-time))
     ; Okay, we're clear to move.
     (setv p-from self.pos)
     (.step-out-of (Tile.at p-from) self p-to)
-    (.take-time self (/ (.walk-dist self p-from p-to) (self.walk-speed)))
+    (.take-time self (seconds (/
+      (.walk-dist self p-from p-to)
+      (self.walk-speed))))
+      ; Hence, a creature with walk-speed 1 takes 1 second to walk
+      ; 1 unit of distance.
     (kwc .move self p-to :+clobber)
     (when cr
       (msg "You push past {:the}." cr)

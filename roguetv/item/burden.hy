@@ -68,4 +68,4 @@
     (setv p (random.choice (disc-taxi (item-pos @) @ice-radius)))
     (when (instance? Floor (Tile.at p))
       (mset p (Ice)))
-    (@take-time (randexp (/ 1 @ice-per-second)))))
+    (@take-time (long (randexp (/ 1 (/ @ice-per-second G.clock-factor)))))))

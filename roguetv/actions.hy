@@ -91,7 +91,7 @@
         (msg :tara "{p:The} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
           G.inventory-limit)
         (ret))
-      (G.player.take-time 1)
+      (.take-time G.player G.player.take-item-time)
       (add-to-inventory item)
       (msg "Taken:  {}" (item.invstr)))]
 
@@ -114,7 +114,7 @@
       (unless clear-spot
         (msg :bob "There ain't room on the ground for that truck.")
         (ret))
-      (G.player.take-time 1)
+      (.take-time G.player G.player.drop-item-time)
       (.pop G.inventory i)
       (.move item clear-spot)
       (msg "Dropped:  {}" (item.invstr)))]
