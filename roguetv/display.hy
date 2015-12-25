@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require kodhy.macros roguetv.macros)
 
 (import
   [math [ceil]]
@@ -186,6 +186,26 @@
     (.draw (AttrStr.from-xml (color-xml "-- more --" G.bg-color G.fg-color)))))
 
 (defn draw-inventory [prompt]
+  (setv item-sort-order (list (enumerate [
+    (get G.itypes "aoy")
+    (rtv-get item.burden.Burden)
+    (rtv-get item.clothing.Clothing)
+    (rtv-get item.gadget.Gadget)
+    (rtv-get item.soda.Soda)
+    (rtv-get item.gadget.Battery)])))
+  (kwc .sort G.inventory :key (fn [item]
+    (setv category (afind-or (instance? (second it) item) item-sort-order))
+    (setv category (if category (first category) (len item-sort-order)))
+    (,
+      category
+      (.lower (.format "{}" item))
+      (not (.identified? item))
+      (when (and (hasattr item "charges") (.identified? item))
+        (- item.charges))
+      (when (hasattr item "boxed")
+        item.boxed)
+      item.curse
+      item.invlet)))
   (setv names (amap (.format "{:a:most}" it) G.inventory))
   (setv prices (amap (.apparent-price it) G.inventory))
   (setv lines (amap (AttrStr.from-xml it) (+
