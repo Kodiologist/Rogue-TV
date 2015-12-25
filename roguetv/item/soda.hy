@@ -28,6 +28,21 @@
     (.destroy self)
     (self.soda-effect)))]])
 
+(defclass EffectSoda [Soda] [
+  [effect None]
+  [effect-time (seconds 1)]
+  [start-msg None]
+  [lengthen-msg None]
+
+  [soda-effect (fn [self]
+    (.add-to-player self.effect self.effect-time
+      (fn [] (if (string? self.start-msg)
+        (msg self.start-msg)
+        (apply msg self.start-msg)))
+      (fn [] (if (string? self.lengthen-msg)
+        (msg self.lengthen-msg)
+        (apply msg self.lengthen-msg)))))]])
+
 (defn can-of [s]
   (kwc NounPhrase
     :stem (+ "can of " s)
@@ -78,78 +93,68 @@
         (if (= summoned 1) "that dog" "those dogs"))
       "You hear plaintive barking."))))
 
-(def-itemtype Soda "stink-serum" :name (can-of "stink serum")
+(def-itemtype EffectSoda "stink-serum" :name (can-of "stink serum")
   ; Inspired by Yipe! III.
   :color-fg :dark-green
   :level-lo 1
   :info-flavor "This refreshing beverage has an odd but tasty flavor with notes of beans, Limburger cheese, durian, and asparagus. The, ah, aftereffects are somewhat less pleasant."
-  :stink-time (seconds 30)
 
-  :info-apply (.format "You'll stink for {{stink-time}}. While you stink, monsters within {} squares will run away from you." G.repulsed-from-player-range)
-  :soda-effect (fn [self]
+  :info-apply (.format "You'll stink for {{effect-time}}. While you stink, monsters within {} squares will run away from you." G.repulsed-from-player-range)
+  :effect Stink
+  :effect-time (seconds 30)
+  :start-msg [:aud "cries out in disgust at the pungent odor."]
+  :lengthen-msg [:tara "Smells like {p:the} is going to keep on smelling for a while."])
 
-    (.add-to-player Stink self.stink-time
-      (fn [] (msg :aud "cries out in disgust at the pungent odor."))
-      (fn [] (msg :tara "Smells like {p:the} is going to keep on smelling for a while.")))))
-
-(def-itemtype Soda "speed-soda" :name (can-of "5-second ENERGY™")
+(def-itemtype EffectSoda "speed-soda" :name (can-of "5-second ENERGY™")
   ; In reference to the real dietary supplement 5-hour Energy.
   :color-fg :red
   :level-lo 4
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, compared to its namesake, which is basically caffeine, this novel beverage is of mysterious origin, and it's got a veritably supernatural kick, for a (very, very) short time."
     ; Mid-20th-century Cheerios ads
-  :haste-time (seconds 5)
 
-  :info-apply (.format "Increases your walking speed by a factor of {} for {{haste-time}}." G.speedup-soda-factor)
-  :soda-effect (fn [self]
+  :info-apply (.format "Increases your walking speed by a factor of {} for {{effect-time}}." G.speedup-soda-factor)
+  :effect Haste
+  :effect-time (seconds 5)
+  :start-msg "You feel extremely jittery."
+  :lengthen-msg "Your jittering intensifies.")
+    ; http://knowyourmeme.com/memes/intensifies
 
-    (.add-to-player Haste self.haste-time
-      (fn [] (msg "You feel extremely jittery."))
-      (fn [] (msg "Your jittering intensifies.")))))
-        ; http://knowyourmeme.com/memes/intensifies
-
-(def-itemtype Soda "confusion-soda" :name (can-of "booze")
+(def-itemtype EffectSoda "confusion-soda" :name (can-of "booze")
   :color-fg :black
   :price-adj :bad-flavor
   :level-hi 5
   :info-flavor "This is a generous portion of the most popular recreational drug in history, possibly excepting caffeine. Did you know that in 2012, about 3 million deaths (6% of all deaths worldwide) were attributable to alcoholic beverages? Seriously, folks, if you must drink, be very careful about how much you drink and what you do while intoxicated. Anyway, back to your regularly scheduled dumb jokes."
     ; World Health Organization. (2014). Global status report on alcohol and health 2014. Retrieved from http://www.who.int/substance_abuse/publications/global_alcohol_report
-  :confusion-time (seconds 45)
 
-  :info-apply "Confuses you for {confusion-time}. While confused, you have a chance of walking or pointing in the wrong direction."
-  :soda-effect (fn [self]
+  :info-apply "Confuses you for {effect-time}. While confused, you have a chance of walking or pointing in the wrong direction."
+  :effect Confusion
+  :effect-time (seconds 45)
+  :start-msg "Wow, that'shh good shhtuff."
+  :lengthen-msg [:tara "Keep your head in the game, {p}."])
 
-    (.add-to-player Confusion self.confusion-time
-      (fn [] (msg "Wow, that'shh good shhtuff."))
-      (fn [] (msg :tara "Keep your head in the game, {p}.")))))
-
-(def-itemtype Soda "strength-soda" :name (can-of "Daffy's Elixir")
+(def-itemtype EffectSoda "strength-soda" :name (can-of "Daffy's Elixir")
   ; A name for several patent medicines.
   :color-fg :dark-blue
   :level-hi 6
   :info-flavor "This marvelous concoction will give you the strength of a raging bull!"
-  :strength-time (minutes 3)
 
-  :info-apply "Allows you to instantly open doors and chests for {strength-time}."
-  :soda-effect (fn [self]
+  :info-apply "Allows you to instantly open doors and chests for {effect-time}."
+  :effect Strength
+  :effect-time (minutes 3)
+  :start-msg "You feel strong."
+  :lengthen-msg "You feel ready for more gainz.")
+    ; Bodybuilding slang.
 
-    (.add-to-player Strength self.strength-time
-      (fn [] (msg "You feel strong."))
-      (fn [] (msg "You feel ready for more gainz.")))))
-        ; Bodybuilding slang.
-
-(def-itemtype Soda "passwall-soda" :name (can-of "pass-through punch")
+(def-itemtype EffectSoda "passwall-soda" :name (can-of "pass-through punch")
   :color-fg :dark-red
   :level-lo 7
   :info-flavor "It lets you walk through walls! Too bad it doesn't let you see through walls."
-  :passwall-time (seconds 45)
 
-  :info-apply "Allows you to walk through solid obstacles for {passwall-time}. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
-  :soda-effect (fn [self]
-
-    (.add-to-player Passwall self.passwall-time
-      (fn [] (msg "You feel ethereal."))
-      (fn [] (msg "You feel more subtle.")))))
+  :info-apply "Allows you to walk through solid obstacles for {effect-time}. If you're inside a wall when the time runs out, you'll be ejected to the nearest free space."
+  :effect Passwall
+  :effect-time (seconds 45)
+  :start-msg "You feel ethereal."
+  :lengthen-msg "You feel more subtle.")
 
 (def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
   :color-fg :dark-orange
