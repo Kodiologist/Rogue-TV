@@ -18,13 +18,13 @@
   (setv items (list (filter predicate (.values G.itypes))))
   (print title (len items))
   (print "--------------------------------------------------")
-  (for [item (kwc sorted items :key (λ (, (- (it.generation-weight 0)) (- it.level-hi) it.price it.tid)))]
+  (for [item (kwc sorted items :key (λ (, (- (it.generation-weight 0)) (- (or it.level-hi 9999)) it.price it.tid)))]
     (setv s (.format "{:20} {:3} {:.3} {:2} {:2} {:5.5} {}"
       item.tid
       item.price
       (keyword->str item.rarity)
       (if (= item.level-lo 0) "" (+ 1 item.level-lo))
-      (if (= item.level-hi G.max-dungeon-level) "" (+ 1 item.level-hi))
+      (if (none? item.level-hi) "" (+ 1 item.level-hi))
       (re.sub r"\Adark-" "D" (keyword->str item.color-fg))
       item.name.stem))
     (print (slice s 0 (int (subprocess.check-output ["tput" "cols"])))))
