@@ -63,7 +63,9 @@
     (setv itype (get G.itypes tid))
     (.set-appearance itype (afind
       (= it.apid apid)
-      (get ItemAppearance.registry (afind (issubclass itype it) (.keys ItemAppearance.registry))))))
+      (get ItemAppearance.registry (afind (issubclass itype it) (.keys ItemAppearance.registry)))))
+    (when known
+      (setv itype.appearance.known True)))
 
   ; A bit of extra explicit initialization is necessary here
   ; because the omaps, FOV map, and G.player are redundant with
