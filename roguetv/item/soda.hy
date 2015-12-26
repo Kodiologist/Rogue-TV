@@ -119,6 +119,12 @@
   :lengthen-msg "Your jittering intensifies.")
     ; http://knowyourmeme.com/memes/intensifies
 
+(def-itemtype (get G.itypes "speed-soda") "speed-soda-2" :name (can-of "5-minute ENERGY™")
+  :level-lo 14
+  :info-flavor "This extra-strength new-and-improved reformulation of 5-second ENERGY™ is only mildly radioactive."
+
+  :effect-time (minutes 5))
+
 (def-itemtype EffectSoda "confusion-soda" :name (can-of "booze")
   :color-fg :black
   :price-adj :bad-flavor

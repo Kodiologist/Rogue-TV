@@ -154,7 +154,7 @@
   end-msg "You smell presentable again.")
 
 (defcls Haste [Effect]
-  status "5SE"
+  status "Fast"
   end-msg "The rush of energy fades.")
 
 (defcls Confusion [Effect]

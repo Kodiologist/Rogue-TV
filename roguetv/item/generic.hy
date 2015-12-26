@@ -207,22 +207,23 @@
   (when (in tid G.itypes)
     (raise (ValueError (.format "redeclared item type: {}" tid))))
 
+  (setv attrdict (dict (amap
+    (let [[k (get body (* 2 it))] [v (get body (inc (* 2 it)))]]
+      (, (.replace (keyword->str k) "-" "_") v))
+    (range (// (len body) 2)))))
   (setv c (type
     (str (+ "itype:" tid))
     (if (instance? list inherit) (tuple inherit) (, inherit))
-    (dict (amap
-      (let [[k (get body (* 2 it))] [v (get body (inc (* 2 it)))]]
-        (, (.replace (keyword->str k) "-" "_") v))
-      (range (// (len body) 2))))))
+    attrdict))
   (setv (get (globals) c.__name__) c)
     ; This ensures that jsonpickle can recreate itypes.
   (setv (get G.itypes tid) c)
 
   (setv c.tid tid)
-  (when (none? c.name)
+  (when (not-in "name" attrdict)
     (setv c.name c.tid))
   (setv c.name (NounPhrase c.name))
-  (when (none? c.price)
+  (when (not-in "price" attrdict)
     (setv p (*
       (+ c.level-lo 2)
       (ecase c.price-adj
@@ -243,7 +244,6 @@
       [(<= p 150)  10]
       [(<= p 500)  50]
       [True       100]))
-;    (setv round-up-to 1)
     (setv c.price (long (* round-up-to (ceil (/ p round-up-to))))))
 
   c)
