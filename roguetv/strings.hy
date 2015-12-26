@@ -96,7 +96,7 @@
   "OYGEVALT"            ; Oy gevalt
   "PYSZCZYNSKI"         ; Tom Pyszczynski, TMT researcher
   "QLZQQLZUUP"          ; The Emperor Quylthulg in Angband
-  "RETSAMTRAFNEGEL"     ; "Legend[ary] fartmaster" (Undertale) backwards
+  "RETSAMTRAFNEGEL"     ; "Legen[dary] fartmaster" (Undertale) backwards
   "SLITHYTOVES"         ; Jabberwocky
   "SPAM"
   "SPISPOPD"            ; http://doom.wikia.com/wiki/SPISPOPD
