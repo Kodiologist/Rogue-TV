@@ -99,7 +99,7 @@
   :level-lo 1
   :info-flavor "This refreshing beverage has an odd but tasty flavor with notes of beans, Limburger cheese, durian, and asparagus. The, ah, aftereffects are somewhat less pleasant."
 
-  :info-apply (.format "You'll stink for {{effect-time}}. While you stink, monsters within {} squares will run away from you." G.repulsed-from-player-range)
+  :info-apply "You'll stink for {effect-time}. While you stink, monsters within {G.repulsed-from-player-range} squares will run away from you."
   :effect Stink
   :effect-time (seconds 30)
   :start-msg [:aud "cries out in disgust at the pungent odor."]
@@ -112,7 +112,7 @@
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, compared to its namesake, which is basically caffeine, this novel beverage is of mysterious origin, and it's got a veritably supernatural kick, for a (very, very) short time."
     ; Mid-20th-century Cheerios ads
 
-  :info-apply (.format "Increases your walking speed by a factor of {} for {{effect-time}}." G.speedup-soda-factor)
+  :info-apply "Increases your walking speed by a factor of {G.speedup-soda-factor} for {effect-time}."
   :effect Haste
   :effect-time (seconds 5)
   :start-msg "You feel extremely jittery."

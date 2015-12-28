@@ -143,9 +143,22 @@
             (when self.info-carry (+ "<b>Effect when carried:</b> " self.info-carry))
             (when self.info-constant (+ "<b>Constant effect:</b> " self.info-constant)))
           self.info-unidentified)]
-        (dict (lc [[k v] (.items (. (type self) __dict__))] (,
+        ; This bit of magic below is to let you use an info
+        ; string like "Does {foo-bar} and {G.baz-bing}." and
+        ; these will be replaced with self.foo_bar and
+        ; G.baz_bing, as you'd expect.
+        ;
+        ; An extra feature is that variables whose names end with
+        ; with "_time" are displayed with `show-duration`, so
+        ; "Waits for {wait-time}." becomes "Waits for 2 minutes."
+        ; or whatever.
+        (dict (+ [(, "G" self.information-G)] (lc [[k v] (.items (. (type self) __dict__))] (,
           (.replace k "_" "-")
-          (if (.endswith k "_time") (show-duration v) v)))))))]
+          (if (.endswith k "_time") (show-duration v) v))))))))]
+
+  [information-G ((type (str "information-G") (, object) {
+    "__getattr__" (fn [self name]
+      (getattr G (.replace name "-" "_")))}))]
 
   [info-extra (fn [self]
     None)]
