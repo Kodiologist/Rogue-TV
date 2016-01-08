@@ -58,6 +58,14 @@
     ["general-seed" :type int
       :metavar "INTEGER"
       :help "RNG seed for all other events (new game only)"]
+    ["start-at-dl"
+      :metavar "INTEGER"
+      :type (λ
+        (setv it (- (int it) 1))
+        (unless (<= 0 it G.max-dungeon-level)
+          (raise (argparse.ArgumentTypeError "no such dungeon level")))
+        it)
+      :help "starting dungeon level (new game only)"]
     ["save" :type uni
       :metavar "FILEPATH"
       :help "where to read saved games and write saved games to"]

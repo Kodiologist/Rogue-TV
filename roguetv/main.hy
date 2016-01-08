@@ -35,7 +35,7 @@
   (setv G.map-rng-state (random.getstate))
   (random.seed (get G.seeds "general"))
 
-  (setv G.dungeon-level 0)
+  (setv G.dungeon-level (or p.start-at-dl 0))
   (reset-level)
 
   (setv (get G.dates "started") (real-timestamp)))
