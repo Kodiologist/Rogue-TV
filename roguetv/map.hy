@@ -24,11 +24,27 @@
   [opaque-container False]
     ; Whether the player can see what item is on the tile.
 
+  [__format__ (fn [self formatstr]
+    ; ":full" is accepted at the end of a format string to
+    ; include the name-suffix.
+    (setv full False)
+    (when (.endswith formatstr ":full")
+      (setv formatstr (slice formatstr 0 (- (len ":full"))))
+      (setv full True))
+    (.escape self (kwc cat :sep " " (.__format__ self.name formatstr)
+      (when full (.name-suffix self)))))]
+
   [information (fn [self]
-    (.format "\n  {} {:a}\n\n{}"
+    (.format "\n  {} {:a:full}\n\n{}"
       (.xml-symbol self)
       self
       (apply .format [self.info-text] (. (type self) __dict__))))]
+
+  [name-suffix (fn [self]
+    ; This method can be overridden to provide extra information
+    ; about a tile, like its state. It's only displayed with the
+    ; "most" formatting tag.
+    None)]
 
   [use-tile (fn [self]
     ; The player has used the command :use-tile on this tile.
@@ -48,8 +64,13 @@
     ; the creature is not moved), and True to continue.
     True)]
 
+  [after-entering (fn [self cr p-from]
+    ; A creature has just moved to this tile, by any means.
+    None)]
+
   [after-step-onto (fn [self cr p-from]
-    ; A creature has just finished stepping onto this tile.
+    ; A creature has just finished walking onto this tile.
+    ; Teleportation, for example, won't trigger this.
     None)]
 
   [step-out-of (fn [self cr p-to]
@@ -389,6 +410,54 @@
     ; get here, it doesn't slip.
     (when (= (- p-to self.pos) cr.ice-slip-towards)
       (cr.reset-ice-slipping)))]])
+
+(defcls StasisTrap [Tile]
+  name (NounPhrase "stasis trap")
+  name-suffix (meth [] (if @trap-active "(on)" "(off)"))
+
+  get-char (meth [] (if @trap-active "✦" "✧"))
+  get-color-bg (meth [] (if @trap-active :dark-orange :gold))
+
+  info-text "This tile toggles between two states, on and off, in a fixed pattern. Any creature caught on the tile when it's on will be temporarily frozen. The trap will stay off for the duration of this stasis plus a 1-second grace period, then return to its old pattern."
+
+  unpleasant True
+  smooth True
+
+  freeze-time (meth [] (+ @on-time (seconds
+    (randint (inc G.dungeon-level) (inc (* 3 G.dungeon-level))))))
+  grace-time (seconds 1) ; N.B. Hard-coded in the info-text above.
+
+  __init__ (meth [off-time on-time]
+    (Tile.__init__ @)
+    (set-self off-time on-time)
+    (setv @trap-active False)
+    (@schedule)
+    (when @pos
+      (@act))
+    None)
+
+  act (meth []
+    (setv cycle-time (+ @off-time @on-time))
+    (setv cycle-pos (% G.current-time cycle-time))
+    (setv last-cycle-start (* (// G.current-time cycle-time) cycle-time))
+    (setv @trap-active (>= cycle-pos @off-time))
+    (setv @next-turn (+ last-cycle-start
+      (if @trap-active cycle-time @off-time)))
+    (@freeze-creature))
+
+  after-entering (meth [cr p-from]
+    (@freeze-creature))
+
+  freeze-creature (meth []
+    (when @trap-active (whenn (.at (rtv-get creature.Creature) @pos)
+      (cond
+        [(player? it) (msg "You are frozen by {:the}." @)]
+        [(seen @pos) (msg "{:The} {:v:is} frozen by {:the}." it it @)])
+      (setv freeze-time (@freeze-time))
+      (.take-time it freeze-time)
+      (setv @trap-active False)
+      (setv @next-turn (+ G.current-time freeze-time @grace-time)))
+      True)))
 
 ; Below, we create a dictionary tile-save-shorthand which
 ; holds unambiguous single-character abbreviations for tiles.

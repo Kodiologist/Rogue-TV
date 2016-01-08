@@ -63,6 +63,12 @@
       (self.reset-ice-slipping)
       (.take-time self slip-time)))]
 
+  [move (fn [self p-to &optional [clobber False]]
+    (setv p-from self.pos)
+    (MapObject.move self p-to clobber)
+    (unless (none? self.pos)
+      (.after-entering (Tile.at self.pos) self p-from)))]
+
   [walk-to (fn [self p-to] (block
     (unless (.bump-into (mget p-to) self)
       (ret False))
@@ -94,9 +100,10 @@
       (self.walk-speed))))
       ; Hence, a creature with walk-speed 1 takes 1 second to walk
       ; 1 unit of distance.
+    (when cr
+      (msg "You push past {:the}." cr))
     (kwc .move self p-to :+clobber)
     (when cr
-      (msg "You push past {:the}." cr)
       (.move cr p-from))
     (when (player? self)
       (rtv display.describe-tile self.pos))

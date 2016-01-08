@@ -29,6 +29,7 @@
     (Creature.__init__ self pos)
     (setv self.effects [])
     (setv self.just-slept False)
+    (setv self.last-turn 0)
     None)]
 
   [ice-immune (fn [self]
@@ -61,10 +62,11 @@
     (when self.just-slept
       (setv self.just-slept False)
       (msg "You wake up."))
-    (full-redraw)
-    (do-normal-command (get-normal-command))
     (setv G.last-action-duration
-      (- self.next-turn G.current-time)))]
+      (- G.current-time self.last-turn))
+    (full-redraw)
+    (setv self.last-turn G.current-time)
+    (do-normal-command (get-normal-command)))]
 
   [get-effect (fn [self effect-cls]
     (afind-or (instance? effect-cls it) self.effects))]

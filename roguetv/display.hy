@@ -240,7 +240,7 @@
       (whenn (Item.at p)
         (.format "  {} {} {:a:full}" (get look-at-keys :item) (.xml-symbol it) it)))
     (or dunno
-      (.format "  {} {} {:a}" (get look-at-keys :tile) (.xml-symbol (Tile.at p)) (Tile.at p)))])
+      (.format "  {} {} {:a:full}" (get look-at-keys :tile) (.xml-symbol (Tile.at p)) (Tile.at p)))])
   (setv lines (amap (AttrStr.from-xml (or it "      ---")) lines))
   (assert (= (len lines) G.look-mode-legend-height))
   (setv width (min G.screen-width (inc (max (map len lines)))))
@@ -257,9 +257,9 @@
         ; This triggers even when 'verbose' is false because
         ; there's an item covering this tile, so the tile type
         ; may not be obvious.
-        (msg "There is also {} {:a} here." (.xml-symbol tile) tile)))]
+        (msg "There is also {} {:a:full} here." (.xml-symbol tile) tile)))]
     [verbose
       (if (instance? Floor tile)
         (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
           (if (G.player.name.female) "dowdy" "cull"))
-        (msg "There is {} {:a} here." (.xml-symbol tile) tile))]))
+        (msg "There is {} {:a:full} here." (.xml-symbol tile) tile))]))

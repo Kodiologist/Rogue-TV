@@ -5,7 +5,7 @@
   [random [choice randint]]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [concat shift ret retf weighted-choice]]
+  [kodhy.util [unique pairs concat shift ret retf weighted-choice]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Generated Scheduled LevelTimer set-time-limit]]
@@ -273,6 +273,46 @@
   max-cheb-radius (cmeth []
     (+ 1 (// @dl 4)))
   make-tile (cmeth [] (Web)))
+
+(defobst O-StasisTraps [Obstacle]
+  level-lo 4
+  off-time-table (pairs
+    0  (seconds 10)
+    1  (seconds 8)
+    2  (seconds 5)
+    6  (seconds 4)
+    8  (seconds 3)
+    10 (seconds 2)
+    12 (seconds 2)
+    15 (seconds 1)
+    18 (seconds .5))
+  off-time (cmeth []
+    (choice (lc [[min-dl span] @off-time-table]
+      (>= @dl min-dl)
+      span)))
+  on-time (cmeth []
+    (seconds (randint 2 (+ 2 @dl))))
+  f (cmeth []
+    (setv start (get @free-floors 0))
+    ; Send two orthogonal line segments out from the start until
+    ; each end hits a position that isn't a free floor. Place
+    ; stasis traps along the shorter line segment.
+    (setv spokes (dict
+      (amap
+        (, it (do
+           (setv spoke [start])
+           (while (in (+ (get spoke -1) it) @free-floors)
+             (.append spoke (+ (get spoke -1) it)))
+           spoke))
+        Pos.ORTHS)))
+    (setv line (kwc min :key len (shuffle [
+      (+ (get spokes Pos.WEST) (get spokes Pos.EAST))
+      (+ (get spokes Pos.NORTH) (get spokes Pos.SOUTH))])))
+    (setv off-time (@off-time))
+    (setv on-time (@on-time))
+    (for [p (unique line)]
+      (.remove @free-floors p)
+      (mset p (StasisTrap off-time on-time)))))
 
 (defobst O-Dogs [Obstacle]
   level-lo 2
