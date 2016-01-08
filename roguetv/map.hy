@@ -354,14 +354,14 @@
 (defclass Slime [Tile HasExitTime] [
   [name (kwc NounPhrase "slime" :+mass :unit "puddles")]
   [char "}"]
-  [info-text "Stepping into this mystery sludge is easy enough, but stepping out of it will take some time as you free yourself."]
+  [info-text "Stepping into this mystery sludge takes time."]
     ; The term "mystery sludge" is from MXC.
   [color-fg :white]
   [color-bg :dark-green]
 
   [unpleasant True]
 
-  [step-out-of (fn [self cr p-to]
+  [after-step-onto (fn [self cr p-from]
     (unless (or cr.flying cr.slime-immune)
       (.do-time-penalty self cr)))]])
 
@@ -369,7 +369,7 @@
   [name (NounPhrase "spiderweb")]
   [char "%"]
   [color-fg :dark-blue]
-  [info-text "This sizable web will make stepping out of its tile difficult, just like slime. Furthermore, while you're standing in a web, you can't apply or drop items."]
+  [info-text "This sizable web will make stepping into its tile difficult, just like slime. Furthermore, while you're standing in a web, you can't apply or drop items."]
 
   [unpleasant True]
 
@@ -380,7 +380,7 @@
         (msg :tara "{p:The} is stuck in the web. {p:He} can't use items.")
         False)))]
 
-  [step-out-of (fn [self cr p-to]
+  [after-step-onto (fn [self cr p-from]
     (unless cr.web-immune
       (.do-time-penalty self cr)))]])
 
