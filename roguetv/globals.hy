@@ -60,6 +60,7 @@
   :very-dark-gray 235
   :red 196
   :dark-red 88
+  :pale-pink 219
   :green 46
   :dark-green 22
   :blue 21

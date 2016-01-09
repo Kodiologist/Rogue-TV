@@ -2,7 +2,7 @@
 
 (import
   [random [randint uniform]]
-  [kodhy.util [ret]]
+  [kodhy.util [ret ucfirst]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -342,7 +342,7 @@
         (.delete item)))
     (mset @pos (Floor)))))
 
-(defclass HasExitTime [object] [
+(defclass HasTimePenalty [object] [
 
   [min-exit-time (fn [self] (seconds 1))]
   [max-exit-time (fn [self] (seconds (inc (* 2 G.dungeon-level))))]
@@ -351,7 +351,7 @@
     (.take-time cr (round-to-second
       (uniform (.min-exit-time self) (.max-exit-time self)))))]])
 
-(defclass Slime [Tile HasExitTime] [
+(defclass Slime [Tile HasTimePenalty] [
   [name (kwc NounPhrase "slime" :+mass :unit "puddles")]
   [char "}"]
   [info-text "Stepping into this mystery sludge takes time."]
@@ -365,7 +365,7 @@
     (unless (or cr.flying cr.slime-immune)
       (.do-time-penalty self cr)))]])
 
-(defclass Web [Tile HasExitTime] [
+(defclass Web [Tile HasTimePenalty] [
   [name (NounPhrase "spiderweb")]
   [char "%"]
   [color-fg :dark-blue]
@@ -458,6 +458,25 @@
       (setv @trap-active False)
       (setv @next-turn (+ G.current-time freeze-time @grace-time)))
       True)))
+
+(defcls PusherTile [Tile HasTimePenalty]
+  children {}
+  name (NounPhrase "pusher tile")
+  name-suffix (meth [] (.format "(pointing {})" (get Pos.DIRNAMES @push-dir)))
+  color-bg :pale-pink
+
+  info-text  "This tile exerts a mysterious force that pushes creatures in the direction of the arrow printed on it. Exiting it from any direction except the indicated one (even diagonally) will slow you down."
+
+  step-out-of (meth [cr p-to]
+    (unless (= p-to (+ @pos @push-dir))
+      (@do-time-penalty cr))))
+
+(for [d Pos.ORTHS]
+  (setv cname (str (+ "PusherTile" (ucfirst (get Pos.DIRNAMES d)))))
+  (setv (get (globals) cname) (type cname (, PusherTile) {
+    "char" (get {Pos.EAST "→" Pos.NORTH "↑" Pos.WEST "←" Pos.SOUTH "↓"} d)
+    "push_dir" d}))
+  (setv (get PusherTile.children d) (get (globals) cname)))
 
 ; Below, we create a dictionary tile-save-shorthand which
 ; holds unambiguous single-character abbreviations for tiles.
