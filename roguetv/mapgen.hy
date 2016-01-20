@@ -231,6 +231,10 @@
   max-cheb-radius None
   make-tile None
 
+  make-tiles (cmeth [ps]
+    (for [p ps]
+      (mset p (@make-tile))))
+
   f (cmeth []
       (setv mcr (@max-cheb-radius))
       (setv n-to-place (randint
@@ -253,8 +257,7 @@
         ; We couldn't find anywhere to place the remaining tiles.
         ; So, just quit the outer loop.
         (break))))
-      (for [p occupied]
-        (mset p (@make-tile)))))
+      (@make-tiles occupied)))
 
 (defobst O-Slime [MudlikeObstacle]
   max-cheb-radius (cmeth []
@@ -273,6 +276,24 @@
   max-cheb-radius (cmeth []
     (+ 1 (// @dl 4)))
   make-tile (cmeth [] (Web)))
+
+(defobst O-PusherTiles [MudlikeObstacle]
+  level-lo 7
+  max-cheb-radius (cmeth []
+    (+ 2 (// @dl 4)))
+  make-tiles (cmeth [ps]
+    (setv open [])
+    (setv closed (list Pos.ORTHS))
+    (for [p ps]
+      (for [d (list closed)]
+        (when (and (not-in (+ d p) ps)
+            (not (. (mget (+ d p)) blocks-movement)))
+          (.append open d)
+          (.remove closed d))))
+    (setv tile-type (get PusherTile.children
+      (choice (or open Pos.ORTHS))))
+    (for [p ps]
+      (mset p (tile-type)))))
 
 (defobst O-StasisTraps [Obstacle]
   level-lo 4
