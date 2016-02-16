@@ -2,10 +2,10 @@
 
 (import
   random
-  [random [choice randint]]
+  [random [choice randint normalvariate]]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [unique pairs concat shift ret retf weighted-choice]]
+  [kodhy.util [unique pairs concat shift ret retf weighted-choice merge-dicts]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Generated Scheduled LevelTimer set-time-limit]]
@@ -156,30 +156,40 @@
   (for [item G.inventory]
     (.on-reset-level item)))
 
+(defn gen-count [dl mean-base mean-dl sd-base sd-dl minimum]
+  (int (round (max minimum (normalvariate
+    (+ mean-base (* dl mean-dl))
+    (+ sd-base (* dl sd-dl)))))))
+(setv gen-count-params (kwc dict
+  :obstacles (kwc dict
+    :mean_base 8 :mean_dl 2
+    :sd_base 3 :sd_dl 1
+    :minimum 1)
+  :benefits (kwc dict
+    :mean_base 0 :mean_dl .5
+    :sd_base 1 :sd_dl .25
+    :minimum 0)
+  :items (kwc dict
+    :mean_base 4 :mean_dl .5
+    :sd_base 2 :sd_dl .25
+    :minimum 1)))
+(defn gen-count-for [dl thingtype]
+  (apply gen-count [] (merge-dicts
+    (get gen-count-params thingtype)
+    {"dl" dl})))
+
 (defn select-obstacles [dl]
   (setv weighted-otypes (amap
     (, (it.generation-weight dl) it)
     Obstacle.types))
-  (replicate (+ 1 (randgeom (+ 10 (* 2 dl))))
-       ; This yields:
-       ; level         quantiles
-       ;      .025  .25   .5  .75 .975
-       ; 1       1    3    8   15   39
-       ; 10      1    9   20   40  106
-       ; 20      2   14   34   68  179
+  (replicate (gen-count-for dl "obstacles")
     (weighted-choice weighted-otypes)))
 
 (defn select-benefits [dl]
   (setv weighted-btypes (amap
     (, (it.generation-weight dl) it)
     Benefit.types))
-  (replicate (randgeom (+ 1 (/ dl 5)))
-       ; This yields:
-       ; level         quantiles
-       ;      .025  .25   .5  .75 .975
-       ;  1      0    0    0    1    5
-       ; 10      0    0    2    4   12
-       ; 20      0    1    3    7   19
+  (replicate (gen-count-for dl "benefits")
     (weighted-choice weighted-btypes)))
 
 (defn select-items [dl]
@@ -189,17 +199,11 @@
   (setv weighted-itypes-chest (amap
     (, (kwc it.generation-weight dl :+in-chest) it)
     (.values G.itypes)))
-  (replicate (+ 1 (randgeom (+ 5 dl))) (do
-       ; This yields:
-       ; level         quantiles
-       ;      .025  .25   .5  .75 .975
-       ; 1       1    2    4    8   21
-       ; 10      1    5   11   21   54
-       ; 20      1    8   17   34   91
+  (replicate (gen-count-for dl "items")
     (setv in-chest (1-in 8))
     (, in-chest (weighted-choice (if in-chest
       weighted-itypes-chest
-      weighted-itypes))))))
+      weighted-itypes)))))
 
 (defcls Obstacle [Generated]
   types [])
