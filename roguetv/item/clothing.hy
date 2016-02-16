@@ -108,6 +108,24 @@
   :carry-cheb-walk True
   :info-carry "When you walk, diagonal moves take the same amount of time as orthogonal moves.")
 
+(setv circ-fmt "You can walk into the {} border of the map to magically wrap around to the farthest available tile on the other side.")
+
+(def-itemtype Clothing "circ-choker" :name "circular choker"
+  :color-fg :blue
+  :level-lo 14
+  :info-flavor "A close-fitting necklace for the geometrically savvy and the topologically flexible."
+
+  :carry-mapwrap-eastwest True
+  :info-carry (.format circ-fmt "east or west"))
+
+(def-itemtype Clothing "circ-ring" :name "circular ring"
+  :color-fg :blue
+  :level-lo 16
+  :info-flavor "Somehow, it looks like a tiny sideways necklace."
+
+  :carry-mapwrap-northsouth True
+  :info-carry (.format circ-fmt "north or south"))
+
 (def-itemtype Clothing "distressed-jeans" :name (pair-of "faux-distressed blue jeans")
   :color-fg :dark-blue
   :price-adj :bad-flavor

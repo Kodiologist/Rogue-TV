@@ -6,7 +6,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject Scheduled]]
-  [roguetv.map [Tile on-map mget room-for? circ-taxi]]
+  [roguetv.map [Tile on-map mget room-for? outer-corner-pos circ-taxi]]
   [roguetv.item [Item]])
 
 (defclass Creature [Drawable MapObject Scheduled NounPhraseNamed] [
@@ -70,11 +70,39 @@
       (.after-entering (Tile.at self.pos) self p-from)))]
 
   [walk-to (fn [self p-to] (block
+    (setv p-from self.pos)
+    (setv dist (.walk-dist self p-from p-to))
     (unless (.bump-into (mget p-to) self)
       (ret False))
-    (when (player? self) (whenn (afind-or it.superheavy (active-inv))
-      (msg "You can't move an inch so long as you're clinging to {:the}." it)
-      (ret False)))
+    (when (player? self)
+      (whenn (afind-or it.superheavy (active-inv))
+        (msg "You can't move an inch so long as you're clinging to {:the}." it)
+        (ret False))
+      (when (not (on-map p-to))
+        ; If the player has an item that allows them to wrap
+        ; around the map, apply it.
+        (when (and (in p-to (outer-corner-pos))
+            (afind-or (or it.carry-mapwrap-eastwest it.carry-mapwrap-northsouth) (active-inv)))
+          (msg :tara "Please don't try to wrap through a corner of the dungeon, {p}. That could tear the spacetime continuum and destroy the universe.")
+          (ret False))
+        (for [[pa item-attr max-coord d-neg d-pos] [
+            ["x" "carry_mapwrap_eastwest" G.map-width Pos.WEST Pos.EAST]
+            ["y" "carry_mapwrap_northsouth" G.map-height Pos.SOUTH Pos.NORTH]]]
+          (unless (and
+              (in (getattr p-to pa) [-1 max-coord])
+              (afind-or (getattr it item-attr) (active-inv)))
+            (continue))
+          (setattr p-to pa
+            (if (= (getattr p-to pa) -1) (dec max-coord) 0))
+          (setv d (if (getattr p-to pa) d-neg d-pos))
+          (while True
+            (when (room-for? self p-to)
+              (break))
+            (+= p-to d)
+            (when (= (getattr p-to pa) (getattr p-from pa))
+              (.take-time self (seconds (/ dist (self.walk-speed))))
+              (msg :tara "Looks like {p} doesn't have room to wrap around the level here.")
+              (ret False))))))
     (when (or
         (not (on-map p-to))
         (and (. (Tile.at p-to) blocks-movement)
@@ -93,11 +121,8 @@
         (ret False))
       (.take-time self self.push-past-monster-time))
     ; Okay, we're clear to move.
-    (setv p-from self.pos)
     (.step-out-of (Tile.at p-from) self p-to)
-    (.take-time self (seconds (/
-      (.walk-dist self p-from p-to)
-      (self.walk-speed))))
+    (.take-time self (seconds (/ dist (self.walk-speed))))
       ; Hence, a creature with walk-speed 1 takes 1 second to walk
       ; 1 unit of distance.
     (when cr

@@ -47,6 +47,10 @@
     ; If True, the player is immune to ice.
   [carry-cheb-walk False]
     ; If True, the player walks according to the Chebyshev metric.
+  [carry-mapwrap-eastwest False]
+    ; bleh
+  [carry-mapwrap-northsouth False]
+    ; bleh
   [carry-gadget-malfunction-1in None]
     ; A chance of gadgets malfunctioning when they're applied.
   [carry-instant-gadget-use False]

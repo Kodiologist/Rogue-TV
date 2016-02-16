@@ -102,6 +102,10 @@
 (defn on-map [pos]
   (and (<= 0 pos.x (dec G.map-width)) (<= 0 pos.y (dec G.map-height))))
 
+(defn outer-corner-pos []
+  [(Pos -1 -1) (Pos G.map-width -1)
+    (Pos -1 G.map-height) (Pos G.map-width G.map-height)])
+
 (defn room-for? [mo-class pos]
   (and
     (on-map pos)
