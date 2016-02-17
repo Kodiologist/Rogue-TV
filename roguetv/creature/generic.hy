@@ -18,6 +18,8 @@
   [flying False]
   [slime-immune False]
   [web-immune False]
+  [heavy False]
+    ; A heavy creature can't be pushed past by the player.
 
   [__init__ (fn [self &optional pos]
     (MapObject.__init__ self pos)
@@ -118,6 +120,9 @@
     ; can't push past the player or each other.
     (when cr
       (unless (player? self)
+        (ret False))
+      (when cr.heavy
+        (msg "You're far too puny to push past {:the}." cr)
         (ret False))
       (.take-time self self.push-past-monster-time))
     ; Okay, we're clear to move.

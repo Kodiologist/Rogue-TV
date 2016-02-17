@@ -13,7 +13,7 @@
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item Curse]]
   [roguetv.creature [Creature Effect]]
-  [roguetv.creature.monster [Snail Spider Nymph Dog Cat]])
+  [roguetv.creature.monster [Snail Spider Nymph Dog Cat Golem]])
 
 (defn reset-level []
 
@@ -359,12 +359,16 @@
 (defobst O-Snails [NormalMonster]
   cr-cls Snail)
 
+(defobst O-Golem [NormalMonster]
+  level-lo 2
+  cr-cls Golem)
+
 (defobst O-Spiders [NormalMonster]
-  level-lo 3
+  level-lo 4
   cr-cls Spider)
 
 (defobst O-Nymph [NormalMonster]
-  level-lo 6
+  level-lo 7
   cr-cls Nymph
   max-to-place 1)
 

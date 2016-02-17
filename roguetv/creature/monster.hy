@@ -4,7 +4,7 @@
   [random [choice]]
   pypaths.astar
   [heidegger.pos [Pos]]
-  [kodhy.util [ret weighted-choice]]
+  [kodhy.util [ret weighted-choice maxes]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -206,6 +206,39 @@
       (@flee-from-player)
       (wander @)
       (@wait))))
+
+(defcls Golem [Monster]
+  name (NounPhrase "golem")
+  char "g"
+  color-fg :brown
+  info-text "A massive clay humanoid given a semblance of life by magic. It's very slow and it moves in a fixed pattern, but it's too heavy to push past."
+
+  walk-speed (meth [] (/ 1 5))
+  change-dir-time (seconds 2)
+  heavy True
+
+  __init__ (meth [&optional pos]
+    (.__init__ (super Golem @) pos)
+    (setv @dir None)
+    None)
+
+  act (meth []
+    ; If we have no direction set, choose the orthogonal
+    ; direction we can walk the farthest in.
+    (unless @dir
+      (setv @dir (first (maxes (shuffle Pos.ORTHS) (λ
+        (setv n 1)
+        (while (room-for? @ (+ @pos (* n it)))
+          (+= n 1))
+        n)))))
+    ; If we have room, walk forward. Otherwise, turn around.
+    ; (When trapped, we'll just spend all our time turning back
+    ; and forth.)
+    (if (room-for? @ (+ @pos @dir))
+      (@walk-to (+ @pos @dir))
+      (do
+        (setv @dir (* -1 @dir))
+        (@take-time @change-dir-time)))))
 
 (defcls Nymph [Monster]
   name (NounPhrase "nymph")
