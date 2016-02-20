@@ -110,6 +110,7 @@
   (setv Obstacle.door-pos (shuffle (concat (amap
     (amap (- it (Pos 1 1)) it.doors)
     (get dugout "rooms")))))
+  (setv Obstacle.golem-pos [])
   (for [o-type (select-obstacles dl)]
     (.f o-type))
 
@@ -352,16 +353,31 @@
   max-to-place 3
 
   f (cmeth []
-      (setv n-to-place (randint 1 @max-to-place))
-      (for [_ (range n-to-place)]
-        (kwc @cr-cls :pos (shift @free-floors)))))
+    (setv n-to-place (randint 1 @max-to-place))
+    (for [_ (range n-to-place)]
+      (kwc @cr-cls :pos (shift @free-floors)))))
 
 (defobst O-Snails [NormalMonster]
   cr-cls Snail)
 
-(defobst O-Golem [NormalMonster]
+(defobst O-Golem [Obstacle]
   level-lo 2
-  cr-cls Golem)
+
+  max-to-place 3
+
+  f (cmeth []
+    (setv n-to-place (randint 1 @max-to-place))
+    (for [p (list @free-floors)]
+      (when (afind-or (or (= it.x p.x) (= it.y p.y)) @golem-pos)
+        ; Never place a golem on a horizontal or vertical line
+        ; with another golem. That could make it impossible for
+        ; the player to get through a corridor.
+        (continue))
+      (kwc Golem :pos p)
+      (.append @golem-pos p)
+      (.remove @free-floors p)
+      (unless n-to-place
+        (break)))))
 
 (defobst O-Spiders [NormalMonster]
   level-lo 4
