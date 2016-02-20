@@ -1,12 +1,13 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  random
   [kodhy.util [ret]]
   [roguetv.english [NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Drawable MapObject Scheduled]]
-  [roguetv.map [Tile on-map mget room-for? outer-corner-pos circ-taxi]]
+  [roguetv.map [Tile on-map mget room-for? outer-corner-pos circ-taxi disc-taxi]]
   [roguetv.item [Item]])
 
 (defclass Creature [Drawable MapObject Scheduled NounPhraseNamed] [
@@ -18,6 +19,7 @@
   [flying False]
   [slime-immune False]
   [web-immune False]
+  [spook-immune False]
   [heavy False]
     ; A heavy creature can't be pushed past by the player.
 
@@ -135,6 +137,12 @@
     (kwc .move self p-to :+clobber)
     (when cr
       (.move cr p-from))
+    (for [p (disc-taxi p-to G.spook-radius)]
+      (when (and (. (mget p) spooky) (not self.spook-immune))
+        (.take-time self (.spook-time self))
+        (when (and (player? self) (not (. (mget p) player-noticed-spook)))
+          (setv (. (mget p) player-noticed-spook) True)
+          (msg "The hair on the back of your neck stands up."))))
     (when (player? self)
       (rtv display.describe-tile self.pos))
     (.after-step-onto (Tile.at p-to) self p-from)
@@ -149,7 +157,10 @@
   [walk-speed (fn [self]
     ; Return the applicable multiplier for the creature's walking
     ; speed.
-    1)]])
+    1)]
+
+  [spook-time (fn [self]
+    (seconds (random.randint 1 (inc G.dungeon-level))))]])
 
 (defcls Effect [Scheduled]
 ; Despite that this class is in creature.generic instead of

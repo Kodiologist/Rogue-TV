@@ -18,6 +18,8 @@
     ; `unpleasant` is a flag meaning that monsters tend not to
     ; want to be on this kind of tile.
   [smooth False]
+  [spooky False]
+    ; Whether the tile has an aura that slows movement.
   [container False]
     ; Whether the tile prevents items from being added to or
     ; removed from it.
@@ -481,6 +483,19 @@
     "char" (get {Pos.EAST "→" Pos.NORTH "↑" Pos.WEST "←" Pos.SOUTH "↓"} d)
     "push_dir" d}))
   (setv (get PusherTile.children d) (get (globals) cname)))
+
+(defcls SpookyTotem [Tile]
+  name (NounPhrase "spooky totem")
+  char "&"
+  color-fg :dark-orange
+  info-text (.format "This is a tall, unsettling sculpture of fierce, alien-looking monsters twisting about each other and brandishing their teeth at the viewer. Just being within {} squares of it, even if you can't see it, will make you tremble with fear, slowing your movements. Multiple spooky totems have a cumulative effect." G.spook-radius)
+
+  spooky True
+
+  __init__ (meth []
+    (Tile.__init__ @)
+    (setv @player-noticed-spook False)
+    None))
 
 ; Below, we create a dictionary tile-save-shorthand which
 ; holds unambiguous single-character abbreviations for tiles.

@@ -216,6 +216,7 @@
   walk-speed (meth [] (/ 1 5))
   change-dir-time (seconds 2)
   heavy True
+  spook-immune True
 
   __init__ (meth [&optional pos]
     (.__init__ (super Golem @) pos)
