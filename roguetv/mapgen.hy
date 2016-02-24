@@ -340,6 +340,11 @@
       (.remove @free-floors p)
       (mset p (StasisTrap off-time on-time)))))
 
+(defobst O-SpookyTotems [Obstacle]
+  level-lo 11
+  f (cmeth []
+    (mset (shift @free-floors) (SpookyTotem))))
+
 (defobst O-Dogs [Obstacle]
   level-lo 2
   rarity :uncommon
