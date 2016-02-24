@@ -15,13 +15,16 @@
   [roguetv.creature [Creature Effect]]
   [roguetv.creature.monster [Snail Spider Nymph Dog Cat Golem]])
 
-(defn reset-level []
-
-  ; Switch to the map seed.
-  (setv general-rng-state (random.getstate))
-  (random.setstate G.map-rng-state)
+(defn reset-level [&optional [new-seed False]]
 
   (setv dl G.dungeon-level)
+
+  ; Seed the map generator for this level.
+  (setv general-rng-state (random.getstate))
+  (if new-seed
+    (random.seed)
+    (random.seed (get G.seeds "map")))
+  (random.jumpahead (int dl))
 
   (setv G.map-width (+ 50 (* 4 dl)))
   (setv G.map-height (+ 20 (* 2 dl)))
@@ -133,7 +136,6 @@
 
   ; Switch back to the general seed. Now we can add things to the
   ; map that depend on game state.
-  (setv G.map-rng-state (random.getstate))
   (random.setstate general-rng-state)
   ; Re-shuffle free-floors so it can be influenced by the general
   ; RNG state.

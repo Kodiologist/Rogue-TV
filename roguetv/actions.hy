@@ -136,7 +136,7 @@
       (mset G.player.pos (Wall)))]
 
     [(= cmd :reset-level) (when-debugging
-      (rtv mapgen.reset-level))]
+      (rtv mapgen.reset-level True))]
 
     [True
       (raise (ValueError (.format "Unknown command {!r}" cmd)))])))

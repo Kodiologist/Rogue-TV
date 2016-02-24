@@ -97,7 +97,6 @@
 (def version-info None)
 
 (defs seeds None)
-(defs map-rng-state None)
 
 (def look-mode-legend-height 4)
 

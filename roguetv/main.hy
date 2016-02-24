@@ -32,7 +32,6 @@
     (get G.seeds "map") (get G.seeds "general")))
   (random.seed (get G.seeds "map"))
   (ItemAppearance.randomize-appearances)
-  (setv G.map-rng-state (random.getstate))
   (random.seed (get G.seeds "general"))
 
   (setv G.dungeon-level (or p.start-at-dl 0))
