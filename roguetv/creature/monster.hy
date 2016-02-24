@@ -224,6 +224,9 @@
     None)
 
   act (meth []
+    ; The usual call to @flee-from-player is omitted on purpose.
+    ; Golems do not know fear.
+    ;
     ; If we have no direction set, choose the orthogonal
     ; direction we can walk the farthest in.
     (unless @dir
