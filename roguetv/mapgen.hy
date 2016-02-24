@@ -376,6 +376,7 @@
       (kwc Golem :pos p)
       (.append @golem-pos p)
       (.remove @free-floors p)
+      (-= n-to-place 1)
       (unless n-to-place
         (break)))))
 
