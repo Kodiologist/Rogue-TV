@@ -351,7 +351,7 @@
 (defclass HasTimePenalty [object] [
 
   [min-exit-time (fn [self] (seconds 1))]
-  [max-exit-time (fn [self] (seconds (inc (* 2 G.dungeon-level))))]
+  [max-exit-time (fn [self] (seconds (* 2 (inc G.dungeon-level))))]
   
   [do-time-penalty (fn [self cr]
     (.take-time cr (round-to-second
@@ -402,7 +402,7 @@
   [smooth True]
 
   [min-slip-time (fn [self] (seconds 1))]
-  [max-slip-time (fn [self] (seconds (inc (* 2 G.dungeon-level))))]
+  [max-slip-time (fn [self] (seconds (* 2 (inc G.dungeon-level))))]
 
   [after-step-onto (fn [self cr p-from]
     (unless (or cr.flying (.ice-immune cr))
@@ -430,7 +430,7 @@
   smooth True
 
   freeze-time (meth [] (+ @on-time (seconds
-    (randint (inc G.dungeon-level) (inc (* 3 G.dungeon-level))))))
+    (randint (inc G.dungeon-level) (* 3 (inc G.dungeon-level))))))
   grace-time (seconds 1) ; N.B. Hard-coded in the info-text above.
 
   __init__ (meth [off-time on-time]
