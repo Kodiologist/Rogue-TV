@@ -241,27 +241,29 @@
     (setv c.name c.tid))
   (setv c.name (NounPhrase c.name))
   (when (not-in "price" attrdict)
-    (setv p (*
-      (+ c.level-lo 2)
+    (setv price-grade (or (.get attrdict "price_grade") (+
+      c.level-lo
       (ecase c.price-adj
-        [None         1]
-        [:bad-flavor  2]
+        [None         0]
+        [:bad-flavor  4]
           ; Items that are flavored items (e.g., gadgets) and
           ; have generally bad effects are worth more, so they
           ; can still be valuable to the player.
-        [:burden      4])
+        [:burden      6])
           ; Items that are high-value but worse than useless.
       (ecase c.rarity
-        [:common   1]
+        [:common   0]
         [:uncommon 2]
-        [:rare     3])))
-    (setv round-up-to (cond
-      [(<= p  15)   1]
-      [(<= p  50)   5]
-      [(<= p 150)  10]
-      [(<= p 500)  50]
-      [True       100]))
-    (setv c.price (long (* round-up-to (ceil (/ p round-up-to))))))
+        [:rare     4]))))
+    (setv c.price (get
+      [
+        5 6 7 8 10
+        12 14 17 20 25
+        30 35 40 50 60
+        70 80 100 120 140
+        170 200 230 275 325
+        400 500 600 700 800]
+      price-grade)))
 
   c)
 
