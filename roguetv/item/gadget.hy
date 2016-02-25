@@ -398,7 +398,6 @@
   (len (filt (instance? Gadget it) (.values G.itypes)))))
 
 (defclass Battery [Item] [
-  [price 1]
   [char "="]
   [apply-time (seconds 1)]
   [charge-factor None]
@@ -427,11 +426,13 @@
 
 (def-itemtype Battery "battery-small" :name "button battery"
   :color-fg :red
+  :price 1
   :info-apply "Restores half of a gadget's maximum charges, rounded up."
   :charge-factor .5)
 
 (def-itemtype Battery "battery-big" :name "big battery"
   :color-fg :blue
+  :price 1
   :level-lo 4
   :info-apply "Completely restores a gadget's charges."
   :charge-factor 1)
