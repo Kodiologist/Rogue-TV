@@ -13,7 +13,7 @@
   [roguetv.fov [init-fov-map]]
   [roguetv.item [Item Curse]]
   [roguetv.creature [Creature Effect]]
-  [roguetv.creature.monster [Snail Spider Nymph Dog Cat Golem]])
+  [roguetv.creature.monster [Snail Spider Nymph Dog Cat Golem UmberHulk]])
 
 (defn reset-level [&optional [new-seed False]]
 
@@ -408,3 +408,8 @@
 (defben B-DoublingMachine [Benefit]
   f (cmeth []
     (mset (shift @free-floors) (DoublingMachine))))
+
+(defben B-UmberHulk [Benefit]
+  level-lo 2
+  f (cmeth []
+    (kwc UmberHulk :pos (shift @free-floors))))

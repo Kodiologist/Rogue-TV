@@ -9,7 +9,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Scheduled]]
-  [roguetv.map [Tile Floor Slime Web room-for? mset on-map disc-taxi in-los?]]
+  [roguetv.map [Tile Wall Floor Slime Web room-for? mget mset on-map disc-taxi in-los?]]
   [roguetv.item [Item drop-pos]]
   [roguetv.creature [Creature Stink]])
 
@@ -243,6 +243,26 @@
       (do
         (setv @dir (* -1 @dir))
         (@take-time @change-dir-time)))))
+
+(defcls UmberHulk [Monster]
+  name (NounPhrase "umber hulk")
+  char "U"
+  color-fg :brown
+  info-text "This creature is large and looks monstrous, like a giant bipedal insect, but what it hungers for is earth and stone. It wanders around gobbling up walls, hopefully creating some passages that are useful to you."
+
+  dig-time (seconds 5)
+
+  act (meth [] (block
+    (when (@flee-from-player)
+      (ret))
+    (for [d (shuffle Pos.ORTHS)]
+      (setv p (+ @pos d))
+      (when (and (instance? Wall (mget p)) (none? (Creature.at p)))
+        (mset p (Floor))
+        (@take-time @dig-time)
+        (@walk-to p)
+        (ret)))
+    (or (wander @) (@wait)))))
 
 (defcls Nymph [Monster]
   name (NounPhrase "nymph")
