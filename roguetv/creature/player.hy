@@ -55,7 +55,7 @@
           1)
         (active-inv))
       [(if (.get-effect self Haste)
-        G.speedup-soda-factor
+        G.haste-factor
         1)]))))]
 
   [act (fn [self]

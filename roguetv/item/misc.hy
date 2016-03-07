@@ -2,8 +2,11 @@
 
 (import
   [roguetv.globals :as G]
+  [roguetv.util [*]]
   [roguetv.english [NounPhrase]]
-  [roguetv.item.generic [Item def-itemtype]])
+  [roguetv.item.generic [Item def-itemtype get-other-item]]
+  [roguetv.creature [Haste]]
+  [kodhy.util [ret]])
 
 (def-itemtype Item "aoy"
   :name (kwc NounPhrase "Amulet of Yendor" :+the-proper)
@@ -15,6 +18,59 @@
   :unique True
   :rarity :nongen
   :indestructible True)
+
+(def-itemtype Item "stormbringer"
+  :name (kwc NounPhrase "Stormbringer" :+bare-proper)
+  :char ")"
+  :color-fg :black
+  :level-lo 14
+  :unique True
+  :rarity :rare
+  :info-flavor "An ancient, malevolent demon in the form of a sword. It's about as powerful and liable to destroy what you love as it sounds."
+  :apply-time (seconds 1)
+  :hunger-time (minutes 5)
+  :price-to-speed-time-ratio 10
+
+  :__init__ (meth [&kwargs kw]
+    (apply Item.__init__ [@] kw)
+    (@schedule)
+    None)
+
+  :info-apply "Consumes an item for a temporary speed boost. Cursed items aren't eligible. The speed boost increases your walking speed by a factor of {G.haste-factor} and lasts for {apply-time} per ${price-to-speed-time-ratio} of the item's price, rounded down."
+  :applied (meth []
+    (whenn (get-other-item @ False "consume")
+      (.take-time G.player @apply-time)
+      (@consume-item it)))
+
+  :info-carry "Occasionally activates spontaneously on a random eligible item. On average, this happens once every {hunger-time}."
+  :act (meth []
+    (when (in @ G.inventory)
+      (setv l (filt (and (is-not it @) (not it.curse) (not it.indestructible))
+        G.inventory))
+      (if l
+        (let [[item (random.choice l)]]
+          (msg "{:Your} {:v:hungers} for {:your}." @ @ item)
+          (@consume-item item))
+        (msg "{:Your} {:v:quivers} for a moment." @ @)))
+    (@take-time (long (randexp @hunger-time))))
+
+  :consume-item (meth [item] (block
+    (setv price item.price)
+    (when item.curse
+      (msg "{:The} {:v:senses} kindred magic in {:the} and {:v:relents}." @ @ item @)
+      (ret))
+    (unless (.delete item)
+      (msg "{:The} {:v:thirsts} for {:the}, but {:he} {:v:is} unaffected." @ @ item item item)
+      (ret))
+    (msg "{:The} {:v:disappears} in a burst of black flame." item item)
+    (unless (>= price @price-to-speed-time-ratio)
+      (msg "{:The} {:v:seems} unsatisfied." @ @)
+      (ret))
+    (.add-to-player Haste (seconds (inc (// price @price-to-speed-time-ratio)))
+      ; The effect time is incremented so the player doesn't use it
+      ; all up just waiting till their next turn.
+      (fn [] (msg "Dark magic courses through your veins."))
+      (fn [] (msg "Dark magic fortifies your speed."))))))
 
 (def-itemtype Item "test-item"
   :name "test item" :name-suffix (fn [self] "(testy)")

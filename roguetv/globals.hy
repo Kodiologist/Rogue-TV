@@ -84,7 +84,7 @@
 
 (def vision-radius 20)
 (def repulsed-from-player-range 20)
-(def speedup-soda-factor 10)
+(def haste-factor 10)
 (def confusion-misdirect-prob .25)
 (def spook-radius 5)
 

@@ -112,7 +112,7 @@
   :info-flavor "He's got go power! He's feeling his—aw, phooey, wrong cue card. Anyway, compared to its namesake, which is basically caffeine, this novel beverage is of mysterious origin, and it's got a veritably supernatural kick, for a (very, very) short time."
     ; Mid-20th-century Cheerios ads
 
-  :info-apply "Increases your walking speed by a factor of {G.speedup-soda-factor} for {effect-time}."
+  :info-apply "Increases your walking speed by a factor of {G.haste-factor} for {effect-time}."
   :effect Haste
   :effect-time (seconds 5)
   :start-msg "You feel extremely jittery."

@@ -8,6 +8,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [MapObject Generated Drawable Scheduled]]
+  [roguetv.input [inventory-loop]]
   [roguetv.map [Tile room-for?]])
 
 (defclass Item [MapObject Generated Scheduled NounPhraseNamed Drawable] [
@@ -356,3 +357,24 @@
     where
     ; Otherwise, 'where' should be a creature.
     where.pos))
+
+(defn get-other-item [self unid verb] (block
+  (setv other-items (filt (is-not it self) G.inventory))
+  (unless other-items
+    (if unid
+      (do
+         (.use-time-and-charge self)
+         (msg "Nothing happens."))
+      (msg "You don't have anything to {}." verb))
+    (ret False))
+  (setv item (if unid
+    (choice other-items)
+    (do
+      (setv i (inventory-loop (.format "What do you want to {}?" verb)))
+      (when (none? i)
+        (ret False))
+      (get G.inventory i))))
+  (when (is item self)
+    (msg :bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
+    (ret False))
+  item))

@@ -11,7 +11,7 @@
   [roguetv.util [*]]
   [roguetv.input [input-direction inventory-loop]]
   [roguetv.map [Tile Floor Wall Door Chest Ice Web on-map room-for? mset mget ray-taxi disc-taxi]]
-  [roguetv.item.generic [Item ItemAppearance def-itemtype]]
+  [roguetv.item.generic [Item ItemAppearance def-itemtype get-other-item]]
   [roguetv.creature [Creature]])
 
 (defclass Gadget [Item] [
@@ -309,27 +309,6 @@
         (msg "Then they all go right back in.")]
       [(< summoned (// self.bees-to-summon 2))
         (msg "Most of them go back in.")])))
-
-(defn get-other-item [self unid verb] (block
-  (setv other-items (filt (is-not it self) G.inventory))
-  (unless other-items
-    (if unid
-      (do
-         (.use-time-and-charge self)
-         (msg "Nothing happens."))
-      (msg "You don't have anything to {}." verb))
-    (ret False))
-  (setv item (if unid
-    (choice other-items)
-    (do
-      (setv i (inventory-loop (.format "What do you want to {}?" verb)))
-      (when (none? i)
-        (ret False))
-      (get G.inventory i))))
-  (when (is item self)
-    (msg :bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
-    (ret False))
-  item))
 
 (def-itemtype Gadget "microscope"
   :color-fg :dark-green
