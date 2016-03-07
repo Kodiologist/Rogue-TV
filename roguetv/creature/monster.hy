@@ -119,15 +119,24 @@
 
   [move-chance (/ 1 30)]
 
+  [unpleasant? (fn [self pos]
+    ; Check whether a tile has an unpleasant terrain or is in
+    ; the range of a spooky tile.
+    (or
+      (. (Tile.at pos) unpleasant)
+      (any (amap
+        (. (Tile.at it) spooky)
+        (disc-taxi pos G.spook-radius)))))]
+
   [act (fn [self] (block
     (when (.flee-from-player self)
       (ret))
     ; Usually just sit there. Occasionally, wander in a random
     ; direction. Avoid unpleasant tiles.
     (unless (and
-        (or (. (Tile.at self.pos) unpleasant)
+        (or (.unpleasant? self self.pos)
           (chance self.move-chance))
-        (or (wander self (λ (not (. (Tile.at it) unpleasant))))
+        (or (wander self (λ (not (.unpleasant? self it))))
           (wander self)))
       (.wait self))))]])
 
