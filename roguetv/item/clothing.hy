@@ -126,7 +126,7 @@
   :carry-mapwrap-northsouth True
   :info-carry (.format circ-fmt "north or south"))
 
-(def-itemtype Clothing "distressed-jeans" :name (pair-of "faux-distressed blue jeans")
+(def-itemtype Clothing "distressed-jeans" :name (pair-of "distressed blue jeans")
   :color-fg :dark-blue
   :price-adj :bad-flavor
   :level-lo 2
