@@ -181,12 +181,12 @@
   [blocks-sight True]])
 
 (defclass Elevator [Tile] [
-  [color-bg :green]
   [smooth True]])
 
 (defclass UpElevator [Elevator] [
   [name (NounPhrase "elevator going up")]
   [char "<"]
+  [color-bg :green]
   [info-text "Taking the elevator back up will immediately end your game of Rogue TV, but you'll be able to keep whatever winnings you're carrying."]
 
   [use-tile (fn [self]
@@ -204,6 +204,7 @@
 (defclass DownElevator [Elevator] [
   [name (NounPhrase "elevator going down")]
   [char ">"]
+  [color-bg :yellow]
   [info-text "This elevator leads to a new, unexplored level. The time limit will be reset, but you won't be able to return to this level, so make sure you're carrying whatever you intend to keep."]
 
   [use-tile (fn [self]
