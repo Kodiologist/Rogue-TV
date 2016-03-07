@@ -1,7 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
-  [math [ceil]]
+  [math [floor ceil]]
   textwrap
   curses
   [heidegger.pos [Pos]]
@@ -97,12 +97,20 @@
 
 (defn draw-status-line []
   (setv time-left (max 0 (- (or G.time-limit 0) G.current-time)))
+  (setv time-left-frac (/ time-left (dl-time-limit G.dungeon-level)))
   (setv s (AttrStr.from-xml
-    (.format "{} {}  DL:{: 2}  {:>6}{}  {}"
+    (.format "{} {} {}  DL:{: 2}  {:>6}{}  {}"
       (color-xml
-        (.rjust (minsec time-left) (len "10:00"))
-        (when (<= time-left G.low-time-threshold) G.low-time-fg-color)
-        (when (<= time-left G.low-time-threshold) G.low-time-bg-color))
+        (let [[w (* G.time-bar-width time-left-frac)]]
+          (cat
+            (* (get G.time-bar-chunk-chars -1) (int (floor w)))
+            (when (% w 1) (get G.time-bar-chunk-chars (int (round
+              (* (% w 1) (dec (len G.time-bar-chunk-chars)))))))
+            (* (get G.time-bar-chunk-chars 0) (- G.time-bar-width (int (ceil w))))))
+        None
+        (whenn (afind-or (<= time-left-frac (first it)) G.time-warnings)
+          (second it)))
+      (.rjust (minsec time-left) (len "10:00"))
       (.ljust
         (if G.last-action-duration
          (.format "({})" (show-round

@@ -41,9 +41,14 @@
   :bob :red
   :aud :dark-green})
 (def unid-item-color :purple)
-(def low-time-bg-color :red)
-(def low-time-fg-color :white)
-(def low-time-threshold 60) ; In seconds; converted to internal units below.
+
+(def time-bar-width 10)
+(setv time-bar-chunk-chars " ▏▎▍▌▋▊▉█")
+(def time-warnings [
+  ; Each element is a proportion of time remaining and a background color.
+  ; Lower proportions must come first.
+  [(/ 1 4) :red]
+  [(/ 1 2) :orange]])
 
 (def new-msg-highlight curses.A-BOLD)
 
@@ -127,7 +132,6 @@
 (defs current-time 0)
 (defs time-limit None)
 (defs last-action-duration 0)
-(*= low-time-threshold clock-factor)
 (def super-low-time-threshold (* clock-factor 5))
 
 (def fov-dirty? True)
