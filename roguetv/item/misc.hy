@@ -1,12 +1,13 @@
 (require kodhy.macros)
 
 (import
+  [kodhy.util [ret]]
+  [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.english [NounPhrase]]
   [roguetv.item.generic [Item def-itemtype get-other-item]]
   [roguetv.creature [Haste]]
-  [kodhy.util [ret]])
+  [roguetv.item.gadget [recharge-gadget]])
 
 (def-itemtype Item "aoy"
   :name (kwc NounPhrase "Amulet of Yendor" :+the-proper)
@@ -71,6 +72,41 @@
       ; all up just waiting till their next turn.
       (fn [] (msg "Dark magic courses through your veins."))
       (fn [] (msg "Dark magic fortifies your speed."))))))
+
+(def-itemtype Item "cyec"
+  :name (kwc NounPhrase "CYEC" :+the-proper)
+  :char "("
+  :level-lo 10
+  :unique True
+  :rarity :rare
+  :info-flavor "This is the celebrated Centurion Yendorian Express Card, the charge card of the rich and famous. \"Hello, this is me, ELOISE, and would you kindly send one roast-beef bone, one raisin, and seven spoons to the top floor and charge it please? Thank you very much.\""
+  :apply-time (seconds 1)
+  :ready-time (minutes 5)
+
+  :__init__ (meth [&kwargs kw]
+    (apply Item.__init__ [@] kw)
+    (setv @ready True)
+    None)
+
+  :name-suffix (meth [] (.format "({})" (if @ready
+    "ready now"
+    (+ "ready in " (minsec (max 0 (- @next-turn G.current-time)))))))
+
+  :info-apply "Restores half of a gadget's maximum charges, rounded up. The CYEC can't be applied again for {ready-time}."
+  :applied (meth []
+     (if @ready
+        (when (recharge-gadget @ .5 @apply-time
+            (fn [gadget] (msg "Cha-ching! {:The} {:v:is} charged." gadget gadget)))
+          (setv @ready False)
+          (@schedule)
+          (@take-time @ready-time))
+        (msg "You feel that {:the} {:v:is} ignoring you." @ @)))
+
+  :act (meth []
+    (@deschedule)
+    (setv @ready True)
+    (when (in @ G.inventory)
+      (msg :tara "{p}, {:the} is ready for use again." @))))
 
 (def-itemtype Item "test-item"
   :name "test item" :name-suffix (fn [self] "(testy)")

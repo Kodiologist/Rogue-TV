@@ -7,8 +7,8 @@
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [MapObject Generated Drawable Scheduled]]
   [roguetv.input [inventory-loop]]
+  [roguetv.types [MapObject Generated Drawable Scheduled]]
   [roguetv.map [Tile room-for?]])
 
 (defclass Item [MapObject Generated Scheduled NounPhraseNamed Drawable] [

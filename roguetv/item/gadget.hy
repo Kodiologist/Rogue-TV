@@ -376,6 +376,21 @@
 (assert (>= (len (get ItemAppearance.registry Gadget))
   (len (filt (instance? Gadget it) (.values G.itypes)))))
 
+(defn recharge-gadget [charger charge-factor charge-time charge-msg] (block
+; Returns a boolean indicating whether the attempt succeeded.
+
+  (setv gadget (or (get-other-item charger False "charge") (ret False)))
+  (unless (instance? Gadget gadget)
+    (msg "{:The} {:v:isn't} a gadget." gadget gadget)
+    (ret False))
+
+  (.take-time G.player charge-time)
+  (charge-msg gadget)
+  (setv gadget.charges (min gadget.max-charges
+    (+ gadget.charges (int (ceil
+      (* gadget.max-charges charge-factor))))))
+  True))
+
 (defclass Battery [Item] [
   [char "="]
   [apply-time (seconds 1)]
@@ -383,25 +398,10 @@
 
   [info-flavor "This generic battery can restore charges to any gadget. 'a'pply it to charge up a gadget."]
 
-  [applied (fn [self] (block
-    (setv i (inventory-loop "What gadget do you want to charge?"))
-    (when (none? i)
-      (ret))
-    (setv gadget (get G.inventory i))
-
-    (when (is gadget self)
-      (msg "Your attempts to insert the battery into itself prove futile.")
-      (ret))
-    (unless (instance? Gadget gadget)
-      (msg "{:The} {:v:doesn't} seem to have a place for batteries." gadget gadget)
-      (ret))
-
-    (.remove G.inventory self)
-    (.take-time G.player self.apply-time)
-    (msg "You insert {:the} into {:the}." self gadget)
-    (setv gadget.charges (min gadget.max-charges
-      (+ gadget.charges (int (ceil
-        (* gadget.max-charges self.charge-factor))))))))]])
+  [applied (fn [self]
+    (when (recharge-gadget self self.charge-factor self.apply-time
+        (fn [gadget] (msg "You insert {:the} into {:the}." self gadget)))
+      (.remove G.inventory self)))]])
 
 (def-itemtype Battery "battery-small" :name "button battery"
   :color-fg :red
