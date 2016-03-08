@@ -5,7 +5,7 @@
   [random [choice randint normalvariate]]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [unique pairs concat shift ret retf weighted-choice merge-dicts]]
+  [kodhy.util [logit ilogit unique pairs concat shift ret retf weighted-choice merge-dicts]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Generated Scheduled LevelTimer set-time-limit]]
@@ -79,7 +79,9 @@
   (setv dugout (kwc heidegger.digger.generate-map
     :room-width [2 8] :room-height [2 5]
     :corridor-length [3 10]
-    :dug-fraction .2
+    :dug-fraction (ilogit (normalvariate (logit .2) .25))
+      ; Quantile rank  .01 .25 .50 .75 .99
+      ; Quantile       .12 .17 .20 .23 .31
     :width (+ G.map-width 2) :height (+ G.map-height 2)))
   
   (setv free-floors [])
