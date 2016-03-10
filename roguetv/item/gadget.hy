@@ -294,7 +294,7 @@
   :level-hi 4
   :info-flavor "A beekeeper is you! It's stuffed with everything you need to make your own honey. Including the bees. <b>Especially</b> the bees."
     ; "A foobar is you" is originally from the NES game Pro
-    ; Wrestling, but is used here in a way paying tribute to the
+    ; Wrestling, but is used here in a way paying tribute to
     ; Kingdom of Loathing.
   :max-charges 5
   :bee-summoning-range 3
@@ -317,6 +317,35 @@
         (msg "Then they all go right back in.")]
       [(< summoned (// self.bees-to-summon 2))
         (msg "Most of them go back in.")])))
+
+(def-itemtype Gadget "party-cannon" :name "party cannon"
+  ; http://mlp.wikia.com/wiki/Pinkie_Pie#Party_cannon
+  :color-fg :hot-pink
+  :level-hi 9
+  :info-flavor "The one and only party-in-a-cannon. Never leave home without it."
+  :max-charges 5
+  :confetti-summoning-range 2
+  :confetti-to-summon 5
+
+  :info-apply "Creates {confetti-to-summon} piles of confetti within {confetti-summoning-range} squares of you."
+  :gadget-effect (meth [unid] (block
+
+    (@use-time-and-charge)
+    (setv summoned 0)
+    (for [p (shuffle (disc-taxi G.player.pos @confetti-summoning-range))]
+      (when (room-for? Item p)
+        (kwc (get G.itypes "confetti") :pos p)
+        (+= summoned 1)
+        (when (> summoned @confetti-to-summon)
+          (break))))
+    (msg "A torrent of confetti pours out of {:the}." @))))
+
+(def-itemtype Item "confetti" :name (kwc NounPhrase "confetti" :+mass :unit "piles")
+  :char "*"
+  :color-fg :hot-pink
+  :rarity :nongen
+  :price 0
+  :info-flavor "A pile of little pieces of brightly colored paper. Its only function seems to be making a mess.")
 
 (def-itemtype Gadget "microscope"
   :color-fg :dark-green
