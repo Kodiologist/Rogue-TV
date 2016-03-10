@@ -145,7 +145,7 @@
   :hookshot-dist 30
   :hookshot-travel-speed 2
 
-  :info-apply "Fire it at a solid obstacle up to {hookshot-dist} squares away to get yourself over there. Travel by hookshot is twice as fast as travel by foot, and you'll pass over unpleasant terrain along the way. Creatures will block the hookshot."
+  :info-apply "Fire it at a solid obstacle up to {hookshot-dist} squares away to get yourself over there. Travel by hookshot is {hookshot-travel-speed} times as fast as travel by foot, and you'll pass over unpleasant terrain along the way. Creatures will block the hookshot."
   :gadget-effect (fn [self unid] (block :gadget
 
     (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
@@ -180,6 +180,14 @@
       self.hookshot-travel-speed)))
     (.move G.player p-to)
     (msg "{:The} pulls you ahead." self))))
+
+(def-itemtype (get G.itypes "hookshot") "longshot"
+  :color-fg :dark-blue
+  :level-lo 15
+  :info-flavor "Corollary to Arfer's law of game design: a video game that already has a grappling hook is further improved by the addition of another grappling hook."
+  :max-charges 10
+  :hookshot-dist 100
+  :hookshot-travel-speed 4)
 
 (def-itemtype Gadget "chainsaw"
   :color-fg :yellow
