@@ -1,6 +1,7 @@
 (require kodhy.macros roguetv.macros)
 
 (import
+  random
   [math [ceil]]
   re
   [kodhy.util [cat keyword->str shift ret]]
@@ -368,7 +369,7 @@
       (msg "You don't have anything to {}." verb))
     (ret False))
   (setv item (if unid
-    (choice other-items)
+    (random.choice other-items)
     (do
       (setv i (inventory-loop (.format "What do you want to {}?" verb)))
       (when (none? i)
