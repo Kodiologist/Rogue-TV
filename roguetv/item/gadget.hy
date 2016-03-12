@@ -189,6 +189,41 @@
   :hookshot-dist 100
   :hookshot-travel-speed 4)
 
+(def-itemtype Gadget "switch-hook" :name (NounPhrase "switch hook")
+  :color-fg :gold
+  :level-lo 9
+  :info-flavor "The switch hook is the oddball of the grappling-hook family. It has a mysterious power of exchange."
+  :max-charges 10
+  :hook-dist 15
+
+  :info-apply "Fire it at another creature up to {hook-dist} squares away to instantly change places, teleporting you to its position and it to yours."
+  :gadget-effect (meth [unid] (block :gadget
+
+    (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
+    (@use-time-and-charge)
+
+    ; Find the monster we're switching places with.
+    (setv ahead (+ G.player.pos d))
+    (setv path (kwc ray-taxi ahead d @hook-dist :+include-off-map))
+    (block
+      (for [p path]
+        (when (and (on-map p) (Creature.at p))
+          (ret))
+        (when (. (mget p) blocks-movement)
+          (msg :tara "{p:The}'s {} bounces off {:the}."
+            @ (mget p))
+          (retf :gadget)))
+      (msg "{:Your} doesn't hit anything. It can only reach monsters up to {} squares away."
+        @ @hook-dist)
+      (retf :gadget))
+    (setv p-to p)
+
+    ; Now switch places.
+    (setv cr (Creature.at p-to))
+    (kwc .move cr G.player.pos :+clobber)
+    (.move G.player p-to)
+    (msg "You switch places with {:the}." cr))))
+
 (def-itemtype Gadget "chainsaw"
   :color-fg :yellow
   :level-hi 7
