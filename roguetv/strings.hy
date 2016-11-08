@@ -104,6 +104,7 @@
   "TIBYOCSPNLAAD"       ; https://www.reddit.com/r/OutOfTheLoop/comments/1w7ojb
   "TVERSKY"             ; Amos Tversky, JDM researcher
   "UWOTM8"              ; http://knowyourmeme.com/memes/u-wot-m8
+  "WOHBANOBONGU"        ; http://cho.cyan.com/rawa/wohba.html
   "X3J13"               ; Common Lisp standardization committee
   "YAGRUMBAGARN"        ; http://www.uesp.net/wiki/Morrowind:Yagrum_Bagarn
   "ZOOMBINI"])          ; Zoombinis video-game series
