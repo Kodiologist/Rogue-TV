@@ -1,3 +1,5 @@
+appdirs
+jsonpickle
 inflect
 pypaths
 
