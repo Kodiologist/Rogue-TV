@@ -6,7 +6,6 @@
   os.path
   errno
   random
-  struct
   [collections [OrderedDict]]
   argparse
   appdirs
