@@ -49,7 +49,8 @@
       (setv l (filt (and (is-not it @) (not it.curse) (not it.indestructible))
         G.inventory))
       (if l
-        (let [[item (random.choice l)]]
+        (do
+          (setv item (random.choice l))
           (msg "{:Your} {:v:hungers} for {:your}." @ @ item)
           (@consume-item item))
         (msg "{:Your} {:v:quivers} for a moment." @ @)))

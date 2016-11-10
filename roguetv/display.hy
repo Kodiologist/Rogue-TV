@@ -86,7 +86,7 @@
           (echo " " G.fg-color G.off-map-color)]
         [(get G.seen-map px py)
           ; Seen by the player.
-          (echo-drawable (let [[p (Pos px py)]] (or
+          (echo-drawable (do (setv p (Pos px py)) (or
             (Creature.at p)
             (.visible-item-at G.player p)
             (Tile.at p))))]
@@ -101,12 +101,11 @@
   (setv s (AttrStr.from-xml
     (.format "{} {} {}  DL:{: 2}  {:>6}{}  {}"
       (color-xml
-        (let [[w (* G.time-bar-width time-left-frac)]]
-          (cat
-            (* (get G.time-bar-chunk-chars -1) (int (floor w)))
-            (when (% w 1) (get G.time-bar-chunk-chars (int (round
-              (* (% w 1) (dec (len G.time-bar-chunk-chars)))))))
-            (* (get G.time-bar-chunk-chars 0) (- G.time-bar-width (int (ceil w))))))
+        (do (setv w (* G.time-bar-width time-left-frac)) (cat
+           (* (get G.time-bar-chunk-chars -1) (int (floor w)))
+           (when (% w 1) (get G.time-bar-chunk-chars (int (round
+             (* (% w 1) (dec (len G.time-bar-chunk-chars)))))))
+           (* (get G.time-bar-chunk-chars 0) (- G.time-bar-width (int (ceil w))))))
         None
         (whenn (afind-or (<= time-left-frac (first it)) G.time-warnings)
           (second it)))
