@@ -36,7 +36,7 @@
 
 (defn seconds [x]
   ; Convert seconds to the internal time representation.
-  (if x (max 1 (long (round (* G.clock-factor x)))) 0))
+  (if x (max 1 (round (* G.clock-factor x)))) 0)
     ; (max 1 …) ensures that no nonzero durations will be rounded
     ; to 0.
 (defn minutes [x]
@@ -44,10 +44,10 @@
 (defn round-to-second [duration]
   ; Rounds a duration (in the internal time representation)
   ; to the nearest second.
-  (* (long (round (/ duration G.clock-factor))) G.clock-factor))
+  (* (round (/ duration G.clock-factor))) G.clock-factor)
 
 (defn minsec [x]
-  (setv x (long (ceil (/ x G.clock-factor))))
+  (setv x (ceil (/ x G.clock-factor)))
   (.format "{}:{:02}" (// x 60) (% x 60)))
 
 (defn show-duration [x &optional [trunc-to-sec False] [abbreviate False]]
@@ -126,7 +126,7 @@
   (minutes (+ 3 (/ dl 2))))
 
 (defn randexp-dl-div [divisor]
-  (long (randexp (/ (dl-time-limit G.dungeon-level) divisor))))
+  (int (randexp (/ (dl-time-limit G.dungeon-level) divisor))))
 
 (defn player? [cr]
   (is cr G.player))

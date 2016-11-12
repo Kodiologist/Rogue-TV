@@ -54,7 +54,7 @@
           (msg "{:Your} {:v:hungers} for {:your}." @ @ item)
           (@consume-item item))
         (msg "{:Your} {:v:quivers} for a moment." @ @)))
-    (@take-time (long (randexp @hunger-time))))
+    (@take-time (int (randexp @hunger-time))))
 
   :consume-item (meth [item] (block
     (setv price item.price)
