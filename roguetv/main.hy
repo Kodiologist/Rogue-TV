@@ -62,7 +62,7 @@
       (kwc show-scores G.scores-file-path :show-all (ecase special
         [:show-scores False]
         [:show-all-scores True]))
-      (ret :just-showing-scores))
+      (ret ':just-showing-scores))
 
     (unless (get G.dates "loaded")
       (unless G.debug
