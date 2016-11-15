@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [filt whenn block meth]])
 
 (import
   [kodhy.util [ret]]
@@ -10,7 +10,7 @@
   [roguetv.item.gadget [recharge-gadget]])
 
 (def-itemtype Item "aoy"
-  :name (kwc NounPhrase "Amulet of Yendor" :+the-proper)
+  :name (NounPhrase "Amulet of Yendor" :the-proper True)
   :char "☥"
   :color-bg :yellow
   :info-flavor "Actually, it's only a cheap plastic imitation of the Amulet of Yendor. In other words, it's a prop. The real Amulet has been lost to the ages. But this prop is worth a <b>fabulous</b> cash prize!"
@@ -21,7 +21,7 @@
   :indestructible True)
 
 (def-itemtype Item "stormbringer"
-  :name (kwc NounPhrase "Stormbringer" :+bare-proper)
+  :name (NounPhrase "Stormbringer" :bare-proper True)
   :char ")"
   :color-fg :black
   :level-lo 14
@@ -33,40 +33,40 @@
   :price-to-speed-time-ratio 10
 
   :__init__ (meth [&kwargs kw]
-    (apply Item.__init__ [@] kw)
+    (apply Item.__init__ [@@] kw)
     (@schedule)
     None)
 
   :info-apply "Consumes an item for a temporary speed boost. Cursed items aren't eligible. The speed boost increases your walking speed by a factor of {G.haste-factor} and lasts for {apply-time} per ${price-to-speed-time-ratio} of the item's price, rounded down."
   :applied (meth []
-    (whenn (get-other-item @ False "consume")
+    (whenn (get-other-item @@ False "consume")
       (.take-time G.player @apply-time)
       (@consume-item it)))
 
   :info-carry "Occasionally activates spontaneously on a random eligible item. On average, this happens once every {hunger-time}."
   :act (meth []
-    (when (in @ G.inventory)
-      (setv l (filt (and (is-not it @) (not it.curse) (not it.indestructible))
+    (when (in @@ G.inventory)
+      (setv l (filt (and (is-not it @@) (not it.curse) (not it.indestructible))
         G.inventory))
       (if l
         (do
           (setv item (random.choice l))
-          (msg "{:Your} {:v:hungers} for {:your}." @ @ item)
+          (msg "{:Your} {:v:hungers} for {:your}." @@ @@ item)
           (@consume-item item))
-        (msg "{:Your} {:v:quivers} for a moment." @ @)))
+        (msg "{:Your} {:v:quivers} for a moment." @@ @@)))
     (@take-time (int (randexp @hunger-time))))
 
   :consume-item (meth [item] (block
     (setv price item.price)
     (when item.curse
-      (msg "{:The} {:v:senses} kindred magic in {:the} and {:v:relents}." @ @ item @)
+      (msg "{:The} {:v:senses} kindred magic in {:the} and {:v:relents}." @@ @@ item @@)
       (ret))
     (unless (.delete item)
-      (msg "{:The} {:v:thirsts} for {:the}, but {:he} {:v:is} unaffected." @ @ item item item)
+      (msg "{:The} {:v:thirsts} for {:the}, but {:he} {:v:is} unaffected." @@ @@ item item item)
       (ret))
     (msg "{:The} {:v:disappears} in a burst of black flame." item item)
     (unless (>= price @price-to-speed-time-ratio)
-      (msg "{:The} {:v:seems} unsatisfied." @ @)
+      (msg "{:The} {:v:seems} unsatisfied." @@ @@)
       (ret))
     (.add-to-player Haste (seconds (inc (// price @price-to-speed-time-ratio)))
       ; The effect time is incremented so the player doesn't use it
@@ -75,7 +75,7 @@
       (fn [] (msg "Dark magic fortifies your speed."))))))
 
 (def-itemtype Item "cyec"
-  :name (kwc NounPhrase "CYEC" :+the-proper)
+  :name (NounPhrase "CYEC" :the-proper True)
   :char "("
   :level-lo 10
   :unique True
@@ -85,7 +85,7 @@
   :ready-time (minutes 5)
 
   :__init__ (meth [&kwargs kw]
-    (apply Item.__init__ [@] kw)
+    (apply Item.__init__ [@@] kw)
     (setv @ready True)
     None)
 
@@ -96,18 +96,18 @@
   :info-apply "Restores half of a gadget's maximum charges, rounded up. The CYEC can't be applied again for {ready-time}."
   :applied (meth []
      (if @ready
-        (when (recharge-gadget @ .5 @apply-time
+        (when (recharge-gadget @@ .5 @apply-time
             (fn [gadget] (msg "Cha-ching! {:The} {:v:is} charged." gadget gadget)))
           (setv @ready False)
           (@schedule)
           (@take-time @ready-time))
-        (msg "You feel that {:the} {:v:is} ignoring you." @ @)))
+        (msg "You feel that {:the} {:v:is} ignoring you." @@ @@)))
 
   :act (meth []
     (@deschedule)
     (setv @ready True)
-    (when (in @ G.inventory)
-      (msg :tara "{p}, {:the} is ready for use again." @))))
+    (when (in @@ G.inventory)
+      (msg :tara "{p}, {:the} is ready for use again." @@))))
 
 (def-itemtype Item "test-item"
   :name "test item" :name-suffix (fn [self] "(testy)")

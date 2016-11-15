@@ -1,10 +1,10 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt afind-or whenn block retf meth]] [roguetv.macros [*]])
 
 (import
   [math [*]]
   [random [randrange choice]]
   [heidegger.pos [Pos]]
-  [kodhy.util [ret retf]]
+  [kodhy.util [ret]]
   [roguetv.strings [gadget-adjectives]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
@@ -15,26 +15,26 @@
   [roguetv.creature [Creature]])
 
 (defclass Gadget [Item] [
-  [max-charges None]
-  [apply-time (seconds 1)]
-  [char "/"]
+  max-charges None
+  apply-time (seconds 1)
+  char "/"
 
-  [info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges. If the gadget can be aimed or otherwise controlled, you'll only be able to control it once you know what it is."]
+  info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges. If the gadget can be aimed or otherwise controlled, you'll only be able to control it once you know what it is."
 
-  [__init__ (fn [self &kwargs kw]
+  __init__ (fn [self &kwargs kw]
     (apply Item.__init__ [self] kw)
     (setv self.charges (.get kw "charges" self.max-charges))
-    None)]
+    None)
 
-  [clone-setup (fn [self orig]
+  clone-setup (fn [self orig]
     (.clone-setup (super Gadget self) orig)
-    (setv self.charges orig.charges))]
+    (setv self.charges orig.charges))
 
-  [name-suffix (fn [self]
+  name-suffix (fn [self]
     (when (.identified? self)
-      (.format "({}/{})" self.charges self.max-charges)))]
+      (.format "({}/{})" self.charges self.max-charges)))
 
-  [applied (fn [self] (block
+  applied (fn [self] (block
     ; Do we have a charge to spare?
     (when (= self.charges 0)
       (msg :bob "That oojah's all chatty, kemosabe.")
@@ -51,9 +51,9 @@
     (when unid
       (msg "You have:  {}" (self.invstr)))
     ; Now you get the gadget effect.
-    (self.gadget-effect unid)))]
+    (self.gadget-effect unid)))
 
-  [gadget-effect (fn [self unid]
+  gadget-effect (fn [self unid]
     ; Do whatever the gadget should do. `unid` says whether
     ; the item was unidentified before this use.
     ;
@@ -62,13 +62,13 @@
     ; call .use-time-and-charge before otherwise affecting the
     ; game world.
     (.use-time-and-charge self)
-    (msg "Nothing happens."))]
+    (msg "Nothing happens."))
 
-  [use-time-and-charge (fn [self]
+  use-time-and-charge (fn [self]
     ; Use up a charge and some time.
     (unless (afind-or it.carry-instant-gadget-use (active-inv))
       (.take-time G.player self.apply-time))
-    (-= self.charges 1))]])
+    (-= self.charges 1))])
 
 (def-itemtype Gadget "panic-button" :name "panic button"
   :color-fg :red
@@ -153,8 +153,8 @@
 
     ; Find our destination square.
     (setv ahead (+ G.player.pos d))
-    (setv path (kwc ray-taxi ahead d self.hookshot-dist
-      :+include-off-map))
+    (setv path (ray-taxi ahead d self.hookshot-dist
+      :include-off-map True))
     (block
       (for [p path]
         (unless (on-map p)
@@ -204,23 +204,23 @@
 
     ; Find the monster we're switching places with.
     (setv ahead (+ G.player.pos d))
-    (setv path (kwc ray-taxi ahead d @hook-dist :+include-off-map))
+    (setv path (ray-taxi ahead d @hook-dist :include-off-map True))
     (block
       (for [p path]
         (when (and (on-map p) (Creature.at p))
           (ret))
         (when (. (mget p) blocks-movement)
           (msg :tara "{p:The}'s {} bounces off {:the}."
-            @ (mget p))
+            @@ (mget p))
           (retf :gadget)))
       (msg "{:Your} doesn't hit anything. It can only reach monsters up to {} squares away."
-        @ @hook-dist)
+        @@ @hook-dist)
       (retf :gadget))
     (setv p-to p)
 
     ; Now switch places.
     (setv cr (Creature.at p-to))
-    (kwc .move cr G.player.pos :+clobber)
+    (.move cr G.player.pos :clobber True)
     (.move G.player p-to)
     (msg "You switch places with {:the}." cr))))
 
@@ -312,7 +312,7 @@
 
     (setv ahead (+ G.player.pos d))
     (setv made-a-web False)
-    (for [p (kwc ray-taxi ahead d self.web-machine-range)]
+    (for [p (ray-taxi ahead d self.web-machine-range)]
       (when (. (Tile.at p) blocks-movement)
         (break))
       (when (instance? Floor (Tile.at p))
@@ -369,13 +369,13 @@
     (setv summoned 0)
     (for [p (shuffle (disc-taxi G.player.pos @confetti-summoning-range))]
       (when (room-for? Item p)
-        (kwc (get G.itypes "confetti") :pos p)
+        ((get G.itypes "confetti") :pos p)
         (+= summoned 1)
         (when (> summoned @confetti-to-summon)
           (break))))
-    (msg "A torrent of confetti pours out of {:the}." @))))
+    (msg "A torrent of confetti pours out of {:the}." @@))))
 
-(def-itemtype Item "confetti" :name (kwc NounPhrase "confetti" :+mass :unit "piles")
+(def-itemtype Item "confetti" :name (NounPhrase "confetti" :mass True :unit "piles")
   :char "*"
   :color-fg :hot-pink
   :rarity :nongen
@@ -464,16 +464,16 @@
   True))
 
 (defclass Battery [Item] [
-  [char "="]
-  [apply-time (seconds 1)]
-  [charge-factor None]
+  char "="
+  apply-time (seconds 1)
+  charge-factor None
 
-  [info-flavor "This generic battery can restore charges to any gadget. 'a'pply it to charge up a gadget."]
+  info-flavor "This generic battery can restore charges to any gadget. 'a'pply it to charge up a gadget."
 
-  [applied (fn [self]
+  applied (fn [self]
     (when (recharge-gadget self self.charge-factor self.apply-time
         (fn [gadget] (msg "You insert {:the} into {:the}." self gadget)))
-      (.remove G.inventory self)))]])
+      (.remove G.inventory self)))])
 
 (def-itemtype Battery "battery-small" :name "button battery"
   :color-fg :red

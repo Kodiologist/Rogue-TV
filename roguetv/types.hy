@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [amap afind-or whenn ecase λ meth cmeth]])
 
 (import
   [random [choice]]
@@ -9,38 +9,38 @@
   [roguetv.util [*]])
 
 (defclass Drawable [object] [
-  [char None]
-  [color-fg G.fg-color]
-  [color-bg None]
+  char None
+  color-fg G.fg-color
+  color-bg None
 
   ; These getters are trivial in Drawable, but may be overridden
   ; in subclasses.
-  [get-char (fn [self]
-    self.char)]
-  [get-color-fg (fn [self]
-    self.color-fg)]
-  [get-color-bg (fn [self]
-    self.color-bg)]
+  get-char (fn [self]
+    self.char)
+  get-color-fg (fn [self]
+    self.color-fg)
+  get-color-bg (fn [self]
+    self.color-bg)
 
-  [xml-symbol (fn [self]
+  xml-symbol (fn [self]
     (color-xml
       (xml.sax.saxutils.escape (.get-char self))
       (.get-color-fg self)
-      (.get-color-bg self)))]])
+      (.get-color-bg self)))])
 
 (defclass MapObject [object] [
 
-  [init-omap (classmethod (fn [self width height]
-    (setv self.omap (amap (* [None] height) (range width)))))]
+  init-omap (classmethod (fn [self width height]
+    (setv self.omap (amap (* [None] height) (range width)))))
 
-  [__init__ (fn [self &optional pos]
+  __init__ (fn [self &optional pos]
     ; 'pos' may be None whenever the object isn't currently
     ; on the map.
     (setv self.pos None)
     (.move self pos)
-    None)]
+    None)
 
-  [move (fn [self p-to &optional [clobber False]]
+  move (fn [self p-to &optional [clobber False]]
     ; Set 'p-to' to None to remove the object from the map.
     ;
     ; If 'p-to' is not None, 'clobber' is true, and there's
@@ -50,7 +50,7 @@
     (when self.pos
       (try
         (setv (get self.omap self.pos.x self.pos.y) None)
-        (catch [_ IndexError])))
+        (except [_ IndexError])))
           ; An IndexError may arise from the assignment if we've
           ; done a .move after an old position has become
           ; invalid. This is fine.
@@ -62,12 +62,12 @@
             "tried to move {} to {} where there was already {}"
             self p-to it)))))
       (setv (get self.omap p-to.x p-to.y) self))
-    (setv self.pos p-to))]
+    (setv self.pos p-to))
 
-  [at (classmethod (fn [self pos]
-    (get self.omap pos.x pos.y)))]])
+  at (classmethod (fn [self pos]
+    (get self.omap pos.x pos.y)))])
 
-(defcls Scheduled [object]
+(defclass Scheduled [object] [
   queue []
   queue-priority 0
     ; Should be an integer. Lower means acting sooner.
@@ -78,15 +78,15 @@
     ; same or lesser .queue-priority) that are currently ready to
     ; act have acted.
     (setv @next-turn G.current-time)
-    (.append @queue @)
-    (kwc .sort @queue :key (λ it.queue-priority)))
+    (.append @queue @@)
+    (.sort @queue :key (λ it.queue-priority)))
 
   scheduled? (meth []
-    (hasattr @ "next_turn"))
+    (hasattr @@ "next_turn"))
 
   deschedule (meth []
     (when (@scheduled?)
-      (.remove @queue @)
+      (.remove @queue @@)
       (del @next-turn)))
 
   take-time (meth [duration]
@@ -100,7 +100,7 @@
   act (meth []
     ; It's this object's turn to act. Go wild, calling
     ; .take-time as needed.
-    (raise (ValueError (.format "No .act implemented for {}" (type @)))))
+    (raise (ValueError (.format "No .act implemented for {}" (type @@)))))
 
   destroy (meth []
     (@deschedule))
@@ -114,9 +114,9 @@
       (setv G.current-time actor.next-turn)
       (.act actor)
       (when G.endgame
-        (break))))))
+        (break)))))])
 
-(defcls LevelTimer [Scheduled]
+(defclass LevelTimer [Scheduled] [
   queue-priority -3
 
   act (meth []
@@ -129,7 +129,7 @@
         (msg :bob (choice bob-too-bad))
         (setv G.time-limit None)
         (setv G.endgame :out-of-time)))
-    (@wait)))
+    (@wait))])
 
 (defn set-time-limit [x]
   (setv G.time-limit x)
@@ -139,7 +139,7 @@
   (setv (. (first Scheduled.queue) next-turn)
     (- G.time-limit G.super-low-time-threshold)))
 
-(defcls Generated [object]
+(defclass Generated [object] [
   level-lo 0
   level-hi None
   rarity :common
@@ -147,7 +147,7 @@
 
   __init__ (meth []
     (when @unique
-      (setv tname (. (type @) __name__))
+      (setv tname (. (type @@) __name__))
       (when (in tname G.uniques-generated)
         (raise (ValueError (+ "Tried to generate a second instance of a unique type: " tname))))
       (.append G.uniques-generated tname))
@@ -170,4 +170,4 @@
             (inc (- @level-lo dl))]
           [(and (not (none? @level-hi)) (> dl @level-hi))
             (inc (- dl @level-hi))]
-          [True 1]))))))
+          [True 1])))))])

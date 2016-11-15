@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap afind-or block qw]] [roguetv.macros [*]])
 
 (import
   xml.sax.saxutils
@@ -23,7 +23,7 @@
   ; identifier. Similarly, we used underscores in place of spaces.
   ; Switch them back.
   (for [row (rest table)]
-    (setv (slice row) (amap (.replace (.replace it "’" "'") "_" " ") row)))
+    (setv (cut row) (amap (.replace (.replace it "’" "'") "_" " ") row)))
   ; Set 'd' to a dictionary mapping the :singular-they forms
   ; to dictionaries of all forms for that part of speech.
   (setv cols (first table))
@@ -76,7 +76,7 @@
 
 (defclass NounPhrase [object] [
 
-  [__init__ (fn [self stem &optional
+  __init__ (fn [self stem &optional
       plural
       [gender :neuter]
       article
@@ -133,22 +133,22 @@
     (set-self
       stem gender mass always-plural
       definite-singular definite-plural indefinite-singular indefinite-plural your count)
-    None))]
+    None))
 
-  [__format__ (fn [self formatstr]
+  __format__ (fn [self formatstr]
     (setv upper (not (none? (afind-or (.isupper it) formatstr))))
     (setv formatstr (.lower formatstr))
     ((if upper ucfirst identity) (cond
       [(in formatstr pronoun-bases)
-        (kwc pronoun formatstr
+        (pronoun formatstr
           :gender self.gender
           :plural self.always-plural)]
       [(.startswith formatstr "v:")
-        (kwc verb (slice formatstr (len "v:"))
+        (verb (cut formatstr (len "v:"))
           :gender self.gender
           :plural self.always-plural)]
       [(.startswith formatstr "p-v:")
-        (kwc verb (slice formatstr (len "p-v:"))
+        (verb (cut formatstr (len "p-v:"))
           :gender self.gender
           :plural (not self.mass))]
       [True
@@ -161,22 +161,22 @@
             "some"  self.indefinite-plural
             "your"  self.your
             "num"   self.count}
-          formatstr)])))]
+          formatstr)])))
 
-  [female (fn [self]
-    (= self.gender :female))]])
+  female (fn [self]
+    (= self.gender :female))])
 
 (defclass NounPhraseNamed [object] [
-  [name None]
-  [escape-xml-in-np-format False]
+  name None
+  escape-xml-in-np-format False
 
-  [escape (classmethod (fn [self s]
+  escape (classmethod (fn [self s]
     (if (and s self.escape-xml-in-np-format)
       (xml.sax.saxutils.escape s)
-      s)))]
+      s)))
 
-  [__format__ (fn [self formatstr]
-    (.escape self (.__format__ self.name formatstr)))]])
+  __format__ (fn [self formatstr]
+    (.escape self (.__format__ self.name formatstr)))])
 
 (defn english-list [l]
   (.join -inflect l))

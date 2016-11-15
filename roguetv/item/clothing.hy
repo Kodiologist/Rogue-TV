@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt block meth]] [roguetv.macros [*]])
 
 (import
   [kodhy.util [ret cat]]
@@ -9,7 +9,7 @@
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature.monster [Nymph]])
 
-(defcls Clothing [Item]
+(defclass Clothing [Item] [
   char "["
 
   open-present-time (seconds 1)
@@ -21,39 +21,39 @@
     (when (and (@identified?) @boxed)
       "(boxed)"))
 
-  info-extra (meth [] (kwc cat :sep "\n\n"
+  info-extra (meth [] (cat :sep "\n\n"
     (when @boxed
       "<b>This item is boxed</b>, suppressing its normal effect when carried. 'a'pply it to open and discard the box.")
     (when @curse-on-unbox
       "<b>This item becomes cursed when it is unboxed.</b>")))
 
   __init__ (meth [&kwargs kw]
-    (apply Item.__init__ [@] kw)
+    (apply Item.__init__ [@@] kw)
     (setv @boxed (.get kw "boxed" True))
     None)
 
   clone-setup (meth [orig]
-    (.clone-setup (super Clothing @) orig)
+    (.clone-setup (super Clothing @@) orig)
     (setv @boxed orig.boxed))
 
   identified? (meth []
     ; Unboxed items count as identified, whether or not you've
     ; identified the box type.
     (if @boxed
-      (.identified? (super Clothing @))
+      (.identified? (super Clothing @@))
       True))
 
   applied (meth [] (block
     (unless @boxed
-      (ret (.applied (super Clothing @))))
+      (ret (.applied (super Clothing @@))))
     (.take-time G.player @open-present-time)
     (setv was-id? (@identified?))
     (msg "You tear open {}.{}"
       (if was-id?
-        (.format "the box containing {:the}" @)
-        (.format "{:the}" @))
+        (.format "the box containing {:the}" @@)
+        (.format "{:the}" @@))
       (if (and was-id? @curse-on-unbox)
-        (.format " {:He's} cursed." @)
+        (.format " {:He's} cursed." @@)
         ""))
     (@identify)
     (setv @boxed False)
@@ -63,10 +63,10 @@
       (msg "You found:  {}" (self.invstr)))))
 
   carry-effects-active? (meth []
-    (not @boxed)))
+    (not @boxed))])
 
 (defn pair-of [s]
-  (kwc NounPhrase s :+always-plural :unit "pairs"))
+  (NounPhrase s :always-plural True :unit "pairs"))
 
 (def-itemtype Clothing "sneakers" :name (pair-of "expensive sneakers")
   :color-fg :white
@@ -197,7 +197,7 @@
   :info-carry "Each time you enter a new level, an extra nymph is generated.")
 
 (setv (get ItemAppearance.registry Clothing) (amap
-  (ItemAppearance it (kwc NounPhrase
+  (ItemAppearance it (NounPhrase
     (+ "present labeled " it)
     :plural (+ "presents labeled " it)
     :article "a"))

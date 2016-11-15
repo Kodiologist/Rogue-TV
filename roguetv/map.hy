@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [afind-or whenn block meth]] [roguetv.macros [*]])
 
 (import
   [random [randint uniform]]
@@ -10,82 +10,82 @@
   [roguetv.types [Drawable MapObject Scheduled]])
 
 (defclass Tile [Drawable MapObject NounPhraseNamed Scheduled] [
-  [escape-xml-in-np-format True]
-  [info-text "[Missing info text]"]
-  [blocks-movement False]
-  [blocks-sight False]
-  [unpleasant False]
+  escape-xml-in-np-format True
+  info-text "[Missing info text]"
+  blocks-movement False
+  blocks-sight False
+  unpleasant False
     ; `unpleasant` is a flag meaning that monsters tend not to
     ; want to be on this kind of tile.
-  [smooth False]
-  [spooky False]
+  smooth False
+  spooky False
     ; Whether the tile has an aura that slows movement.
-  [container False]
+  container False
     ; Whether the tile prevents items from being added to or
     ; removed from it.
-  [opaque-container False]
+  opaque-container False
     ; Whether the player can see what item is on the tile.
 
-  [__format__ (fn [self formatstr]
+  __format__ (fn [self formatstr]
     ; ":full" is accepted at the end of a format string to
     ; include the name-suffix.
     (setv full False)
     (when (.endswith formatstr ":full")
-      (setv formatstr (slice formatstr 0 (- (len ":full"))))
+      (setv formatstr (cut formatstr 0 (- (len ":full"))))
       (setv full True))
-    (.escape self (kwc cat :sep " " (.__format__ self.name formatstr)
-      (when full (.name-suffix self)))))]
+    (.escape self (cat :sep " " (.__format__ self.name formatstr)
+      (when full (.name-suffix self)))))
 
-  [information (fn [self]
+  information (fn [self]
     (.format "\n  {} {:a:full}\n\n{}"
       (.xml-symbol self)
       self
-      (apply .format [self.info-text] (. (type self) __dict__))))]
+      (apply .format [self.info-text] (. (type self) __dict__))))
 
-  [name-suffix (fn [self]
+  name-suffix (fn [self]
     ; This method can be overridden to provide extra information
     ; about a tile, like its state. It's only displayed with the
     ; "most" formatting tag.
-    None)]
+    None)
 
-  [use-tile (fn [self]
+  use-tile (fn [self]
     ; The player has used the command :use-tile on this tile.
     ;
     ; The default implementaton does nothing.
-    (msg "There's nothing special you can do at this tile."))]
+    (msg "There's nothing special you can do at this tile."))
 
-  [use-item-while-here (fn [self]
+  use-item-while-here (fn [self]
     ; The player has tried to use (i.e., apply or drop) an item
     ; while standing on this tile. Return False to halt further
     ; processing of the action, and True to continue.
-    True)]
+    True)
 
-  [bump-into (fn [self cr]
+  bump-into (fn [self cr]
     ; A creature has tried to step onto this tile. Return
     ; False to halt further processing of the step (in particular,
     ; the creature is not moved), and True to continue.
-    True)]
+    True)
 
-  [after-entering (fn [self cr p-from]
+  after-entering (fn [self cr p-from]
     ; A creature has just moved to this tile, by any means.
-    None)]
+    None)
 
-  [after-step-onto (fn [self cr p-from]
+  after-step-onto (fn [self cr p-from]
     ; A creature has just finished walking onto this tile.
     ; Teleportation, for example, won't trigger this.
-    None)]
+    None)
 
-  [step-out-of (fn [self cr p-to]
+  step-out-of (fn [self cr p-to]
     ; A creature is stepping out of this tile.
-    None)]])
+    None)])
 
 (defclass LevelBoundary [NounPhraseNamed] [
   ; This object is not a real tile. Rather, it is used as a flag
   ; for the lack of a tile when you use `mget` rather than `Tile.at`.
-  [name (kwc NounPhrase "level boundary" :+mass :unit "sections")]
-  [blocks-movement True]
-  [blocks-sight True]
-  [bump-into (fn [self cr] True)]])
+  name (NounPhrase "level boundary" :mass True :unit "sections")
+  blocks-movement True
+  blocks-sight True
+  bump-into (fn [self cr] True)])
 (setv LevelBoundary (LevelBoundary))
 
 (defn mset [pos tile &optional [initializing-map False]]
@@ -94,7 +94,7 @@
     (when (!= tile.blocks-sight old-tile.blocks-sight)
       (soil-fov))
     (.destroy old-tile))
-  (kwc .move tile pos :+clobber))
+  (.move tile pos :clobber True))
 
 (defn mget [pos]
   (if (on-map pos)
@@ -153,47 +153,47 @@
     (on-map (+ center (Pos dx dy)))))
 
 (defn in-los? [eye target] (block
-  (for [p (slice (line-bresen eye target) 1)]
+  (for [p (cut (line-bresen eye target) 1)]
     (when (. (mget p) blocks-sight)
       (ret False)))
   True))
 
 (defclass Floor [Tile] [
-  [name (kwc NounPhrase "ordinary floor" :+mass :unit "tiles")]
-  [char "."]
-  [info-text "Just what it says on the tin."]
+  name (NounPhrase "ordinary floor" :mass True :unit "tiles")
+  char "."
+  info-text "Just what it says on the tin."
 
-  [smooth True]])
+  smooth True])
 
 (defclass Wall [Tile] [
-  [name (NounPhrase "wall")]
-  [char "#"]
-  [color-bg G.fg-color]
-  [info-text (.join "\n" [
+  name (NounPhrase "wall")
+  char "#"
+  color-bg G.fg-color
+  info-text (.join "\n" [
     "A common and persistent obstacle to scooping up all the prizes on the level and hopping into the down elevator."
     ""
     "  This man, with lime and rough-cast, doth present"
     "  Wall, that vile Wall which did these lovers sunder;"
     "  And through Wall's chink, poor souls, they are content"
-    "  To whisper, at the which let no man wonder."])]
+    "  To whisper, at the which let no man wonder."])
       ; A Midsummer Night's Dream, 5.1.131–134
-  [blocks-movement True]
-  [blocks-sight True]])
+  blocks-movement True
+  blocks-sight True])
 
 (defclass Elevator [Tile] [
-  [smooth True]])
+  smooth True])
 
 (defclass UpElevator [Elevator] [
-  [name (NounPhrase "elevator going up")]
-  [char "<"]
-  [color-bg :green]
-  [info-text "Taking the elevator back up will immediately end your game of Rogue TV, but you'll be able to keep whatever winnings you're carrying."]
+  name (NounPhrase "elevator going up")
+  char "<"
+  color-bg :green
+  info-text "Taking the elevator back up will immediately end your game of Rogue TV, but you'll be able to keep whatever winnings you're carrying."
 
-  [use-tile (fn [self]
+  use-tile (fn [self]
     (msg :tara "Beware, there will be no return!")
     (msg "Do you really want to take the elevator up?")
     (when (user-confirms)
-      (setv G.endgame :used-up-elevator)))]])
+      (setv G.endgame :used-up-elevator)))])
 
 (defn upelevator-pos [] (block
   (for [l Tile.omap]
@@ -202,12 +202,12 @@
         (ret t.pos))))))
 
 (defclass DownElevator [Elevator] [
-  [name (NounPhrase "elevator going down")]
-  [char ">"]
-  [color-bg :yellow]
-  [info-text "This elevator leads to a new, unexplored level. The time limit will be reset, but you won't be able to return to this level, so make sure you're carrying whatever you intend to keep."]
+  name (NounPhrase "elevator going down")
+  char ">"
+  color-bg :yellow
+  info-text "This elevator leads to a new, unexplored level. The time limit will be reset, but you won't be able to return to this level, so make sure you're carrying whatever you intend to keep."
 
-  [use-tile (fn [self]
+  use-tile (fn [self]
     (if (= G.dungeon-level G.max-dungeon-level)
       (if (afind-or (instance? (get G.itypes "aoy") it) G.inventory)
         (do
@@ -227,23 +227,23 @@
           (if (= G.dungeon-level G.max-dungeon-level)
             "{p} has reached level {}, the final level. It's {} by {} squares. {p} must now find the mystical Amulet of Yendor and take the final down elevator to win Rogue TV!"
             "And {p:he's} on to level {}. It spans {} by {} squares.")
-          (inc G.dungeon-level) G.map-width G.map-height))))]])
+          (inc G.dungeon-level) G.map-width G.map-height))))])
 
 (defclass Door [Tile] [
-  [color-fg :brown]
-  [info-text "Rogue TV has obtained only the most rotten and ill-fitting of doors to block your progress through the level. They're unlocked, but heaving them open will take some time. And once open, they'll swing shut after a while."]])
+  color-fg :brown
+  info-text "Rogue TV has obtained only the most rotten and ill-fitting of doors to block your progress through the level. They're unlocked, but heaving them open will take some time. And once open, they'll swing shut after a while."])
 
 (defclass ClosedDoor [Door] [
-  [name (NounPhrase "closed door")]
-  [char "+"]
+  name (NounPhrase "closed door")
+  char "+"
 
-  [blocks-movement True]
-  [blocks-sight True]
+  blocks-movement True
+  blocks-sight True
 
-  [open-time (fn [self]
-    (seconds (+ 2 G.dungeon-level (randint 1 8))))]
+  open-time (fn [self]
+    (seconds (+ 2 G.dungeon-level (randint 1 8))))
 
-  [bump-into (fn [self cr] (block
+  bump-into (fn [self cr] (block
     (unless cr.can-open-doors
       (ret True))
     (setv open-time (.open-time self))
@@ -253,15 +253,15 @@
         (msgp cr "You open the old door after a struggle.")
         (.take-time cr open-time)))
     (mset self.pos (OpenDoor open-time))
-    False))]])
+    False))])
 
 (defclass OpenDoor [Door] [
-  [name (NounPhrase "open door")]
-  [char "|"]
+  name (NounPhrase "open door")
+  char "|"
 
-  [smooth True]
-  [close-time (fn [self]
-    (seconds (+ 5 (randexp (* 60 (inc G.dungeon-level))))))]
+  smooth True
+  close-time (fn [self]
+    (seconds (+ 5 (randexp (* 60 (inc G.dungeon-level))))))
       ; Yes, doors take longer to close at deeper levels, even
       ; though that makes things easier rather than harder. The
       ; point is to keep the question of whether a door will
@@ -269,20 +269,20 @@
       ; uncertain. Later levels involve more travel and bigger
       ; time losses due to obstacles, so we have to compensate.
 
-  [__init__ (fn [self open-time]
+  __init__ (fn [self open-time]
     (Door.__init__ self)
     (.schedule self)
     (.take-time self (+ open-time (.close-time self)))
-    None)]
+    None)
 
-  [act (fn [self]
+  act (fn [self]
     (if (.at (rtv-get creature.Creature) self.pos)
       (.wait self)
       (do
         (mset self.pos (ClosedDoor))
-        (.deschedule self))))]])
+        (.deschedule self))))])
 
-(defcls Chest [Tile]
+(defclass Chest [Tile] [
   name (NounPhrase "chest")
   char "■"
   color-fg :brown
@@ -308,15 +308,15 @@
     (if item
       (msgp cr "You found {} {:a:full}." (.xml-symbol item) item)
       (msgp cr "The chest was empty."))
-    item))
+    item)])
 
-(defcls GlassChest [Chest]
+(defclass GlassChest [Chest] [
   name (NounPhrase "glass chest")
   char "□"
   info-text "Implemented, but doesn't spawn currently, because it's too annoying. (An item in a glass chest looks like an item just sitting on the floor unless the player uses look mode.)"
-  opaque-container False)
+  opaque-container False])
 
-(defcls DoublingMachine [Tile]
+(defclass DoublingMachine [Tile] [
   name (NounPhrase "double-or-nothing machine")
   char "⁑"
   color-fg :red
@@ -347,78 +347,78 @@
       (do
         (msg "The machine plays a sad little tune. You lost {:the}." item)
         (.delete item)))
-    (mset @pos (Floor)))))
+    (mset @pos (Floor))))])
 
 (defclass HasTimePenalty [object] [
 
-  [min-exit-time (fn [self] (seconds 1))]
-  [max-exit-time (fn [self] (seconds (* 2 (inc G.dungeon-level))))]
+  min-exit-time (fn [self] (seconds 1))
+  max-exit-time (fn [self] (seconds (* 2 (inc G.dungeon-level))))
   
-  [do-time-penalty (fn [self cr]
+  do-time-penalty (fn [self cr]
     (.take-time cr (round-to-second
-      (uniform (.min-exit-time self) (.max-exit-time self)))))]])
+      (uniform (.min-exit-time self) (.max-exit-time self)))))])
 
 (defclass Slime [Tile HasTimePenalty] [
-  [name (kwc NounPhrase "slime" :+mass :unit "puddles")]
-  [char "}"]
-  [info-text "Stepping into this mystery sludge takes time."]
+  name (NounPhrase "slime" :mass True :unit "puddles")
+  char "}"
+  info-text "Stepping into this mystery sludge takes time."
     ; The term "mystery sludge" is from MXC.
-  [color-fg :white]
-  [color-bg :dark-green]
+  color-fg :white
+  color-bg :dark-green
 
-  [unpleasant True]
+  unpleasant True
 
-  [after-step-onto (fn [self cr p-from]
+  after-step-onto (fn [self cr p-from]
     (unless (or cr.flying cr.slime-immune)
-      (.do-time-penalty self cr)))]])
+      (.do-time-penalty self cr)))])
 
 (defclass Web [Tile HasTimePenalty] [
-  [name (NounPhrase "spiderweb")]
-  [char "%"]
-  [color-fg :dark-blue]
-  [info-text "This sizable web will make stepping into its tile difficult, just like slime. Furthermore, while you're standing in a web, you can't apply or drop items."]
+  name (NounPhrase "spiderweb")
+  char "%"
+  color-fg :dark-blue
+  info-text "This sizable web will make stepping into its tile difficult, just like slime. Furthermore, while you're standing in a web, you can't apply or drop items."
 
-  [unpleasant True]
+  unpleasant True
 
-  [use-item-while-here (fn [self]
+  use-item-while-here (fn [self]
     (if G.player.web-immune
       True
       (do
         (msg :tara "{p:The} is stuck in the web. {p:He} can't use items.")
-        False)))]
+        False)))
 
-  [after-step-onto (fn [self cr p-from]
+  after-step-onto (fn [self cr p-from]
     (unless cr.web-immune
-      (.do-time-penalty self cr)))]])
+      (.do-time-penalty self cr)))])
 
 (defclass Ice [Tile] [
-  [name (kwc NounPhrase "patch of ice"
-    :plural "patches of ice")]
-  [char ":"]
-  [color-fg :white]
-  [color-bg :pale-azure]
-  [info-text "A slippery sort of tile. If the next thing you do after stepping on it is move again in the same direction, you'll glide along without an issue. But if you take any other action, you'll need to take a moment to steady yourself first."]
+  name (NounPhrase "patch of ice"
+    :plural "patches of ice")
+  char ":"
+  color-fg :white
+  color-bg :pale-azure
+  info-text "A slippery sort of tile. If the next thing you do after stepping on it is move again in the same direction, you'll glide along without an issue. But if you take any other action, you'll need to take a moment to steady yourself first."
 
-  [unpleasant True]
-  [smooth True]
+  unpleasant True
+  smooth True
 
-  [min-slip-time (fn [self] (seconds 1))]
-  [max-slip-time (fn [self] (seconds (* 2 (inc G.dungeon-level))))]
+  min-slip-time (fn [self] (seconds 1))
+  max-slip-time (fn [self] (seconds (* 2 (inc G.dungeon-level))))
 
-  [after-step-onto (fn [self cr p-from]
+  after-step-onto (fn [self cr p-from]
     (unless (or cr.flying (.ice-immune cr))
       ; Set up the creature to slip.
       (setv cr.ice-slip-towards (- self.pos p-from))
       (setv cr.ice-slip-time (round-to-second
-        (uniform (.min-slip-time self) (.max-slip-time self))))))]
+        (uniform (.min-slip-time self) (.max-slip-time self))))))
 
-  [step-out-of (fn [self cr p-to]
+  step-out-of (fn [self cr p-to]
     ; If the creature moves in the same direction it moved to
     ; get here, it doesn't slip.
     (when (= (- p-to self.pos) cr.ice-slip-towards)
-      (cr.reset-ice-slipping)))]])
+      (cr.reset-ice-slipping)))])
 
-(defcls StasisTrap [Tile]
+(defclass StasisTrap [Tile] [
   name (NounPhrase "stasis trap")
   name-suffix (meth [] (if @trap-active "(on)" "(off)"))
 
@@ -435,7 +435,7 @@
   grace-time (seconds 1) ; N.B. Hard-coded in the info-text above.
 
   __init__ (meth [off-time on-time]
-    (Tile.__init__ @)
+    (Tile.__init__ @@)
     (set-self off-time on-time)
     (setv @trap-active False)
     (@schedule)
@@ -458,15 +458,15 @@
   freeze-creature (meth []
     (when @trap-active (whenn (.at (rtv-get creature.Creature) @pos)
       (cond
-        [(player? it) (msg "You are frozen by {:the}." @)]
-        [(seen @pos) (msg "{:The} {:v:is} frozen by {:the}." it it @)])
+        [(player? it) (msg "You are frozen by {:the}." @@)]
+        [(seen @pos) (msg "{:The} {:v:is} frozen by {:the}." it it @@)])
       (setv freeze-time (@freeze-time))
       (.take-time it freeze-time)
       (setv @trap-active False)
       (setv @next-turn (+ G.current-time freeze-time @grace-time)))
-      True)))
+      True))])
 
-(defcls PusherTile [Tile HasTimePenalty]
+(defclass PusherTile [Tile HasTimePenalty] [
   children {}
   name (NounPhrase "pusher tile")
   name-suffix (meth [] (.format "(pointing {})" (get Pos.DIRNAMES @push-dir)))
@@ -476,7 +476,7 @@
 
   step-out-of (meth [cr p-to]
     (unless (= p-to (+ @pos @push-dir))
-      (@do-time-penalty cr))))
+      (@do-time-penalty cr)))])
 
 (for [d Pos.ORTHS]
   (setv cname (str (+ "PusherTile" (ucfirst (get Pos.DIRNAMES d)))))
@@ -485,7 +485,7 @@
     "push_dir" d}))
   (setv (get PusherTile.children d) (get (globals) cname)))
 
-(defcls SpookyTotem [Tile]
+(defclass SpookyTotem [Tile] [
   name (NounPhrase "spooky totem")
   char "&"
   color-fg :dark-orange
@@ -494,9 +494,9 @@
   spooky True
 
   __init__ (meth []
-    (Tile.__init__ @)
+    (Tile.__init__ @@)
     (setv @player-noticed-spook False)
-    None))
+    None)])
 
 ; Below, we create a dictionary tile-save-shorthand which
 ; holds unambiguous single-character abbreviations for tiles.
@@ -508,7 +508,7 @@
     (try
       (unless (issubclass cls Tile)
         (continue))
-      (catch [_ TypeError]
+      (except [_ TypeError]
         (continue)))
     (setv (get d cls) cls.char))
   ; Remove ambiguous entries (for which a single char has more than

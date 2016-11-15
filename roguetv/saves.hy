@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [lc amap filt afind]])
 
 (import
   random
@@ -46,12 +46,12 @@
 
   (setv (get x "Scheduled.queue") Scheduled.queue)
 
-  (with [[o (gzip.open path "wb")]]
-    (o.write (kwc jsonpickle.encode x :+warn :+keys))))
+  (with [o (gzip.open path "wb")]
+    (o.write (jsonpickle.encode x :warn True :keys True))))
 
 (defn load-from-save-file [path]
-  (with [[o (gzip.open path "rb")]]
-    (setv x (kwc jsonpickle.decode (.read o) :+keys)))
+  (with [o (gzip.open path "rb")]
+    (setv x (jsonpickle.decode (.read o) :keys True)))
 
   (for ([k v] (.items (get x "G")))
     (setattr G k v))

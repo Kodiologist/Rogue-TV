@@ -1,4 +1,4 @@
-(require roguetv.macros)
+(require [roguetv.macros [*]])
 
 (import
   re
@@ -15,7 +15,7 @@
     (setv bg (G.pick-bg-color fg)))
   (curses.color-pair (try
     (get G.color-pairs (, fg bg))
-    (catch [_ KeyError]
+    (except [_ KeyError]
       ; This color pair hasn't been initialized yet. So do that.
       ; First ensure each color is defined correctly to have its
       ; usual value under xterm.
@@ -66,41 +66,41 @@
 ; An AttrStr is a string with an accompanying list of curses
 ; attributes for each character.
 
-  [__init__ (fn [self &optional chars attrs]
+  __init__ (fn [self &optional chars attrs]
     (setv self.chars (or chars ""))
     (setv self.attrs (or attrs []))
     (assert (= (len self.chars) (len self.attrs)))
-    None)]
+    None)
 
-  [from-xml (classmethod (fn [self xml-string]
+  from-xml (classmethod (fn [self xml-string]
     (setv root (xml.etree.ElementTree.fromstring
       (.encode (+ "<root>" xml-string "</root>") "UTF-8")))
-    (apply AttrStr (-from-xml-f root 0))))]
+    (apply AttrStr (-from-xml-f root 0))))
 
-  [__repr__ (fn [self]
-    (.format "AttrStr({!r}, {!r})" self.chars self.attrs))]
+  __repr__ (fn [self]
+    (.format "AttrStr({!r}, {!r})" self.chars self.attrs))
 
-  [__len__ (fn [self]
-    (len self.chars))]
+  __len__ (fn [self]
+    (len self.chars))
 
-  [draw (fn [self &optional extra-attrs]
+  draw (fn [self &optional extra-attrs]
     (for [[c a] (zip self.chars self.attrs)]
       (try
         (G.T.addstr (curses-encode c) (| (or a 0) (or extra-attrs 0)))
-        (catch [_ curses.error] None))))]
+        (except [_ curses.error] None))))
           ; http://bugs.python.org/issue8243
 
-  [ljust (fn [self width]
+  ljust (fn [self width]
     (AttrStr
       (.ljust self.chars width)
-      (+ self.attrs (* [None] (max 0 (- width (len self.chars)))))))]
+      (+ self.attrs (* [None] (max 0 (- width (len self.chars)))))))
 
-  [trunc (fn [self width]
+  trunc (fn [self width]
     (if (<= (len self) width)
       self
-      (AttrStr (slice self.chars 0 width) (slice self.attrs 0 width))))]
+      (AttrStr (cut self.chars 0 width) (cut self.attrs 0 width))))
 
-  [wrap (fn [self width]
+  wrap (fn [self width]
     ; Returns a list of AttrStrs, each no longer than the
     ; specified width.
     (setv lines [])
@@ -120,7 +120,7 @@
       (shift-attrs (len (first chunks)))
       (del (get chunks 0)))
     (.insert chunks 0 "")
-    (for [[ws nonws] (zip (slice chunks 0 None 2) (slice chunks 1 None 2))]
+    (for [[ws nonws] (zip (cut chunks 0 None 2) (cut chunks 1 None 2))]
       (when (> (+ (len line-chars) (len ws) (len nonws)) width)
         ; This line is full. Move on to the next line.
         (.append lines (AttrStr line-chars line-attrs))
@@ -134,4 +134,4 @@
       (+= line-chars (+ ws nonws))
       (+= line-attrs (shift-attrs (+ (len ws) (len nonws)))))
     (.append lines (AttrStr line-chars line-attrs))
-    lines)]])
+    lines)])

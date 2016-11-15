@@ -1,8 +1,8 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt block retf]] [roguetv.macros [*]])
 
 (import
   [heidegger.pos [Pos]]
-  [kodhy.util [ret retf]]
+  [kodhy.util [ret]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [text-screen message-log-screen inventory-loop look-mode user-confirms normal-command-keys]]
@@ -60,7 +60,7 @@
       (look-mode G.player.pos)]
 
     [(= cmd :examine-ground) (do
-      (kwc describe-tile G.player.pos :+verbose))]
+      (describe-tile G.player.pos :verbose True))]
 
     [(= cmd :use-tile)
       (.use-tile (Tile.at G.player.pos))]

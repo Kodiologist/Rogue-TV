@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt ecase block λ]] [roguetv.macros [*]])
 
 (import
   os
@@ -59,7 +59,7 @@
     (setv G.screen-mode :normal)
 
     (when special
-      (kwc show-scores G.scores-file-path :show-all (ecase special
+      (show-scores G.scores-file-path :show-all (ecase special
         [:show-scores False]
         [:show-all-scores True]))
       (ret ':just-showing-scores))
@@ -93,13 +93,13 @@
       ; Yes, we're brute-forcing the knapsack problem here.
       ; This should be fine so long as the inventory is small.
       (setv winnings (list
-        (kwc max :key total
+        (max :key total
         (filt (<= (total it) (/ gross 2))
         (concat
         (amap (list (combinations winnings it))
         (range (inc (len winnings)))))))))
       (setv gross (total winnings)))
-    (kwc .sort winnings :key (λ (, (- it.price) it.tid)))
+    (.sort winnings :key (λ (, (- it.price) it.tid)))
     (unless G.debug
       (add-current-game-to-scores G.scores-file-path winnings gross))
     (msg "Game over. Your total winnings are ${}. Hit \"!\" to quit." gross)

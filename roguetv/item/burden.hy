@@ -1,7 +1,7 @@
 ; This file is for special items that have negative effects and
 ; high values.
 
-(require kodhy.macros)
+(require [kodhy.macros [meth]])
 
 (import
   random
@@ -11,15 +11,15 @@
   [roguetv.map [disc-taxi Tile Floor Ice mset]]
   [roguetv.item.generic [Item def-itemtype item-pos]])
 
-(defcls Burden [Item]
+(defclass Burden [Item] [
   rarity :rare
-  price-adj :burden)
+  price-adj :burden])
 
-(defcls BigMoney [Burden]
+(defclass BigMoney [Burden] [
   char "$"
 
   info-flavor "Big money! Really heavy money, in fact."
-  info-carry "Slows your walking speed to {carry_speed_factor} times normal.")
+  info-carry "Slows your walking speed to {carry_speed_factor} times normal."])
 
 (def-itemtype BigMoney "briefcase-cash" :name "briefcase full of cash"
   :color-fg :dark-green
@@ -44,12 +44,12 @@
   :info-carry "You can't walk. At all."
   :superheavy True)
 
-(defcls CursedGem [Burden]
+(defclass CursedGem [Burden] [
   char "*"
-  unique True)
+  unique True])
 
 (def-itemtype CursedGem "cursedgem-ice"
-  :name (kwc NounPhrase "White Ice" :+the-proper)
+  :name (NounPhrase "White Ice" :the-proper True)
   :color-fg :white
   :level-lo 4
 
@@ -60,12 +60,12 @@
   :info-constant "Produces ice around itself. An ice tile is generated within {ice_radius} squares about {ice_per_second} times per second."
 
   :__init__ (meth [&kwargs kw]
-    (apply CursedGem.__init__ [@] kw)
+    (apply CursedGem.__init__ [@@] kw)
     (@schedule)
     None)
 
   :act (meth []
-    (setv p (random.choice (disc-taxi (item-pos @) @ice-radius)))
+    (setv p (random.choice (disc-taxi (item-pos @@) @ice-radius)))
     (when (instance? Floor (Tile.at p))
       (mset p (Ice)))
     (@take-time (int (randexp (/ 1 (/ @ice-per-second G.clock-factor)))))))

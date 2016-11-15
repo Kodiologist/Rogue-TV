@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt afind-or block]] [roguetv.macros [*]])
 
 (import
   [heidegger.pos [Pos]]
@@ -12,12 +12,12 @@
   [roguetv.creature [Creature Stink Haste Confusion Strength Passwall]])
 
 (defclass Soda [Item] [
-  [apply-time (seconds 1)]
-  [char "!"]
+  apply-time (seconds 1)
+  char "!"
 
-  [info-unidentified "A Rogue TV-branded insulated miniature aluminum can of some unidentifiable beverage. 'a'pply it to chug it and find out what it is."]
+  info-unidentified "A Rogue TV-branded insulated miniature aluminum can of some unidentifiable beverage. 'a'pply it to chug it and find out what it is."
 
-  [applied (fn [self] (block
+  applied (fn [self] (block
     (setv was-id? (.identified? self))
     (.identify self)
     (unless was-id?
@@ -26,25 +26,25 @@
       (.take-time G.player self.apply-time))
     (.remove G.inventory self)
     (.destroy self)
-    (self.soda-effect)))]])
+    (self.soda-effect)))])
 
 (defclass EffectSoda [Soda] [
-  [effect None]
-  [effect-time (seconds 1)]
-  [start-msg None]
-  [lengthen-msg None]
+  effect None
+  effect-time (seconds 1)
+  start-msg None
+  lengthen-msg None
 
-  [soda-effect (fn [self]
+  soda-effect (fn [self]
     (.add-to-player self.effect self.effect-time
       (fn [] (if (string? self.start-msg)
         (msg self.start-msg)
         (apply msg self.start-msg)))
       (fn [] (if (string? self.lengthen-msg)
         (msg self.lengthen-msg)
-        (apply msg self.lengthen-msg)))))]])
+        (apply msg self.lengthen-msg)))))])
 
 (defn can-of [s]
-  (kwc NounPhrase
+  (NounPhrase
     :stem (+ "can of " s)
     :article "a"))
 

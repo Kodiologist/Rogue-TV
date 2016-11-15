@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [lc amap fmap afind-or whenn]] [roguetv.macros [*]])
 
 (import
   [math [floor ceil]]
@@ -27,7 +27,7 @@
         (G.T.addstr (curses-encode a1) a2)]
       [True
         (G.T.addstr (curses-encode a1))])
-    (catch [_ curses.error] None)))
+    (except [_ curses.error] None)))
       ; http://bugs.python.org/issue8243
 
 (defn echo [str color-fg color-bg]
@@ -132,12 +132,12 @@
     (G.T.erase))
   (setv height (if fullscreen G.screen-height G.message-lines))
   (setv lines (concat
-    (lc [[mn [count text-xml]] (slice (list (enumerate G.message-log)) (- height))]
+    (lc [[mn [count text-xml]] (cut (list (enumerate G.message-log)) (- height))]
       (amap (, mn count it) (.wrap
         (AttrStr.from-xml (cat text-xml (when (> count 1)
           (.format " [× {}]" count))))
         G.screen-width)))))
-  (setv lines (slice lines (- height)))
+  (setv lines (cut lines (- height)))
   (for [[i [mn count astr]] (enumerate lines)]
     (G.T.move (+ i (- G.screen-height height)) 0)
     (.draw astr (if (or
@@ -149,7 +149,7 @@
 
 (defn full-redraw [&optional focus]
   (G.T.erase)
-  (setv focus-t-coords (kwc draw-map
+  (setv focus-t-coords (draw-map
     :focus (or focus G.player.pos)
     :ty-min 0
     :ty-max (if (= G.screen-mode :normal)
@@ -174,11 +174,11 @@
   (setv pages [])
   (setv i 0)
   (while True
-    (.append pages {"text" (slice lines i (+ i G.screen-height))})
+    (.append pages {"text" (cut lines i (+ i G.screen-height))})
     (when (>= (+ i G.screen-height) (len lines))
       (break))
     ; Remove the bottom line to make room for a "more" prompt.
-    (setv (get pages -1 "text") (slice (get pages -1 "text") None -1))
+    (setv (get pages -1 "text") (cut (get pages -1 "text") None -1))
     (setv (get pages -1 "more") True)
     (+= i (+ G.screen-height -1 (- G.text-screen-page-overlap))))
   pages)
@@ -200,7 +200,7 @@
     (rtv-get item.gadget.Gadget)
     (rtv-get item.soda.Soda)
     (rtv-get item.gadget.Battery)])))
-  (kwc .sort G.inventory :key (fn [item]
+  (.sort G.inventory :key (fn [item]
     (setv category (afind-or (instance? (second it) item) item-sort-order))
     (setv category (if category (first category) (len item-sort-order)))
     (,

@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [amap amap2 whenn λ qw]])
 
 (import
   sys
@@ -18,10 +18,10 @@
   (whenn (os.getenv "ROGUETV_BUNDLE_INFO")
     (setv [l1 l2 l3] (.split it "\n"))
     (setv G.bundle-os l1)
-    (setv G.bundle-git (slice l2 (len "Git commit ")))
-    (setv (get G.dates "bundle_created") (slice l3 (len "Packaged at ")))
+    (setv G.bundle-git (cut l2 (len "Git commit ")))
+    (setv (get G.dates "bundle_created") (cut l3 (len "Packaged at ")))
     (setv G.version-info (.format "Bundle version {}-{} ({})"
-      (slice G.bundle-git 0 12) G.bundle-os (get G.dates "bundle_created")))))
+      (cut G.bundle-git 0 12) G.bundle-os (get G.dates "bundle_created")))))
 
 (def pronouns->genders (OrderedDict [
   (, "he" :male)
@@ -37,7 +37,7 @@
 (defn parse-args [&optional args]
   (setv desc (+ "Rogue TV by Kodi Arfer\n" G.version-info))
 
-  (setv parser (kwc argparse.ArgumentParser
+  (setv parser (argparse.ArgumentParser
     :formatter-class argparse.RawDescriptionHelpFormatter
     :description desc))
 
@@ -124,7 +124,7 @@
              ; Captain Underpants and the Invasion of the Incredibly Naughty Cafeteria Ladies from Outer Space (and the Subsequent Assault of the Equally Evil Lunchroom Zombie Nerds)
            ["Robert'); DROP TABLE Players;--"]))])))
             ; http://www.xkcd.com/327/
-  (setv p.name (kwc NounPhrase p.name :+bare-proper :gender p.gender))
+  (setv p.name (NounPhrase p.name :bare-proper True :gender p.gender))
 
   p)
 
@@ -135,7 +135,7 @@
       (setv d (appdirs.user-data-dir "Rogue TV" "Kodiologist"))
       (try
         (os.makedirs d)
-        (catch [e OSError]
+        (except [e OSError]
           (unless (= e.errno errno.EEXIST)
             (raise))))
       d)))

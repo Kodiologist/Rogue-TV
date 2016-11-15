@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt afind ecase block]] [roguetv.macros [*]])
 
 (import
   [random [choice]]
@@ -160,7 +160,7 @@
         (break)]
 
       [(in key direction-keys) (do
-        (setv new-focus (+ focus (kwc get-direction key :+pure)))
+        (setv new-focus (+ focus (get-direction key :pure True)))
         (unless (rtv map.on-map new-focus)
           (continue))
         (setv focus new-focus))]

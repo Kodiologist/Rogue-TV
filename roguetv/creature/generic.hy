@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [afind-or whenn block meth cmeth]] [roguetv.macros [*]])
 
 (import
   random
@@ -11,69 +11,69 @@
   [roguetv.item [Item]])
 
 (defclass Creature [Drawable MapObject Scheduled NounPhraseNamed] [
-  [escape-xml-in-np-format True]
-  [char "C"]
-  [info-text "[Missing info text]"]
+  escape-xml-in-np-format True
+  char "C"
+  info-text "[Missing info text]"
 
-  [can-open-doors False]
-  [flying False]
-  [slime-immune False]
-  [web-immune False]
-  [spook-immune False]
-  [heavy False]
+  can-open-doors False
+  flying False
+  slime-immune False
+  web-immune False
+  spook-immune False
+  heavy False
     ; A heavy creature can't be pushed past by the player.
 
-  [__init__ (fn [self &optional pos]
+  __init__ (fn [self &optional pos]
     (MapObject.__init__ self pos)
     (Scheduled.__init__ self)
     (self.schedule)
     (self.reset-ice-slipping)
-    None)]
+    None)
 
-  [reset-ice-slipping (fn [self]
+  reset-ice-slipping (fn [self]
     (setv self.ice-slip-time 0)
-    (setv self.ice-slip-towards None))]
+    (setv self.ice-slip-towards None))
 
-  [ice-immune (fn [self]
-    False)]
+  ice-immune (fn [self]
+    False)
 
-  [can-see-contents (fn [self container-tile]
-    (not container-tile.opaque-container))]
+  can-see-contents (fn [self container-tile]
+    (not container-tile.opaque-container))
 
-  [visible-item-at (fn [self p]
+  visible-item-at (fn [self p]
     ; Returns 0 for being able to see there's no item, and None
     ; if the creature can't see whether there is one or not.
     ; N.B. This does *not* check whether the creature can see the
     ; tile in the first place.
     (setv t (Tile.at p))
     (when (or (not t.container) (.can-see-contents self t))
-      (or (Item.at p) 0)))]
+      (or (Item.at p) 0)))
 
-  [gettable-item-at (fn [self p]
-    (and (not (. (Tile.at p) container)) (Item.at p)))]
+  gettable-item-at (fn [self p]
+    (and (not (. (Tile.at p) container)) (Item.at p)))
 
-  [information (fn [self]
+  information (fn [self]
     (.format "\n  {} {:a}\n\n{}"
       (.xml-symbol self)
       self
-      (apply .format [self.info-text] (. (type self) __dict__))))]
+      (apply .format [self.info-text] (. (type self) __dict__))))
 
-  [take-time (fn [self duration]
+  take-time (fn [self duration]
     (.take-time Scheduled self duration)
     (when (and duration self.ice-slip-time)
       ; The creature takes some extra time slipping.
       (setv slip-time self.ice-slip-time)
       (msgp self "You take a moment to steady yourself on the ice.")
       (self.reset-ice-slipping)
-      (.take-time self slip-time)))]
+      (.take-time self slip-time)))
 
-  [move (fn [self p-to &optional [clobber False]]
+  move (fn [self p-to &optional [clobber False]]
     (setv p-from self.pos)
     (MapObject.move self p-to clobber)
     (unless (none? self.pos)
-      (.after-entering (Tile.at self.pos) self p-from)))]
+      (.after-entering (Tile.at self.pos) self p-from)))
 
-  [walk-to (fn [self p-to] (block
+  walk-to (fn [self p-to] (block
     (setv p-from self.pos)
     (setv dist (.walk-dist self p-from p-to))
     (unless (.bump-into (mget p-to) self)
@@ -134,7 +134,7 @@
       ; 1 unit of distance.
     (when cr
       (msg "You push past {:the}." cr))
-    (kwc .move self p-to :+clobber)
+    (.move self p-to :clobber True)
     (when cr
       (.move cr p-from))
     (for [p (disc-taxi p-to G.spook-radius)]
@@ -146,23 +146,23 @@
     (when (player? self)
       (rtv display.describe-tile self.pos))
     (.after-step-onto (Tile.at p-to) self p-from)
-    True))]
+    True))
 
-  [get-effect (fn [self effect-cls]
-    None)]
+  get-effect (fn [self effect-cls]
+    None)
 
-  [walk-dist (fn [self p-from p-to]
-    (dist-taxi p-from p-to))]
+  walk-dist (fn [self p-from p-to]
+    (dist-taxi p-from p-to))
 
-  [walk-speed (fn [self]
+  walk-speed (fn [self]
     ; Return the applicable multiplier for the creature's walking
     ; speed.
-    1)]
+    1)
 
-  [spook-time (fn [self]
-    (seconds (random.randint 1 (inc G.dungeon-level))))]])
+  spook-time (fn [self]
+    (seconds (random.randint 1 (inc G.dungeon-level))))])
 
-(defcls Effect [Scheduled]
+(defclass Effect [Scheduled] [
 ; Despite that this class is in creature.generic instead of
 ; creature.player, only the player can have effects.
 
@@ -177,8 +177,8 @@
     (@take-time duration)
     None)
 
-  add-to-player (classmethod (meth [duration start-msg lengthen-msg]
-    (setv e (.get-effect G.player @))
+  add-to-player (cmeth [duration start-msg lengthen-msg]
+    (setv e (.get-effect G.player @@))
     ; If the player already has an effect of this kind,
     ; the new duration is added to the old one.
     (if e
@@ -187,39 +187,39 @@
         (.take-time e duration))
       (do
         (start-msg)
-        (.append G.player.effects (@ duration))))))
+        (.append G.player.effects (@@ duration)))))
 
   act (meth []
     (@destroy))
 
   destroy (meth []
     (msg @end-msg)
-    (.remove G.player.effects @)
-    (.destroy (super Effect @))))
+    (.remove G.player.effects @@)
+    (.destroy (super Effect @@)))])
 
-(defcls Stink [Effect]
+(defclass Stink [Effect] [
   status "PU"
-  end-msg "You smell presentable again.")
+  end-msg "You smell presentable again."])
 
-(defcls Haste [Effect]
+(defclass Haste [Effect] [
   status "Fast"
-  end-msg "The rush of energy fades.")
+  end-msg "The rush of energy fades."])
 
-(defcls Confusion [Effect]
+(defclass Confusion [Effect] [
   status "Conf"
-  end-msg "Your mind clears.")
+  end-msg "Your mind clears."])
 
-(defcls Strength [Effect]
+(defclass Strength [Effect] [
   status "Str"
-  end-msg "You feel like a 98-pound weakling.")
+  end-msg "You feel like a 98-pound weakling."])
     ; Charles Atlas ads
 
-(defcls Passwall [Effect]
+(defclass Passwall [Effect] [
   status "Pass"
   end-msg "You feel solid again."
 
   destroy (meth []
-    (.destroy (super Passwall @))
+    (.destroy (super Passwall @@))
     (when (. (Tile.at G.player.pos) blocks-movement)
       (block
         ; Passwall just ended while the player was in a solid
@@ -231,4 +231,4 @@
               (.move G.player p)
               (ret))))
         ; There's no room anywhere on the level!
-        (msg :tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at G.player.pos))))))
+        (msg :tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at G.player.pos)))))])

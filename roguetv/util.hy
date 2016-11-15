@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [lc filt]])
 
 (import
   [math [log sqrt exp ceil]]
@@ -159,7 +159,7 @@
   ; count. When more messages are printed, we'll highlight them
   ; if they're new messages or if the last message had its count
   ; increased.
-  (setv G.message-log (slice G.message-log (- G.max-message-log-len)))
+  (setv G.message-log (cut G.message-log (- G.max-message-log-len)))
   (setv G.last-new-message-number (dec (len G.message-log)))
   (setv G.last-message-count (get G.message-log -1 0)))
 

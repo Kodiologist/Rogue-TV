@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [lc amap afind ecase block λ]])
 
 (import
   [math [floor ceil]]
@@ -13,16 +13,16 @@
 
 (defn get-scores [path]
   (try
-    (with [[o (open path "rb")]]
+    (with [o (open path "rb")]
       (setv scores (get (json.load o) "scores")))
-    (catch [e IOError]
+    (except [e IOError]
       (unless (= e.errno errno.ENOENT)
         (raise))
       (setv scores [])))
   scores)
 
 (defn add-current-game-to-scores [path prizes gross]
-  (setv x (kwc dict
+  (setv x (dict
     :name (.format "{:a}" G.player)
     :dates G.dates
     :seeds G.seeds
@@ -40,11 +40,11 @@
   (.append scores x)
   ; Sort the highest-scoring characters first, breaking ties with
   ; newer characters first.
-  (kwc .sort scores :+reverse :key (λ (,
+  (.sort scores :reverse True :key (λ (,
     (get it "gross")
     (get it "dates" "ended"))))
-  (with [[o (open path "wb")]]
-    (kwc json.dump {"scores" scores} o :+sort-keys)))
+  (with [o (open path "wb")]
+    (json.dump {"scores" scores} o :sort-keys True)))
 
 (defn show-scores [path &optional [show-all False]]
 
@@ -60,12 +60,12 @@
 
     (out "Games: {}" (len scores))
     (out "Mean score: <b>${}</b>"
-      (kwc show-round :ndigits 2 (/
+      (show-round :ndigits 2 (/
         (sum (amap (get it "gross") scores))
         (len scores))))
     (out)
 
-    (setv latest (kwc max scores :key (λ (get it "dates" "ended"))))
+    (setv latest (max scores :key (λ (get it "dates" "ended"))))
 
     (when (or (< (len scores) 3) show-all)
       (for [character scores]
@@ -74,7 +74,7 @@
 
     (defn print-latest []
       (out "<b>• Last score</b> ({} quantile)" (no-leading-0
-        (kwc round :ndigits 3 (- 1 (/ (inc (.index scores latest)) (len scores))))))
+        (round :ndigits 3 (- 1 (/ (inc (.index scores latest)) (len scores))))))
       (out (show-character latest latest)))
     (setv printed-latest False)
 
@@ -106,14 +106,14 @@
   (setv [d1 d2] (amap
     (.lstrip (.strftime
         (datetime.datetime.strptime
-          (slice (get x "dates" it) 0 (len "2004-12-31"))
+          (cut (get x "dates" it) 0 (len "2004-12-31"))
           "%Y-%m-%d")
         "%d %b %Y")
       "0")
     ["started" "ended"]))
   (.join "\n" [
     (.format "<b>{}</b> ({})"
-      (kwc color-xml (ucfirst (get x "name"))
+      (color-xml (ucfirst (get x "name"))
         :bg (when (and latest (= x latest)) :yellow))
       (if (= d1 d2)
         d1
@@ -127,8 +127,8 @@
       (inc (get x "dungeon_level"))
       (if (< (get x "time") G.clock-factor)
         "in less than a second"
-        (+ "after " (kwc show-duration (get x "time")
-          :+trunc-to-sec :+abbreviate))))
+        (+ "after " (show-duration (get x "time")
+          :trunc-to-sec True :abbreviate True))))
     (if (get x "prizes")
       (.format "with {} worth <b>${}</b>: {}."
         (if (= (len (get x "prizes")) 1) "a prize" "prizes")
@@ -139,5 +139,5 @@
 
 (defn no-leading-0 [x]
   (if (< 0 x 1)
-    (slice (string x) 1)
+    (cut (string x) 1)
     (string x)))
