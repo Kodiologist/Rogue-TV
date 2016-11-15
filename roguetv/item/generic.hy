@@ -221,16 +221,11 @@
     ; in the player's inventory.
     None)]])
 
-(defn def-itemtype [inherit tid &rest body]
+(defn def-itemtype [inherit tid &kwargs attrdict]
 
   (when (in tid G.itypes)
     (raise (ValueError (.format "redeclared item type: {}" tid))))
 
-  (setv attrdict (dict (amap
-    (do
-      (setv k (get body (* 2 it)) v (get body (inc (* 2 it))))
-      (, (.replace (keyword->str k) "-" "_") v))
-    (range (// (len body) 2)))))
   (setv c (type
     (str (+ "itype:" tid))
     (if (instance? list inherit) (tuple inherit) (, inherit))
