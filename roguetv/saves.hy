@@ -46,11 +46,11 @@
 
   (setv (get x "Scheduled.queue") Scheduled.queue)
 
-  (with [o (gzip.open path "wb")]
+  (with [o (gzip.open path "wt" :encoding "UTF-8")]
     (o.write (jsonpickle.encode x :warn True :keys True))))
 
 (defn load-from-save-file [path]
-  (with [o (gzip.open path "rb")]
+  (with [o (gzip.open path "rt" :encoding "UTF-8")]
     (setv x (jsonpickle.decode (.read o) :keys True)))
 
   (for ([k v] (.items (get x "G")))

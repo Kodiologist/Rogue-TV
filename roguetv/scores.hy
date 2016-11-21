@@ -13,7 +13,7 @@
 
 (defn get-scores [path]
   (try
-    (with [o (open path "rb")]
+    (with [o (open path "r" :encoding "UTF-8")]
       (setv scores (get (json.load o) "scores")))
     (except [e IOError]
       (unless (= e.errno errno.ENOENT)
@@ -43,7 +43,7 @@
   (.sort scores :reverse True :key (λ (,
     (get it "gross")
     (get it "dates" "ended"))))
-  (with [o (open path "wb")]
+  (with [o (open path "w" :encoding "UTF-8")]
     (json.dump {"scores" scores} o :sort-keys True)))
 
 (defn show-scores [path &optional [show-all False]]
