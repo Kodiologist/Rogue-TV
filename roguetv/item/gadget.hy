@@ -37,7 +37,7 @@
   applied (fn [self] (block
     ; Do we have a charge to spare?
     (when (= self.charges 0)
-      (msg :bob "That oojah's all chatty, kemosabe.")
+      (msg 'bob "That oojah's all chatty, kemosabe.")
       (ret))
     ; Do we succeed in applying the gadget?
     (for [x (filt it.carry-gadget-malfunction-1in (active-inv))]
@@ -97,7 +97,7 @@
 
     ; Now teleport there.
     (.move G.player p-to)
-    (msg :tara "{p:He's} teleported to another part of the level."))))
+    (msg 'tara "{p:He's} teleported to another part of the level."))))
 
 (def-itemtype Gadget "warpback" :name "warpback machine"
   :color-fg :dark-orange
@@ -162,7 +162,7 @@
         (when (. (Tile.at p) blocks-movement)
           (ret))
         (whenn (Creature.at p)
-          (msg :tara "{p:The}'s {} bounces off {:the}."
+          (msg 'tara "{p:The}'s {} bounces off {:the}."
             self it)
           (retf :gadget)))
       (msg "{:Your} doesn't hit anything. It can only reach objects up to {} squares away."
@@ -210,7 +210,7 @@
         (when (and (on-map p) (Creature.at p))
           (ret))
         (when (. (mget p) blocks-movement)
-          (msg :tara "{p:The}'s {} bounces off {:the}."
+          (msg 'tara "{p:The}'s {} bounces off {:the}."
             @@ (mget p))
           (retf :gadget)))
       (msg "{:Your} doesn't hit anything. It can only reach monsters up to {} squares away."
@@ -250,7 +250,7 @@
             (msg "Oops! {:Your} destroyed {:him}." self it)
             (msg "{:He} miraculously {:v:avoids} being destroyed by {:the}." it it self)))))]
       [(and (on-map p) (Creature.at p))
-        (msg :bob "This is Rogue TV, not DoomRL!")]
+        (msg 'bob "This is Rogue TV, not DoomRL!")]
       [True
         (msg "{:Your} proves ineffective against {:the}." self t)]))))
 
@@ -292,7 +292,7 @@
         (msg "Your drill reduces {:the} to dust." t)
         (mset p (Floor)))]
       [(and (on-map p) (Creature.at p))
-        (msg :aud "gasps. You can't use a drill like that on a family show.")]
+        (msg 'aud "gasps. You can't use a drill like that on a family show.")]
       [True
         (msg "Your drill proves ineffective against {:the}." t)]))))
 
@@ -321,7 +321,7 @@
 
     (msg "You spray some aerosol string.")
     (unless made-a-web
-      (msg :tara "{p:The}'s spraying hasn't come to much.")))))
+      (msg 'tara "{p:The}'s spraying hasn't come to much.")))))
 
 (def-itemtype Gadget "bee-machine" :name "personal beekeeping device"
   :color-fg :yellow

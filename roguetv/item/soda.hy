@@ -59,7 +59,7 @@
 
     (for [p (shuffle (disc-taxi (upelevator-pos) self.radius-around-upelv))]
       (when (= p G.player.pos)
-        (msg :bob "You've always had the power to go back to Kansas.")
+        (msg 'bob "You've always had the power to go back to Kansas.")
           ; The Wizard of Oz
         (ret))
       (when (room-for? G.player p)
@@ -102,8 +102,8 @@
   :info-apply "You'll stink for {effect-time}. While you stink, monsters within {G.repulsed-from-player-range} squares will run away from you."
   :effect Stink
   :effect-time (seconds 30)
-  :start-msg [:aud "cries out in disgust at the pungent odor."]
-  :lengthen-msg [:tara "Smells like {p:the} is going to keep on smelling for a while."])
+  :start-msg ['aud "cries out in disgust at the pungent odor."]
+  :lengthen-msg ['tara "Smells like {p:the} is going to keep on smelling for a while."])
 
 (def-itemtype EffectSoda "speed-soda" :name (can-of "5-second ENERGY™")
   ; In reference to the real dietary supplement 5-hour Energy.
@@ -136,7 +136,7 @@
   :effect Confusion
   :effect-time (seconds 45)
   :start-msg "Wow, that'shh good shhtuff."
-  :lengthen-msg [:tara "Keep your head in the game, {p}."])
+  :lengthen-msg ['tara "Keep your head in the game, {p}."])
 
 (def-itemtype EffectSoda "strength-soda" :name (can-of "Daffy's Elixir")
   ; A name for several patent medicines.
@@ -176,7 +176,7 @@
   :soda-effect (fn [self]
 
     (.fall-asleep G.player self.sleep-time)
-    (msg :tara "Oh no! {p:The} has fallen asleep!")))
+    (msg 'tara "Oh no! {p:The} has fallen asleep!")))
 
 (setv (get ItemAppearance.registry Soda) (amap
   (ItemAppearance it (NounPhrase (+ it " soda can")))

@@ -37,9 +37,9 @@
 (def unseen-color :dark-gray)
 (def off-map-color :very-dark-gray)
 (def announcer-colors {
-  :tara :blue
-  :bob :red
-  :aud :dark-green})
+  'tara :blue
+  'bob :red
+  'aud :dark-green})
 (def unid-item-color :purple)
 
 (def time-bar-width 10)

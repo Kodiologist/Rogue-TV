@@ -190,7 +190,7 @@
   info-text "Taking the elevator back up will immediately end your game of Rogue TV, but you'll be able to keep whatever winnings you're carrying."
 
   use-tile (fn [self]
-    (msg :tara "Beware, there will be no return!")
+    (msg 'tara "Beware, there will be no return!")
     (msg "Do you really want to take the elevator up?")
     (when (user-confirms)
       (setv G.endgame :used-up-elevator)))])
@@ -211,19 +211,19 @@
     (if (= G.dungeon-level G.max-dungeon-level)
       (if (afind-or (instance? (get G.itypes "aoy") it) G.inventory)
         (do
-          (msg :aud "goes wild! You won the game!")
+          (msg 'aud "goes wild! You won the game!")
           (setv G.endgame :won))
-        (msg :tara "Sorry, {p}, you'll need the Amulet of Yendor to finish the game."))
+        (msg 'tara "Sorry, {p}, you'll need the Amulet of Yendor to finish the game."))
       (do
         (when G.autosave
           (rtv saves.write-save-file G.save-file-path))
         (when (<= (- G.time-limit G.current-time) G.super-low-time-threshold)
           ; The audience was counting down when the player got
           ; to the down elevator.
-          (msg :aud "cheers. You made it!"))
+          (msg 'aud "cheers. You made it!"))
         (+= G.dungeon-level 1)
         (rtv mapgen.reset-level)
-        (msg :tara
+        (msg 'tara
           (if (= G.dungeon-level G.max-dungeon-level)
             "{p} has reached level {}, the final level. It's {} by {} squares. {p} must now find the mystical Amulet of Yendor and take the final down elevator to win Rogue TV!"
             "And {p:he's} on to level {}. It spans {} by {} squares.")
@@ -384,7 +384,7 @@
     (if G.player.web-immune
       True
       (do
-        (msg :tara "{p:The} is stuck in the web. {p:He} can't use items.")
+        (msg 'tara "{p:The} is stuck in the web. {p:He} can't use items.")
         False)))
 
   after-step-onto (fn [self cr p-from]

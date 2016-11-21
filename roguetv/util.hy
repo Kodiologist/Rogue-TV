@@ -136,12 +136,12 @@
 
 (defn msg [&rest args]
   (setv args (list args))
-  (setv mtype (when (keyword? (first args))
+  (setv mtype (when (symbol? (first args))
     (.pop args 0)))
   (when mtype
     (setv (get args 0) (.format "{} {}"
       (color-xml
-        (get {:tara "Tara:" :bob "Bob:" :aud "The audience"} mtype)
+        (get {'tara "Tara:" 'bob "Bob:" 'aud "The audience"} mtype)
         (get G.announcer-colors mtype))
       (get args 0))))
   (setv text

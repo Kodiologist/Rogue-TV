@@ -267,6 +267,6 @@
         (msg "There is also {} {:a:full} here." (.xml-symbol tile) tile)))]
     [verbose
       (if (instance? Floor tile)
-        (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
+        (msg 'bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
           (if (G.player.name.female) "dowdy" "cull"))
         (msg "There is {} {:a:full} here." (.xml-symbol tile) tile))]))

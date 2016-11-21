@@ -88,7 +88,7 @@
         (msg "{:The} {:v:is} inside {:the}, which {:v:is} closed." item item t t)
         (ret))
       (when (= (len G.inventory) G.inventory-limit)
-        (msg :tara "{p:The} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
+        (msg 'tara "{p:The} has {p:his} eyes on another prize, but {p:his} inventory is full. {p:He} can only carry up to {} items."
           G.inventory-limit)
         (ret))
       (.take-time G.player G.player.take-item-time)
@@ -107,12 +107,12 @@
         (ret))
       (setv item (get G.inventory i))
       (when item.curse
-        (msg :tara "{:The} {:v:is} cursed! {p:The} can't drop {:him}."
+        (msg 'tara "{:The} {:v:is} cursed! {p:The} can't drop {:him}."
           item item item)
         (ret))
       (setv clear-spot (drop-pos G.player.pos))
       (unless clear-spot
-        (msg :bob "There ain't room on the ground for that truck.")
+        (msg 'bob "There ain't room on the ground for that truck.")
         (ret))
       (.take-time G.player G.player.drop-item-time)
       (.pop G.inventory i)

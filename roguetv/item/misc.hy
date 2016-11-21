@@ -107,7 +107,7 @@
     (@deschedule)
     (setv @ready True)
     (when (in @@ G.inventory)
-      (msg :tara "{p}, {:the} is ready for use again." @@))))
+      (msg 'tara "{p}, {:the} is ready for use again." @@))))
 
 (def-itemtype Item "test-item"
   :name "test item" :name-suffix (fn [self] "(testy)")

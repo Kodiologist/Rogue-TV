@@ -87,7 +87,7 @@
         ; around the map, apply it.
         (when (and (in p-to (outer-corner-pos))
             (afind-or (or it.carry-mapwrap-eastwest it.carry-mapwrap-northsouth) (active-inv)))
-          (msg :tara "Please don't try to wrap through a corner of the dungeon, {p}. That could tear the spacetime continuum and destroy the universe.")
+          (msg 'tara "Please don't try to wrap through a corner of the dungeon, {p}. That could tear the spacetime continuum and destroy the universe.")
           (ret False))
         (for [[pa item-attr max-coord d-neg d-pos] [
             ["x" "carry_mapwrap_eastwest" G.map-width Pos.WEST Pos.EAST]
@@ -105,7 +105,7 @@
             (+= p-to d)
             (when (= (getattr p-to pa) (getattr p-from pa))
               (.take-time self (seconds (/ dist (self.walk-speed))))
-              (msg :tara "Looks like {p} doesn't have room to wrap around the level here.")
+              (msg 'tara "Looks like {p} doesn't have room to wrap around the level here.")
               (ret False))))))
     (when (or
         (not (on-map p-to))
@@ -231,4 +231,4 @@
               (.move G.player p)
               (ret))))
         ; There's no room anywhere on the level!
-        (msg :tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at G.player.pos)))))])
+        (msg 'tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at G.player.pos)))))])

@@ -122,11 +122,11 @@
   act (meth []
     (setv seconds-left (// (- G.time-limit G.current-time) G.clock-factor))
     (if seconds-left
-      (msg :aud "chants \"{}!\""
+      (msg 'aud "chants \"{}!\""
         (get [None "One" "Two" "Three" "Four" "Five"] seconds-left))
       (do
-        (msg :tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
-        (msg :bob (choice bob-too-bad))
+        (msg 'tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
+        (msg 'bob (choice bob-too-bad))
         (setv G.time-limit None)
         (setv G.endgame :out-of-time)))
     (@wait))])

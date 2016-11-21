@@ -306,7 +306,7 @@
   remove-curse (meth []
     (setv @host-item.curse None)
     (when (in @host-item G.inventory)
-      (msg :tara "{p:}, the curse on {:your} has faded." @host-item))
+      (msg 'tara "{p:}, the curse on {:your} has faded." @host-item))
     (@deschedule))
 
   act (meth []
@@ -373,6 +373,6 @@
         (ret False))
       (get G.inventory i))))
   (when (is item self)
-    (msg :bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
+    (msg 'bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
     (ret False))
   item))
