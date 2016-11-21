@@ -35,6 +35,7 @@
   :__init__ (meth [&kwargs kw]
     (apply Item.__init__ [@@] kw)
     (@schedule)
+    (@take-time (int (randexp @hunger-time)))
     None)
 
   :info-apply "Consumes an item for a temporary speed boost. Cursed items aren't eligible. The speed boost increases your walking speed by a factor of {G.haste-factor} and lasts for {apply-time} per ${price-to-speed-time-ratio} of the item's price, rounded down."
