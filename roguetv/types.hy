@@ -50,7 +50,7 @@
     (when self.pos
       (try
         (setv (get self.omap self.pos.x self.pos.y) None)
-        (except [_ IndexError])))
+        (except [IndexError])))
           ; An IndexError may arise from the assignment if we've
           ; done a .move after an old position has become
           ; invalid. This is fine.

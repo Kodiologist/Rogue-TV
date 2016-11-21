@@ -29,7 +29,7 @@
   (, "it" :neuter)]))
 
 (def max-seed sys.maxint)
-(def min-seed (- (- sys.maxint) (int 1)))
+(def min-seed (- (- sys.maxint) 1))
 
 (defn uni [s]
   (.decode s (sys.getfilesystemencoding)))

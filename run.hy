@@ -37,4 +37,4 @@
 
 (unless (or p.debug (= exit-reason :save-and-quit))
   (try (os.remove p.save)
-    (except [_ OSError])))
+    (except [OSError])))

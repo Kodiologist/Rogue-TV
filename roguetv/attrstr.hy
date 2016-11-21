@@ -15,7 +15,7 @@
     (setv bg (G.pick-bg-color fg)))
   (curses.color-pair (try
     (get G.color-pairs (, fg bg))
-    (except [_ KeyError]
+    (except [KeyError]
       ; This color pair hasn't been initialized yet. So do that.
       ; First ensure each color is defined correctly to have its
       ; usual value under xterm.
@@ -87,7 +87,7 @@
     (for [[c a] (zip self.chars self.attrs)]
       (try
         (G.T.addstr (curses-encode c) (| (or a 0) (or extra-attrs 0)))
-        (except [_ curses.error] None))))
+        (except [curses.error] None))))
           ; http://bugs.python.org/issue8243
 
   ljust (fn [self width]

@@ -27,7 +27,7 @@
         (G.T.addstr (curses-encode a1) a2)]
       [True
         (G.T.addstr (curses-encode a1))])
-    (except [_ curses.error] None)))
+    (except [curses.error] None)))
       ; http://bugs.python.org/issue8243
 
 (defn echo [str color-fg color-bg]

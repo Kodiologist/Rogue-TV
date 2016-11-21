@@ -162,7 +162,7 @@
           (.replace k "_" "-")
           (if (.endswith k "_time") (show-duration v) v))))))))
 
-  information-G ((type (str "information-G") (, object) {
+  information-G ((type "information-G" (, object) {
     "__getattr__" (fn [self name]
       (getattr G (.replace name "-" "_")))}))
 

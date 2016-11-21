@@ -508,7 +508,7 @@
     (try
       (unless (issubclass cls Tile)
         (continue))
-      (except [_ TypeError]
+      (except [TypeError]
         (continue)))
     (setv (get d cls) cls.char))
   ; Remove ambiguous entries (for which a single char has more than
