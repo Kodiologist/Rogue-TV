@@ -364,15 +364,15 @@
          (.use-time-and-charge self)
          (msg "Nothing happens."))
       (msg "You don't have anything to {}." verb))
-    (ret F))
+    (ret))
   (setv item (if unid
     (random.choice other-items)
     (do
       (setv i (inventory-loop (.format "What do you want to {}?" verb)))
       (when (none? i)
-        (ret F))
+        (ret))
       (get G.inventory i))))
   (when (is item self)
     (msg 'bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
-    (ret F))
+    (ret))
   item))
