@@ -239,7 +239,8 @@
     (setv c.name c.tid))
   (setv c.name (NounPhrase c.name))
   (when (not-in "price" attrdict)
-    (setv price-grade (or (.get attrdict "price_grade") (+
+    (setv price-grade (.get attrdict "price_grade"))
+    (unless price-grade (setv price-grade (+
       c.level-lo
       (ecase c.price-adj
         [None         0]
