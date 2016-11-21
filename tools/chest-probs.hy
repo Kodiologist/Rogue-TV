@@ -1,7 +1,5 @@
 ; Computes the proportion of chests that are nonempty on each level.
 
-(require kodhy.macros)
-
 (import
   [roguetv.globals :as G]
   [roguetv.mapgen [*]])

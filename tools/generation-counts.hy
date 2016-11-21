@@ -2,7 +2,7 @@
 ; number of obstacles, items, and benefits generated per level.
 ; The output is tables of quantiles per dungeon level/
 
-(require kodhy.macros)
+(require [kodhy.macros [rmap replicate]])
 
 (import
   roguetv.mapgen

@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [λ amap filt ecase]])
 
 (import
   sys
@@ -9,7 +9,7 @@
   roguetv.item
     ; To ensure G.itypes is filled.
   [roguetv.mapgen [Obstacle select-items select-obstacles select-benefits]]
-  [kodhy.util [shift weighted-choice]])
+  [kodhy.util [T F shift weighted-choice]])
 
 (shift sys.argv)
 (setv mode (shift sys.argv))
@@ -18,10 +18,10 @@
 
 (setv dl (int dl))
 
-(cond
-  [(= mode "probs")
+(ecase mode
+  ["probs"
     (for [ition [0 1]]
-      (setv l (kwc sorted :+reverse
+      (setv l (sorted :reverse T :key (λ (, (first it) (repr (second it))))
         (amap (, (it.generation-weight dl chest?) it)
         (filt (!= it.rarity :nongen)
         (get [Obstacle.types (.values G.itypes)] ition)))))
@@ -29,13 +29,13 @@
       (for [[w c] l]
         (print (.format "{:1.03f} {.__name__}" (/ w total) c)))
       (print))]
-  [(= mode "sample") (do
+  ["sample"
     (for [[s f] [["Obstacles" select-obstacles] ["Benefits" select-benefits]]]
       (print "---" s "---")
-      (for [[_ l] (groupby (sorted (f dl)))]
+      (for [[_ l] (groupby (sorted (f dl) :key str))]
         (setv l (list l))
         (print (len l) "×" (. (first l) __name__)))
       (print))
     (print "--- Items ---")
-    (for [[in-chest? itype] (sorted (select-items dl))]
-      (print itype.tid (if in-chest? "(chest)" ""))))])
+    (for [[in-chest? itype] (sorted (select-items dl) :key str)]
+      (print itype.tid (if in-chest? "(chest)" "")))])
