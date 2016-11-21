@@ -215,11 +215,11 @@
 
 (defmacro defobst [name inherit &rest body]
   `(do
-    (defcls ~name ~inherit ~@body)
+    (defclass ~name ~inherit ~@body)
     ; Add this obstacle type to the list.
     (.append Obstacle.types ~name)))
 
-(defobst O-Doors [Obstacle]
+(defobst O-Doors [Obstacle] [
   f (cmeth [] (block
       (setv n-to-place (inc (// @dl 3)))
       (for [p @door-pos]
@@ -228,13 +228,13 @@
           (.remove @free-floors p)
           (-= n-to-place 1)
           (unless n-to-place
-            (ret)))))))
+            (ret))))))])
 
-(defobst O-EmptyChest [Obstacle]
+(defobst O-EmptyChest [Obstacle] [
   level-lo 9
   rarity :uncommon
   f (cmeth []
-    (mset (shift @free-floors) (Chest))))
+    (mset (shift @free-floors) (Chest)))])
 
 (defclass MudlikeObstacle [Obstacle] [
   max-cheb-radius None
@@ -268,25 +268,25 @@
         (break))))
       (@make-tiles occupied))])
 
-(defobst O-Slime [MudlikeObstacle]
+(defobst O-Slime [MudlikeObstacle] [
   max-cheb-radius (cmeth []
     (+ 2 (// @dl 4)))
-  make-tile (cmeth [] (Slime)))
+  make-tile (cmeth [] (Slime))])
 
-(defobst O-Ice [MudlikeObstacle]
+(defobst O-Ice [MudlikeObstacle] [
   level-lo 1
   level-hi 6
   max-cheb-radius (cmeth []
     (+ 2 (// @dl 4)))
-  make-tile (cmeth [] (Ice)))
+  make-tile (cmeth [] (Ice))])
 
-(defobst O-Webs [MudlikeObstacle]
+(defobst O-Webs [MudlikeObstacle] [
   level-lo 2
   max-cheb-radius (cmeth []
     (+ 1 (// @dl 4)))
-  make-tile (cmeth [] (Web)))
+  make-tile (cmeth [] (Web))])
 
-(defobst O-PusherTiles [MudlikeObstacle]
+(defobst O-PusherTiles [MudlikeObstacle] [
   level-lo 7
   max-cheb-radius (cmeth []
     (+ 2 (// @dl 4)))
@@ -302,9 +302,9 @@
     (setv tile-type (get PusherTile.children
       (choice (or open Pos.ORTHS))))
     (for [p ps]
-      (mset p (tile-type)))))
+      (mset p (tile-type))))])
 
-(defobst O-StasisTraps [Obstacle]
+(defobst O-StasisTraps [Obstacle] [
   level-lo 4
   off-time-table (pairs
     0  (seconds 10)
@@ -342,20 +342,20 @@
     (setv on-time (@on-time))
     (for [p (unique line)]
       (.remove @free-floors p)
-      (mset p (StasisTrap off-time on-time)))))
+      (mset p (StasisTrap off-time on-time))))])
 
-(defobst O-SpookyTotems [Obstacle]
+(defobst O-SpookyTotems [Obstacle] [
   level-lo 11
   f (cmeth []
-    (mset (shift @free-floors) (SpookyTotem))))
+    (mset (shift @free-floors) (SpookyTotem)))])
 
-(defobst O-Dogs [Obstacle]
+(defobst O-Dogs [Obstacle] [
   level-lo 2
   rarity :uncommon
   f (cmeth []
       (setv n-to-place (+ (// @dl 4) (randint 1 3)))
       (for [_ (range n-to-place)]
-        (Dog :pos (shift @free-floors)))))
+        (Dog :pos (shift @free-floors))))])
 
 (defclass NormalMonster [Obstacle] [
   cr-cls None
@@ -366,10 +366,10 @@
     (for [_ (range n-to-place)]
       (@cr-cls :pos (shift @free-floors))))])
 
-(defobst O-Snails [NormalMonster]
-  cr-cls Snail)
+(defobst O-Snails [NormalMonster] [
+  cr-cls Snail])
 
-(defobst O-Golem [Obstacle]
+(defobst O-Golem [Obstacle] [
   level-lo 2
 
   max-to-place 3
@@ -387,31 +387,31 @@
       (.remove @free-floors p)
       (-= n-to-place 1)
       (unless n-to-place
-        (break)))))
+        (break))))])
 
-(defobst O-Spiders [NormalMonster]
+(defobst O-Spiders [NormalMonster] [
   level-lo 4
-  cr-cls Spider)
+  cr-cls Spider])
 
-(defobst O-Nymph [NormalMonster]
+(defobst O-Nymph [NormalMonster] [
   level-lo 7
   cr-cls Nymph
-  max-to-place 1)
+  max-to-place 1])
 
 (defclass Benefit [Generated] [
   types []])
 
 (defmacro defben [name inherit &rest body]
   `(do
-    (defcls ~name ~inherit ~@body)
+    (defclass ~name ~inherit ~@body)
     ; Add this benefit type to the list.
     (.append Benefit.types ~name)))
 
-(defben B-DoublingMachine [Benefit]
+(defben B-DoublingMachine [Benefit] [
   f (cmeth []
-    (mset (shift @free-floors) (DoublingMachine))))
+    (mset (shift @free-floors) (DoublingMachine)))])
 
-(defben B-UmberHulk [Benefit]
+(defben B-UmberHulk [Benefit] [
   level-lo 2
   f (cmeth []
-    (UmberHulk :pos (shift @free-floors))))
+    (UmberHulk :pos (shift @free-floors)))])
