@@ -23,8 +23,10 @@
   (setv general-rng-state (random.getstate))
   (if new-seed
     (random.seed)
-    (random.seed (get G.seeds "map")))
-  (random.jumpahead (int dl))
+    (random.seed (repr (, (get G.seeds "map") (int dl)))))
+      ; This method of seeding might not be particularly smart.
+      ; For now, I'm just covering for Python 3's lack of
+      ; random.jumpahead.
 
   (setv G.map-width (+ 50 (* 4 dl)))
   (setv G.map-height (+ 20 (* 2 dl)))
