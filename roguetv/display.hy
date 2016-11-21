@@ -5,7 +5,7 @@
   textwrap
   curses
   [heidegger.pos [Pos]]
-  [kodhy.util [concat]]
+  [kodhy.util [T F concat]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [look-at-keys]]
@@ -25,7 +25,7 @@
         (G.T.addstr a1 a2 (curses-encode a3))]
       [(not (none? a2))
         (G.T.addstr (curses-encode a1) a2)]
-      [True
+      [T
         (G.T.addstr (curses-encode a1))])
     (except [curses.error] None)))
       ; http://bugs.python.org/issue8243
@@ -52,7 +52,7 @@
       (- tx G.map-border-width)]
     [(>= right (+ G.map-border-width G.map-width))
       (+ tx G.map-border-width G.map-width (- G.screen-width))]
-    [True
+    [T
       (+ (- tx (// G.screen-width 2)) focus-px)]))
 (defn ty->py [ty focus-py]
   (-= focus-py (int (ceil (/ G.bottom-border 2))))
@@ -66,13 +66,13 @@
       (- G.screen-height 1 G.map-border-width G.bottom-border ty)]
     [(>= top (+ G.map-border-width G.map-height))
       (- (+ G.map-height G.map-border-width) 1 ty)]
-    [True
+    [T
       (+ (- (// G.screen-height 2) ty) focus-py)]))
 
 (defn draw-map [focus ty-min ty-max]
   (when G.fov-dirty?
     (recompute-fov)
-    (setv G.fov-dirty? False))
+    (setv G.fov-dirty? F))
   (G.T.move 0 ty-min)
   (for [ty (seq ty-min ty-max)]
     (setv py (ty->py ty focus.y))
@@ -90,7 +90,7 @@
             (Creature.at p)
             (.visible-item-at G.player p)
             (Tile.at p))))]
-        [True
+        [T
           ; Unseen.
           (echo " " G.fg-color G.unseen-color)])))
   focus-t-coords)
@@ -127,7 +127,7 @@
   (G.T.move (- G.screen-height 1 G.message-lines) 0)
   (.draw (.trunc s G.screen-width)))
 
-(defn draw-message-log [&optional [fullscreen False]]
+(defn draw-message-log [&optional [fullscreen F]]
   (when fullscreen
     (G.T.erase))
   (setv height (if fullscreen G.screen-height G.message-lines))
@@ -173,13 +173,13 @@
     (.split text-xml "\n"))))
   (setv pages [])
   (setv i 0)
-  (while True
+  (while T
     (.append pages {"text" (cut lines i (+ i G.screen-height))})
     (when (>= (+ i G.screen-height) (len lines))
       (break))
     ; Remove the bottom line to make room for a "more" prompt.
     (setv (get pages -1 "text") (cut (get pages -1 "text") None -1))
-    (setv (get pages -1 "more") True)
+    (setv (get pages -1 "more") T)
     (+= i (+ G.screen-height -1 (- G.text-screen-page-overlap))))
   pages)
 

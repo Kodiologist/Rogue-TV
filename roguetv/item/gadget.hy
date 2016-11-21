@@ -4,7 +4,7 @@
   [math [*]]
   [random [randrange choice]]
   [heidegger.pos [Pos]]
-  [kodhy.util [ret]]
+  [kodhy.util [T F ret]]
   [roguetv.strings [gadget-adjectives]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
@@ -134,7 +134,7 @@
             (msg "You reappear at {:the}'s registered location." self)
             (.move G.player self.warpback-pos)
             (setv self.warpback-pos None))]
-          [True
+          [T
             (msg "{:The} beeps at you accusingly." self)])))))
 
 (def-itemtype Gadget "hookshot"
@@ -154,7 +154,7 @@
     ; Find our destination square.
     (setv ahead (+ G.player.pos d))
     (setv path (ray-taxi ahead d self.hookshot-dist
-      :include-off-map True))
+      :include-off-map T))
     (block
       (for [p path]
         (unless (on-map p)
@@ -204,7 +204,7 @@
 
     ; Find the monster we're switching places with.
     (setv ahead (+ G.player.pos d))
-    (setv path (ray-taxi ahead d @hook-dist :include-off-map True))
+    (setv path (ray-taxi ahead d @hook-dist :include-off-map T))
     (block
       (for [p path]
         (when (and (on-map p) (Creature.at p))
@@ -220,7 +220,7 @@
 
     ; Now switch places.
     (setv cr (Creature.at p-to))
-    (.move cr G.player.pos :clobber True)
+    (.move cr G.player.pos :clobber T)
     (.move G.player p-to)
     (msg "You switch places with {:the}." cr))))
 
@@ -251,7 +251,7 @@
             (msg "{:He} miraculously {:v:avoids} being destroyed by {:the}." it it self)))))]
       [(and (on-map p) (Creature.at p))
         (msg 'bob "This is Rogue TV, not DoomRL!")]
-      [True
+      [T
         (msg "{:Your} proves ineffective against {:the}." self t)]))))
 
 (def-itemtype Gadget "hairdryer" :name "hair dryer"
@@ -293,7 +293,7 @@
         (mset p (Floor)))]
       [(and (on-map p) (Creature.at p))
         (msg 'aud "gasps. You can't use a drill like that on a family show.")]
-      [True
+      [T
         (msg "Your drill proves ineffective against {:the}." t)]))))
 
 (def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
@@ -311,13 +311,13 @@
     (.use-time-and-charge self)
 
     (setv ahead (+ G.player.pos d))
-    (setv made-a-web False)
+    (setv made-a-web F)
     (for [p (ray-taxi ahead d self.web-machine-range)]
       (when (. (Tile.at p) blocks-movement)
         (break))
       (when (instance? Floor (Tile.at p))
         (mset p (Web))
-        (setv made-a-web True)))
+        (setv made-a-web T)))
 
     (msg "You spray some aerosol string.")
     (unless made-a-web
@@ -375,7 +375,7 @@
           (break))))
     (msg "A torrent of confetti pours out of {:the}." @@))))
 
-(def-itemtype Item "confetti" :name (NounPhrase "confetti" :mass True :unit "piles")
+(def-itemtype Item "confetti" :name (NounPhrase "confetti" :mass T :unit "piles")
   :char "*"
   :color-fg :hot-pink
   :rarity :nongen
@@ -431,11 +431,11 @@
   :gadget-effect (fn [self unid]
 
     (.use-time-and-charge self)
-    (setv did-something False)
+    (setv did-something F)
     (for [p (disc-taxi G.player.pos self.gps-range)]
       (unless (seen p)
-        (setv did-something True)
-        (setv (get G.seen-map p.x p.y) True)))
+        (setv did-something T)
+        (setv (get G.seen-map p.x p.y) T)))
     (when did-something
       (soil-fov))
     (if did-something
@@ -451,17 +451,17 @@
 (defn recharge-gadget [charger charge-factor charge-time charge-msg] (block
 ; Returns a boolean indicating whether the attempt succeeded.
 
-  (setv gadget (or (get-other-item charger False "charge") (ret False)))
+  (setv gadget (or (get-other-item charger F "charge") (ret F)))
   (unless (instance? Gadget gadget)
     (msg "{:The} {:v:isn't} a gadget." gadget gadget)
-    (ret False))
+    (ret F))
 
   (.take-time G.player charge-time)
   (charge-msg gadget)
   (setv gadget.charges (min gadget.max-charges
     (+ gadget.charges (int (ceil
       (* gadget.max-charges charge-factor))))))
-  True))
+  T))
 
 (defclass Battery [Item] [
   char "="

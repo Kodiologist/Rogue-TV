@@ -5,7 +5,7 @@
   [itertools [groupby]]
   json
   errno
-  [kodhy.util [ret ucfirst keyword->str]]
+  [kodhy.util [T F ret ucfirst keyword->str]]
   [roguetv.english [english-list]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -40,13 +40,13 @@
   (.append scores x)
   ; Sort the highest-scoring characters first, breaking ties with
   ; newer characters first.
-  (.sort scores :reverse True :key (λ (,
+  (.sort scores :reverse T :key (λ (,
     (get it "gross")
     (get it "dates" "ended"))))
   (with [o (open path "w" :encoding "UTF-8")]
-    (json.dump {"scores" scores} o :sort-keys True)))
+    (json.dump {"scores" scores} o :sort-keys T)))
 
-(defn show-scores [path &optional [show-all False]]
+(defn show-scores [path &optional [show-all F]]
 
   (setv accum [""])
   (defn out [&rest args]
@@ -76,7 +76,7 @@
       (out "<b>• Last score</b> ({} quantile)" (no-leading-0
         (round :ndigits 3 (- 1 (/ (inc (.index scores latest)) (len scores))))))
       (out (show-character latest latest)))
-    (setv printed-latest False)
+    (setv printed-latest F)
 
     (setv low-quantile (/ (- 1 G.score-interval) 2))
     (setv high-quantile (- 1 low-quantile))
@@ -90,11 +90,11 @@
       (setv character (afind (= (get it "gross") target-gross) scores))
       (when (and (not printed-latest) (> (get latest "gross") (get character "gross")))
         (print-latest)
-        (setv printed-latest True))
+        (setv printed-latest T))
       (out (.format "<b>• {}</b> ({} quantile)" text (no-leading-0 q)))
       (when (= character latest)
         (out "is also the last score")
-        (setv printed-latest True))
+        (setv printed-latest T))
       (out (show-character character latest)))
 
     (unless printed-latest
@@ -128,7 +128,7 @@
       (if (< (get x "time") G.clock-factor)
         "in less than a second"
         (+ "after " (show-duration (get x "time")
-          :trunc-to-sec True :abbreviate True))))
+          :trunc-to-sec T :abbreviate T))))
     (if (get x "prizes")
       (.format "with {} worth <b>${}</b>: {}."
         (if (= (len (get x "prizes")) 1) "a prize" "prizes")

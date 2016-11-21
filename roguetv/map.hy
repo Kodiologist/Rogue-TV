@@ -2,7 +2,7 @@
 
 (import
   [random [randint uniform]]
-  [kodhy.util [ret ucfirst]]
+  [kodhy.util [T F ret ucfirst]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -10,29 +10,29 @@
   [roguetv.types [Drawable MapObject Scheduled]])
 
 (defclass Tile [Drawable MapObject NounPhraseNamed Scheduled] [
-  escape-xml-in-np-format True
+  escape-xml-in-np-format T
   info-text "[Missing info text]"
-  blocks-movement False
-  blocks-sight False
-  unpleasant False
+  blocks-movement F
+  blocks-sight F
+  unpleasant F
     ; `unpleasant` is a flag meaning that monsters tend not to
     ; want to be on this kind of tile.
-  smooth False
-  spooky False
+  smooth F
+  spooky F
     ; Whether the tile has an aura that slows movement.
-  container False
+  container F
     ; Whether the tile prevents items from being added to or
     ; removed from it.
-  opaque-container False
+  opaque-container F
     ; Whether the player can see what item is on the tile.
 
   __format__ (fn [self formatstr]
     ; ":full" is accepted at the end of a format string to
     ; include the name-suffix.
-    (setv full False)
+    (setv full F)
     (when (.endswith formatstr ":full")
       (setv formatstr (cut formatstr 0 (- (len ":full"))))
-      (setv full True))
+      (setv full T))
     (.escape self (cat :sep " " (.__format__ self.name formatstr)
       (when full (.name-suffix self)))))
 
@@ -56,15 +56,15 @@
 
   use-item-while-here (fn [self]
     ; The player has tried to use (i.e., apply or drop) an item
-    ; while standing on this tile. Return False to halt further
-    ; processing of the action, and True to continue.
-    True)
+    ; while standing on this tile. Return F to halt further
+    ; processing of the action, and T to continue.
+    T)
 
   bump-into (fn [self cr]
     ; A creature has tried to step onto this tile. Return
-    ; False to halt further processing of the step (in particular,
-    ; the creature is not moved), and True to continue.
-    True)
+    ; F to halt further processing of the step (in particular,
+    ; the creature is not moved), and T to continue.
+    T)
 
   after-entering (fn [self cr p-from]
     ; A creature has just moved to this tile, by any means.
@@ -82,19 +82,19 @@
 (defclass LevelBoundary [NounPhraseNamed] [
   ; This object is not a real tile. Rather, it is used as a flag
   ; for the lack of a tile when you use `mget` rather than `Tile.at`.
-  name (NounPhrase "level boundary" :mass True :unit "sections")
-  blocks-movement True
-  blocks-sight True
-  bump-into (fn [self cr] True)])
+  name (NounPhrase "level boundary" :mass T :unit "sections")
+  blocks-movement T
+  blocks-sight T
+  bump-into (fn [self cr] T)])
 (setv LevelBoundary (LevelBoundary))
 
-(defn mset [pos tile &optional [initializing-map False]]
+(defn mset [pos tile &optional [initializing-map F]]
   (unless initializing-map
     (setv old-tile (Tile.at pos))
     (when (!= tile.blocks-sight old-tile.blocks-sight)
       (soil-fov))
     (.destroy old-tile))
-  (.move tile pos :clobber True))
+  (.move tile pos :clobber T))
 
 (defn mget [pos]
   (if (on-map pos)
@@ -119,7 +119,7 @@
     direction ; Pos
     length    ; int
     &optional
-    [include-off-map False]]
+    [include-off-map F]]
   ; Produces a list of Pos. `direction` should be in Pos.DIR8.
   ; If `direction` is orthogonal, you get `length` elements.
   ; Otherwise, you get `length` // 2 elements.
@@ -155,15 +155,15 @@
 (defn in-los? [eye target] (block
   (for [p (cut (line-bresen eye target) 1)]
     (when (. (mget p) blocks-sight)
-      (ret False)))
-  True))
+      (ret F)))
+  T))
 
 (defclass Floor [Tile] [
-  name (NounPhrase "ordinary floor" :mass True :unit "tiles")
+  name (NounPhrase "ordinary floor" :mass T :unit "tiles")
   char "."
   info-text "Just what it says on the tin."
 
-  smooth True])
+  smooth T])
 
 (defclass Wall [Tile] [
   name (NounPhrase "wall")
@@ -177,11 +177,11 @@
     "  And through Wall's chink, poor souls, they are content"
     "  To whisper, at the which let no man wonder."])
       ; A Midsummer Night's Dream, 5.1.131–134
-  blocks-movement True
-  blocks-sight True])
+  blocks-movement T
+  blocks-sight T])
 
 (defclass Elevator [Tile] [
-  smooth True])
+  smooth T])
 
 (defclass UpElevator [Elevator] [
   name (NounPhrase "elevator going up")
@@ -237,15 +237,15 @@
   name (NounPhrase "closed door")
   char "+"
 
-  blocks-movement True
-  blocks-sight True
+  blocks-movement T
+  blocks-sight T
 
   open-time (fn [self]
     (seconds (+ 2 G.dungeon-level (randint 1 8))))
 
   bump-into (fn [self cr] (block
     (unless cr.can-open-doors
-      (ret True))
+      (ret T))
     (setv open-time (.open-time self))
     (if (.get-effect cr (rtv-get creature.Strength))
       (msgp cr "You effortlessly kick the door open.")
@@ -253,13 +253,13 @@
         (msgp cr "You open the old door after a struggle.")
         (.take-time cr open-time)))
     (mset self.pos (OpenDoor open-time))
-    False))])
+    F))])
 
 (defclass OpenDoor [Door] [
   name (NounPhrase "open door")
   char "|"
 
-  smooth True
+  smooth T
   close-time (fn [self]
     (seconds (+ 5 (randexp (* 60 (inc G.dungeon-level))))))
       ; Yes, doors take longer to close at deeper levels, even
@@ -287,8 +287,8 @@
   char "■"
   color-fg :brown
   info-text "This is a treasure chest. How exciting! On average, chests contain better items than are found on the floor of the same dungeon level. You aren't one of those goody-two-shoes video-game heroes who only open locks with the proper key, and these locks aren't very good, so given enough time, you can bust a chest open."
-  container True
-  opaque-container True
+  container T
+  opaque-container T
 
   open-time (meth []
     (+ (seconds 3) (round-to-second (randexp-dl-div 20))))
@@ -314,7 +314,7 @@
   name (NounPhrase "glass chest")
   char "□"
   info-text "Implemented, but doesn't spawn currently, because it's too annoying. (An item in a glass chest looks like an item just sitting on the floor unless the player uses look mode.)"
-  opaque-container False])
+  opaque-container F])
 
 (defclass DoublingMachine [Tile] [
   name (NounPhrase "double-or-nothing machine")
@@ -359,14 +359,14 @@
       (uniform (.min-exit-time self) (.max-exit-time self)))))])
 
 (defclass Slime [Tile HasTimePenalty] [
-  name (NounPhrase "slime" :mass True :unit "puddles")
+  name (NounPhrase "slime" :mass T :unit "puddles")
   char "}"
   info-text "Stepping into this mystery sludge takes time."
     ; The term "mystery sludge" is from MXC.
   color-fg :white
   color-bg :dark-green
 
-  unpleasant True
+  unpleasant T
 
   after-step-onto (fn [self cr p-from]
     (unless (or cr.flying cr.slime-immune)
@@ -378,14 +378,14 @@
   color-fg :dark-blue
   info-text "This sizable web will make stepping into its tile difficult, just like slime. Furthermore, while you're standing in a web, you can't apply or drop items."
 
-  unpleasant True
+  unpleasant T
 
   use-item-while-here (fn [self]
     (if G.player.web-immune
-      True
+      T
       (do
         (msg 'tara "{p:The} is stuck in the web. {p:He} can't use items.")
-        False)))
+        F)))
 
   after-step-onto (fn [self cr p-from]
     (unless cr.web-immune
@@ -399,8 +399,8 @@
   color-bg :pale-azure
   info-text "A slippery sort of tile. If the next thing you do after stepping on it is move again in the same direction, you'll glide along without an issue. But if you take any other action, you'll need to take a moment to steady yourself first."
 
-  unpleasant True
-  smooth True
+  unpleasant T
+  smooth T
 
   min-slip-time (fn [self] (seconds 1))
   max-slip-time (fn [self] (seconds (* 2 (inc G.dungeon-level))))
@@ -427,8 +427,8 @@
 
   info-text "This tile toggles between two states, on and off, in a fixed pattern. Any creature caught on the tile when it's on will be temporarily frozen. The trap will stay off for the duration of this stasis plus a 1-second grace period, then return to its old pattern."
 
-  unpleasant True
-  smooth True
+  unpleasant T
+  smooth T
 
   freeze-time (meth [] (+ @on-time (seconds
     (randint (inc G.dungeon-level) (* 3 (inc G.dungeon-level))))))
@@ -437,7 +437,7 @@
   __init__ (meth [off-time on-time]
     (Tile.__init__ @@)
     (set-self off-time on-time)
-    (setv @trap-active False)
+    (setv @trap-active F)
     (@schedule)
     (when @pos
       (@act))
@@ -462,9 +462,9 @@
         [(seen @pos) (msg "{:The} {:v:is} frozen by {:the}." it it @@)])
       (setv freeze-time (@freeze-time))
       (.take-time it freeze-time)
-      (setv @trap-active False)
+      (setv @trap-active F)
       (setv @next-turn (+ G.current-time freeze-time @grace-time)))
-      True))])
+      T))])
 
 (defclass PusherTile [Tile HasTimePenalty] [
   children {}
@@ -491,11 +491,11 @@
   color-fg :dark-orange
   info-text (.format "This is a tall, unsettling sculpture of fierce, alien-looking monsters twisting about each other and brandishing their teeth at the viewer. Just being within {} squares of it, even if you can't see it, will make you tremble with fear, slowing your movements. Multiple spooky totems have a cumulative effect." G.spook-radius)
 
-  spooky True
+  spooky T
 
   __init__ (meth []
     (Tile.__init__ @@)
-    (setv @player-noticed-spook False)
+    (setv @player-noticed-spook F)
     None)])
 
 ; Below, we create a dictionary tile-save-shorthand which

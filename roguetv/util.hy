@@ -5,7 +5,7 @@
   random
   datetime
   [heidegger.pos [Pos]]
-  [kodhy.util [signum seq keyword->str cat]]
+  [kodhy.util [T F signum seq keyword->str cat]]
   [roguetv.globals :as G])
 
 (defn real-timestamp []
@@ -50,7 +50,7 @@
   (setv x (ceil (/ x G.clock-factor)))
   (.format "{}:{:02}" (// x 60) (% x 60)))
 
-(defn show-duration [x &optional [trunc-to-sec False] [abbreviate False]]
+(defn show-duration [x &optional [trunc-to-sec F] [abbreviate F]]
   (setv parts [])
   (.append parts ["h" "hour" (// x (* 60 60 G.clock-factor))])
   (%= x (* 60 60 G.clock-factor))
@@ -103,10 +103,10 @@
   (when steep?
     (setv p1 (Pos p1.y p1.x))
     (setv p2 (Pos p2.y p2.x)))
-  (setv swapped False)
+  (setv swapped F)
   (when (> p1.x p2.x)
     (setv [p1 p2] [p2 p1])
-    (setv swapped True))
+    (setv swapped T))
   (setv dx (- p2.x p1.x))
   (setv dy (- p2.y p1.y))
   (setv error (// dx 2))
@@ -174,7 +174,7 @@
     text))
 
 (defn soil-fov []
-  (setv G.fov-dirty? True))
+  (setv G.fov-dirty? T))
 
 (defn active-inv []
   (filt (.carry-effects-active? it) G.inventory))

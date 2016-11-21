@@ -6,7 +6,7 @@
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
-  [kodhy.util [ret concat]]
+  [kodhy.util [T F ret concat]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -60,8 +60,8 @@
 
     (when special
       (show-scores G.scores-file-path :show-all (ecase special
-        [:show-scores False]
-        [:show-all-scores True]))
+        [:show-scores F]
+        [:show-all-scores T]))
       (ret ':just-showing-scores))
 
     (unless (get G.dates "loaded")

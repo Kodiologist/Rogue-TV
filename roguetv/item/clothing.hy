@@ -1,7 +1,7 @@
 (require [kodhy.macros [amap filt block meth]] [roguetv.macros [*]])
 
 (import
-  [kodhy.util [ret cat]]
+  [kodhy.util [T F ret cat]]
   [roguetv.strings [gift-box-labels]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
@@ -13,7 +13,7 @@
   char "["
 
   open-present-time (seconds 1)
-  curse-on-unbox False
+  curse-on-unbox F
 
   info-unidentified "This festively wrapped gift box contains an item of clothing. Your only clue as to what's inside is a cryptic product code. Clothing has a special effect on you so long you carry it, but the effect is suppressed while it's in a box. 'a'pply the box to open it."
 
@@ -29,7 +29,7 @@
 
   __init__ (meth [&kwargs kw]
     (apply Item.__init__ [@@] kw)
-    (setv @boxed (.get kw "boxed" True))
+    (setv @boxed (.get kw "boxed" T))
     None)
 
   clone-setup (meth [orig]
@@ -41,7 +41,7 @@
     ; identified the box type.
     (if @boxed
       (.identified? (super Clothing @@))
-      True))
+      T))
 
   applied (meth [] (block
     (unless @boxed
@@ -56,7 +56,7 @@
         (.format " {:He's} cursed." @@)
         ""))
     (@identify)
-    (setv @boxed False)
+    (setv @boxed F)
     (when @curse-on-unbox
       (@mk-curse))
     (unless was-id?
@@ -66,7 +66,7 @@
     (not @boxed))])
 
 (defn pair-of [s]
-  (NounPhrase s :always-plural True :unit "pairs"))
+  (NounPhrase s :always-plural T :unit "pairs"))
 
 (def-itemtype Clothing "sneakers" :name (pair-of "expensive sneakers")
   :color-fg :white
@@ -84,7 +84,7 @@
   :info-flavor "Unless you're Ginger Rogers, these are going to make you somewhat less graceful."
     ; http://www.reelclassics.com/Actresses/Ginger/ginger-article2.htm
 
-  :curse-on-unbox True
+  :curse-on-unbox T
   :carry-speed-factor .8
   :info-carry "You walk at {carry-speed-factor} times normal speed.")
 
@@ -105,7 +105,7 @@
     ; Pafnuty Chebyshev was Russian. Kings in chess move according
     ; to the Chebyshev metric.
 
-  :carry-cheb-walk True
+  :carry-cheb-walk T
   :info-carry "When you walk, diagonal moves take the same amount of time as orthogonal moves.")
 
 (setv circ-fmt "You can walk into the {} border of the map to magically wrap around to the farthest available tile on the other side.")
@@ -115,7 +115,7 @@
   :level-lo 14
   :info-flavor "A close-fitting necklace for the geometrically savvy and the topologically flexible."
 
-  :carry-mapwrap-eastwest True
+  :carry-mapwrap-eastwest T
   :info-carry (.format circ-fmt "east or west"))
 
 (def-itemtype Clothing "circ-ring" :name "circular ring"
@@ -123,7 +123,7 @@
   :level-lo 16
   :info-flavor "Somehow, it looks like a tiny sideways necklace."
 
-  :carry-mapwrap-northsouth True
+  :carry-mapwrap-northsouth T
   :info-carry (.format circ-fmt "north or south"))
 
 (def-itemtype Clothing "distressed-jeans" :name (pair-of "distressed blue jeans")
@@ -132,7 +132,7 @@
   :level-lo 2
   :info-flavor "These are favored by fashion fanatics, but walking around in pants full of holes and tears may also make you look like a yokel."
 
-  :curse-on-unbox True
+  :curse-on-unbox T
   :carry-gadget-malfunction-1in 3
   :info-carry "When you apply a gadget, there's a 1 in {carry-gadget-malfunction-1in} chance that nothing will happen, wasting a charge.")
 
@@ -142,7 +142,7 @@
   :rarity :uncommon
   :info-flavor "A thick, luxurious coat made from the pelts of many adorable woodland creatures. When this prize was announced, animal-welfare organizations lambasted Rogue TV, calling for a boycott of the middlingly popular game show. This gave Rogue TV's ratings a much-needed boost."
 
-  :carry-ice-immunity True
+  :carry-ice-immunity T
   :info-carry "You don't slip on ice.")
 
 (def-itemtype Clothing "ugly-sweater" :name "ugly Christmas sweater"
@@ -157,7 +157,7 @@
   :color-fg :white
   :info-flavor "With this groovy outerwear, you'll be chugging mystery sludge in no time."
 
-  :carry-instant-soda-use True
+  :carry-instant-soda-use T
   :info-carry "Removes the basic time cost of drinking sodas.")
 
 (def-itemtype Clothing "trenchcoat"
@@ -165,7 +165,7 @@
   :level-lo 1
   :info-flavor "It's full of pockets for easy access to all your toys."
 
-  :carry-instant-gadget-use True
+  :carry-instant-gadget-use T
   :info-carry "Removes the basic time cost of using gadgets.")
 
 (def-itemtype Clothing "goggles" :name (pair-of "goggles")
@@ -175,7 +175,7 @@
   :info-flavor "The goggles do nothing!"
     ; http://knowyourmeme.com/memes/the-goggles-do-nothing
 
-  :curse-on-unbox True)
+  :curse-on-unbox T)
 
 (def-itemtype Clothing "trilby"
   :color-fg :black
@@ -192,7 +192,7 @@
   :level-lo 12
   :info-flavor "This classy hat will get you allll the ladies, yow! Regardless of your gender and sexual orientation. Sorry, rules are rules."
 
-  :curse-on-unbox True
+  :curse-on-unbox T
   :carry-gen-monster Nymph
   :info-carry "Each time you enter a new level, an extra nymph is generated.")
 

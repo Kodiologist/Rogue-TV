@@ -5,7 +5,7 @@
   [random [choice randint normalvariate]]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [logit ilogit unique pairs concat shift ret weighted-choice merge-dicts]]
+  [kodhy.util [T F logit ilogit unique pairs concat shift ret weighted-choice merge-dicts]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Generated Scheduled LevelTimer set-time-limit]]
@@ -15,7 +15,7 @@
   [roguetv.creature [Creature Effect]]
   [roguetv.creature.monster [Snail Spider Nymph Dog Cat Golem UmberHulk]])
 
-(defn reset-level [&optional [new-seed False]]
+(defn reset-level [&optional [new-seed F]]
 
   (setv dl G.dungeon-level)
 
@@ -42,29 +42,29 @@
 
   (set-time-limit (+ G.current-time (dl-time-limit dl)))
 
-  (setv G.seen-map (amap (* [False] G.map-height) (range G.map-width)))
+  (setv G.seen-map (amap (* [F] G.map-height) (range G.map-width)))
   (for [t [Tile Item Creature]]
     (.init-omap t G.map-width G.map-height))
   (for [x (list Scheduled.queue)]
     ; Destroy objects that we left behind on the previous level.
     (setv keep (cond
       [(instance? LevelTimer x)
-        True]
+        T]
       [(player? x)
-        True]
+        T]
       [(instance? Effect x)
         ; Effects only apply to the player, so they're going
         ; with the player.
-        True]
+        T]
       [(instance? Creature x)
-        False]
+        F]
       [(instance? Tile x)
-        False]
+        F]
       [(instance? Item x)
         (in x G.inventory)]
       [(instance? Curse x)
         (in x.host-item G.inventory)]
-      [True
+      [T
         (raise (ValueError (.format "Weird thing in Schedule.queue: {!r}" x)))]))
     (unless keep
       (.destroy x)))
@@ -93,7 +93,7 @@
       (setv floor? (not (get dugout "map" (inc x) (inc y))))
       (when floor?
         (.append free-floors p))
-      (mset p (if floor? (Floor) (Wall)) True)))
+      (mset p (if floor? (Floor) (Wall)) T)))
   (setv free-floors (shuffle free-floors))
 
   ; Add elevators.
@@ -204,7 +204,7 @@
     (, (it.generation-weight dl) it)
     (.values G.itypes)))
   (setv weighted-itypes-chest (amap
-    (, (it.generation-weight dl :in-chest True) it)
+    (, (it.generation-weight dl :in-chest T) it)
     (.values G.itypes)))
   (replicate (gen-count-for dl "items")
     (setv in-chest (1-in 8))

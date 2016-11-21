@@ -2,7 +2,7 @@
 
 (import
   [heidegger.pos [Pos]]
-  [kodhy.util [ret]]
+  [kodhy.util [T F ret]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [text-screen message-log-screen inventory-loop look-mode user-confirms normal-command-keys]]
@@ -60,7 +60,7 @@
       (look-mode G.player.pos)]
 
     [(= cmd :examine-ground) (do
-      (describe-tile G.player.pos :verbose True))]
+      (describe-tile G.player.pos :verbose T))]
 
     [(= cmd :use-tile)
       (.use-tile (Tile.at G.player.pos))]
@@ -136,7 +136,7 @@
       (mset G.player.pos (Wall)))]
 
     [(= cmd :reset-level) (when-debugging
-      (rtv mapgen.reset-level True))]
+      (rtv mapgen.reset-level T))]
 
-    [True
+    [T
       (raise (ValueError (.format "Unknown command {!r}" cmd)))])))

@@ -5,6 +5,7 @@
 
 (import
   random
+  [kodhy.util [T F]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -42,14 +43,14 @@
   :level-lo 19
 
   :info-carry "You can't walk. At all."
-  :superheavy True)
+  :superheavy T)
 
 (defclass CursedGem [Burden] [
   char "*"
-  unique True])
+  unique T])
 
 (def-itemtype CursedGem "cursedgem-ice"
-  :name (NounPhrase "White Ice" :the-proper True)
+  :name (NounPhrase "White Ice" :the-proper T)
   :color-fg :white
   :level-lo 4
 

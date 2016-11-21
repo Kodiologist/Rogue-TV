@@ -2,7 +2,7 @@
 
 (import
   random
-  [kodhy.util [ret]]
+  [kodhy.util [T F ret]]
   [roguetv.english [NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -11,16 +11,16 @@
   [roguetv.item [Item]])
 
 (defclass Creature [Drawable MapObject Scheduled NounPhraseNamed] [
-  escape-xml-in-np-format True
+  escape-xml-in-np-format T
   char "C"
   info-text "[Missing info text]"
 
-  can-open-doors False
-  flying False
-  slime-immune False
-  web-immune False
-  spook-immune False
-  heavy False
+  can-open-doors F
+  flying F
+  slime-immune F
+  web-immune F
+  spook-immune F
+  heavy F
     ; A heavy creature can't be pushed past by the player.
 
   __init__ (fn [self &optional pos]
@@ -35,7 +35,7 @@
     (setv self.ice-slip-towards None))
 
   ice-immune (fn [self]
-    False)
+    F)
 
   can-see-contents (fn [self container-tile]
     (not container-tile.opaque-container))
@@ -67,7 +67,7 @@
       (self.reset-ice-slipping)
       (.take-time self slip-time)))
 
-  move (fn [self p-to &optional [clobber False]]
+  move (fn [self p-to &optional [clobber F]]
     (setv p-from self.pos)
     (MapObject.move self p-to clobber)
     (unless (none? self.pos)
@@ -77,18 +77,18 @@
     (setv p-from self.pos)
     (setv dist (.walk-dist self p-from p-to))
     (unless (.bump-into (mget p-to) self)
-      (ret False))
+      (ret F))
     (when (player? self)
       (whenn (afind-or it.superheavy (active-inv))
         (msg "You can't move an inch so long as you're clinging to {:the}." it)
-        (ret False))
+        (ret F))
       (when (not (on-map p-to))
         ; If the player has an item that allows them to wrap
         ; around the map, apply it.
         (when (and (in p-to (outer-corner-pos))
             (afind-or (or it.carry-mapwrap-eastwest it.carry-mapwrap-northsouth) (active-inv)))
           (msg 'tara "Please don't try to wrap through a corner of the dungeon, {p}. That could tear the spacetime continuum and destroy the universe.")
-          (ret False))
+          (ret F))
         (for [[pa item-attr max-coord d-neg d-pos] [
             ["x" "carry_mapwrap_eastwest" G.map-width Pos.WEST Pos.EAST]
             ["y" "carry_mapwrap_northsouth" G.map-height Pos.SOUTH Pos.NORTH]]]
@@ -99,14 +99,14 @@
           (setattr p-to pa
             (if (= (getattr p-to pa) -1) (dec max-coord) 0))
           (setv d (if (getattr p-to pa) d-neg d-pos))
-          (while True
+          (while T
             (when (room-for? self p-to)
               (break))
             (+= p-to d)
             (when (= (getattr p-to pa) (getattr p-from pa))
               (.take-time self (seconds (/ dist (self.walk-speed))))
               (msg 'tara "Looks like {p} doesn't have room to wrap around the level here.")
-              (ret False))))))
+              (ret F))))))
     (when (or
         (not (on-map p-to))
         (and (. (Tile.at p-to) blocks-movement)
@@ -116,16 +116,16 @@
       (when (and (player? self) (.get-effect self Confusion))
         (msg "You bump into {:the}." (mget p-to))
         (.take-time self self.confusion-bump-time))
-      (ret False))
+      (ret F))
     (setv cr (Creature.at p-to))
     ; The player can push past other creatures, but other creatures
     ; can't push past the player or each other.
     (when cr
       (unless (player? self)
-        (ret False))
+        (ret F))
       (when cr.heavy
         (msg "You're far too puny to push past {:the}." cr)
-        (ret False))
+        (ret F))
       (.take-time self self.push-past-monster-time))
     ; Okay, we're clear to move.
     (.step-out-of (Tile.at p-from) self p-to)
@@ -134,19 +134,19 @@
       ; 1 unit of distance.
     (when cr
       (msg "You push past {:the}." cr))
-    (.move self p-to :clobber True)
+    (.move self p-to :clobber T)
     (when cr
       (.move cr p-from))
     (for [p (disc-taxi p-to G.spook-radius)]
       (when (and (. (mget p) spooky) (not self.spook-immune))
         (.take-time self (.spook-time self))
         (when (and (player? self) (not (. (mget p) player-noticed-spook)))
-          (setv (. (mget p) player-noticed-spook) True)
+          (setv (. (mget p) player-noticed-spook) T)
           (msg "The hair on the back of your neck stands up."))))
     (when (player? self)
       (rtv display.describe-tile self.pos))
     (.after-step-onto (Tile.at p-to) self p-from)
-    True))
+    T))
 
   get-effect (fn [self effect-cls]
     None)

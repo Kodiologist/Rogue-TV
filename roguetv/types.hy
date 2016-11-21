@@ -3,7 +3,7 @@
 (import
   [random [choice]]
   xml.sax.saxutils
-  [kodhy.util [mins]]
+  [kodhy.util [T F mins]]
   [roguetv.strings [bob-too-bad]]
   [roguetv.globals :as G]
   [roguetv.util [*]])
@@ -40,7 +40,7 @@
     (.move self pos)
     None)
 
-  move (fn [self p-to &optional [clobber False]]
+  move (fn [self p-to &optional [clobber F]]
     ; Set 'p-to' to None to remove the object from the map.
     ;
     ; If 'p-to' is not None, 'clobber' is true, and there's
@@ -106,7 +106,7 @@
     (@deschedule))
 
   game-loop (classmethod (meth []
-    (while True
+    (while T
       (setv actor (first (mins @queue (λ it.next-turn))))
         ; We use (first (mins …)) instead of just (min …) because
         ; the behavior of Python's `min` is undefined for ties.
@@ -143,7 +143,7 @@
   level-lo 0
   level-hi None
   rarity :common
-  unique False
+  unique F
 
   __init__ (meth []
     (when @unique
@@ -153,7 +153,7 @@
       (.append G.uniques-generated tname))
     None)
 
-  generation-weight (cmeth [dl &optional [in-chest False]]
+  generation-weight (cmeth [dl &optional [in-chest F]]
     (when in-chest
       ; Chests generate deeper items.
       (+= dl 3))
@@ -170,4 +170,4 @@
             (inc (- @level-lo dl))]
           [(and (not (none? @level-hi)) (> dl @level-hi))
             (inc (- dl @level-hi))]
-          [True 1])))))])
+          [T 1])))))])

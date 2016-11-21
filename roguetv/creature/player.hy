@@ -1,7 +1,7 @@
 (require [kodhy.macros [amap afind-or]])
 
 (import
-  [kodhy.util [ret product]]
+  [kodhy.util [T F ret product]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [get-normal-command]]
@@ -18,7 +18,7 @@
   info-text "Applying state-of-the-art neuroludological algorithms to the choices you've made while playing this game, I've inferred the following about you:\n\nYou have a great need for other people to like and admire you. You have a tendency to be critical of yourself. You have a great deal of unused capacity which you have not turned to your advantage. While you have some personality weaknesses, you are generally able to compensate for them. Your sexual adjustment has presented problems for you. Disciplined and self-controlled outside, you tend to be worrisome and insecure inside. At times you have serious doubts as to whether you have made the right decision or done the right thing. You prefer a certain amount of change and variety and become dissatisfied when hemmed in by restrictions and limitations. You pride yourself as an independent thinker and do not accept others' statements without satisfactory proof. You have found it unwise to be too frank in revealing yourself to others."
     ; Forer, B. R. (1949). The fallacy of personal validation: A classroom demonstration of gullibility. Journal of Abnormal Psychology, 44(1), 118–123. doi:10.1037/h0059240
 
-  can-open-doors True
+  can-open-doors T
 
   push-past-monster-time (seconds 1)
   confusion-bump-time (seconds 1)
@@ -28,14 +28,14 @@
   __init__ (fn [self &optional pos]
     (Creature.__init__ self pos)
     (setv self.effects [])
-    (setv self.just-slept False)
+    (setv self.just-slept F)
     (setv self.last-turn 0)
     None)
 
   ice-immune (fn [self]
     (afind-or it.carry-ice-immunity (active-inv)))
 
-  move (fn [self p-to &optional [clobber False]]
+  move (fn [self p-to &optional [clobber F]]
     (.move (super Player self) p-to clobber)
     (soil-fov))
 
@@ -60,7 +60,7 @@
 
   act (fn [self]
     (when self.just-slept
-      (setv self.just-slept False)
+      (setv self.just-slept F)
       (msg "You wake up."))
     (setv G.last-action-duration
       (- G.current-time self.last-turn))
@@ -73,4 +73,4 @@
 
   fall-asleep (fn [self sleep-time]
     (.take-time self sleep-time)
-    (setv self.just-slept True))])
+    (setv self.just-slept T))])

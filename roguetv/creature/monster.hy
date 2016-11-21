@@ -4,7 +4,7 @@
   [random [choice]]
   pypaths.astar
   [heidegger.pos [Pos]]
-  [kodhy.util [ret weighted-choice maxes]]
+  [kodhy.util [T F ret weighted-choice maxes]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -28,12 +28,12 @@
 
   flee-from-player (fn [self] (block
     ; If the player is repulsive to us and we're in range, try to
-    ; run away (not very intelligently), and return True.
-    ; Otherwise, return False.
+    ; run away (not very intelligently), and return T.
+    ; Otherwise, return F.
     (unless (and
         (.player-repulsive? self)
         (<= (dist-taxi self.pos G.player.pos) G.repulsed-from-player-range))
-      (ret False))
+      (ret F))
     (setv neighbors (sorted
       (shuffle (clear-neighbors self.pos))
       :key (λ (,
@@ -44,7 +44,7 @@
         (dist-taxi self.pos G.player.pos)))
       (.walk-to self (first neighbors))
       (.wait self))
-    True))])
+    T))])
 
 (defn extant-monsters []
   (filt (instance? Monster it) Scheduled.queue))
@@ -53,18 +53,18 @@
   (filt (room-for? Creature it)
     (amap (+ pos it) Pos.DIR8)))
 
-(defn wander [cr &optional [okay? (λ True)]] (block
+(defn wander [cr &optional [okay? (λ T)]] (block
   ; Try to step in a random direction. (Diagonal moves are half
   ; as likely as orthogonal moves.) Return a boolean indicating
   ; whether we succeeded.
   (setv neighbors (filt (okay? it) (clear-neighbors cr.pos)))
   (unless neighbors
-    (ret False))
+    (ret F))
   (setv p-to (weighted-choice (amap
     (, (/ 1 (dist-taxi cr.pos it)) it)
     neighbors)))
   (.walk-to cr p-to)
-  True))
+  T))
 
 (defn find-path [p-from p-to &optional [max-cost (int 1e6)]] (block
   (when (= p-from p-to)
@@ -103,7 +103,7 @@
   color-fg :yellow
   info-text "A jolly little insect that buzzes about aimlessly. Your standard-issue contestant protective gear will protect you from stings. Bees can still kind of get in the way, though."
 
-  flying True
+  flying T
 
   act (fn [self]
     (or
@@ -190,7 +190,7 @@
   info-text "A mindless, oversized gastropod that slithers around the dungeon, leaving a trail of slime in its wake. It's very slow, but it isn't slowed any further by slime."
 
   walk-speed (meth [] (/ 1 4))
-  slime-immune True
+  slime-immune T
 
   act (meth []
     (when (instance? Floor (Tile.at @pos))
@@ -206,7 +206,7 @@
   color-fg :red
   info-text "It doesn't bite, but it leaves webs wherever it goes."
 
-  web-immune True
+  web-immune T
 
   act (meth []
     (when (instance? Floor (Tile.at @pos))
@@ -224,8 +224,8 @@
 
   walk-speed (meth [] (/ 1 5))
   change-dir-time (seconds 2)
-  heavy True
-  spook-immune True
+  heavy T
+  spook-immune T
 
   __init__ (meth [&optional pos]
     (.__init__ (super Golem @@) pos)
@@ -355,7 +355,7 @@
           [(room-for? @@ (first path))
             ; We have a usable path to an item. Take the next step.
             (@walk-to (first path))]
-          [True
+          [T
             (@wait)])
         (ret)))
     ; Otherwise, wander.

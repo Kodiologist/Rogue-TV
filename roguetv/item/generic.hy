@@ -4,7 +4,7 @@
   random
   [math [ceil]]
   re
-  [kodhy.util [cat keyword->str shift ret]]
+  [kodhy.util [T F cat keyword->str shift ret]]
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -13,7 +13,7 @@
   [roguetv.map [Tile room-for?]])
 
 (defclass Item [MapObject Generated Scheduled NounPhraseNamed Drawable] [
-  escape-xml-in-np-format True
+  escape-xml-in-np-format T
   tid None
     ; A string.
   appearance None
@@ -31,7 +31,7 @@
   price-adj None
     ; A keyword that can adjust the price set by def-itemtype.
 
-  indestructible False
+  indestructible F
     ; Indestructible items can't be destroyed by, e.g., paper
     ; shredders.
   carry-speed-factor None
@@ -43,21 +43,21 @@
   carry-speed-factor-rough-terrain None
     ; Like .carry-speed-factor, but applies only when exiting
     ; non-smooth terrian.
-  superheavy False
-    ; If True, the player can't walk while carrying this item.
-  carry-ice-immunity False
-    ; If True, the player is immune to ice.
-  carry-cheb-walk False
-    ; If True, the player walks according to the Chebyshev metric.
-  carry-mapwrap-eastwest False
+  superheavy F
+    ; If T, the player can't walk while carrying this item.
+  carry-ice-immunity F
+    ; If T, the player is immune to ice.
+  carry-cheb-walk F
+    ; If T, the player walks according to the Chebyshev metric.
+  carry-mapwrap-eastwest F
     ; bleh
-  carry-mapwrap-northsouth False
+  carry-mapwrap-northsouth F
     ; bleh
   carry-gadget-malfunction-1in None
     ; A chance of gadgets malfunctioning when they're applied.
-  carry-instant-gadget-use False
+  carry-instant-gadget-use F
     ; Allows the player to apply gadgets without the usual time cost.
-  carry-instant-soda-use False
+  carry-instant-soda-use F
     ; Allows the player to apply sodas without the usual time cost.
   carry-gen-item None
     ; If a class, one of that type of item is generated on each
@@ -109,7 +109,7 @@
 
   identify (fn [self]
     (unless (.identified? self)
-      (setv self.appearance.known True)))
+      (setv self.appearance.known T)))
 
   __format__ (fn [self formatstr]
     ; Examples:
@@ -187,18 +187,18 @@
 
   delete (fn [self] (block
     (when self.indestructible
-      (ret False))
+      (ret F))
     (setv where (find-item self))
     (cond
       [(instance? Pos where)
         (.move self None)]
       [(is where G.player)
         (.remove G.inventory self)]
-      [True (do
+      [T (do
         (assert (hasattr where "item"))
         (setv where.item None))])
     (.destroy self)
-    True))
+    T))
 
   mk-curse (fn [self]
     (setv self.curse (Curse self)))
@@ -214,7 +214,7 @@
     (msg "You can't do anything special with {:the}." self))
 
   carry-effects-active? (fn [self]
-    True)
+    T)
 
   on-reset-level (fn [self]
     ; This is triggered when the level is reset for each item
@@ -275,7 +275,7 @@
     ; `apid` is a short string identifying the appearance, whereas
     ; `name` is a NounPhrase.
     (set-self apid name)
-    (setv self.known False)
+    (setv self.known F)
       ; .known is true when the player has learned the type of
       ; item that goes with this appearance.
     None)
@@ -342,7 +342,7 @@
       item.pos]
     [(in item G.inventory)
       G.player]
-    [True
+    [T
       (afind
         (and
           (instance? (rtv-get creature.monster.Nymph) it)
@@ -364,15 +364,15 @@
          (.use-time-and-charge self)
          (msg "Nothing happens."))
       (msg "You don't have anything to {}." verb))
-    (ret False))
+    (ret F))
   (setv item (if unid
     (random.choice other-items)
     (do
       (setv i (inventory-loop (.format "What do you want to {}?" verb)))
       (when (none? i)
-        (ret False))
+        (ret F))
       (get G.inventory i))))
   (when (is item self)
     (msg 'bob "What's {p:he} trying? Has {p:he} blown {p:his} wig?")
-    (ret False))
+    (ret F))
   item))

@@ -9,7 +9,7 @@
   [collections [OrderedDict]]
   argparse
   appdirs
-  [kodhy.util [ret by-ns concat keyword->str str->keyword]]
+  [kodhy.util [T F ret by-ns concat keyword->str str->keyword]]
   [roguetv.english [genders NounPhrase]]
   [roguetv.globals :as G])
 
@@ -118,13 +118,13 @@
       [(= p.gender :female)
         (random.choice (qw Meg Jo Beth Amy))]
           ; Little Women
-      [True
+      [T
         (random.choice (+
            (qw Zorx Klax Jennifer)
              ; Captain Underpants and the Invasion of the Incredibly Naughty Cafeteria Ladies from Outer Space (and the Subsequent Assault of the Equally Evil Lunchroom Zombie Nerds)
            ["Robert'); DROP TABLE Players;--"]))])))
             ; http://www.xkcd.com/327/
-  (setv p.name (NounPhrase p.name :bare-proper True :gender p.gender))
+  (setv p.name (NounPhrase p.name :bare-proper T :gender p.gender))
 
   p)
 
