@@ -1,4 +1,4 @@
-(require [roguetv.macros [*]])
+(require [kodhy.macros [amap ecase]] [roguetv.macros [*]])
 
 (import
   re
