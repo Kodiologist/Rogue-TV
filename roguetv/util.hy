@@ -36,7 +36,7 @@
 
 (defn seconds [x]
   ; Convert seconds to the internal time representation.
-  (if x (max 1 (round (* G.clock-factor x)))) 0)
+  (if x (max 1 (round (* G.clock-factor x))) 0))
     ; (max 1 …) ensures that no nonzero durations will be rounded
     ; to 0.
 (defn minutes [x]
