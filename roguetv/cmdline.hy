@@ -28,9 +28,6 @@
   (, "she" :female)
   (, "it" :neuter)]))
 
-(def max-seed sys.maxint)
-(def min-seed (- (- sys.maxint) 1))
-
 (defn uni [s]
   (.decode s (sys.getfilesystemencoding)))
 
@@ -98,11 +95,7 @@
 
   (for [a ["map_seed" "general_seed"]]
     (unless (getattr p a)
-      (setattr p a (random.randrange min-seed (+ max-seed 1))))
-    (unless (<= min-seed (getattr p a) max-seed)
-      (sys.exit (.format "Seeds must lie between {} and {} inclusive." min-seed max-seed)))
-    (unless (is (type (getattr p a)) int)
-      (raise (ValueError (.format "Weird seed type: {!r}" (getattr p a))))))
+      (setattr p a (random.randrange (- (** 2 63)) (- (** 2 63) 1)))))
 
   (unless p.pronouns
     (when p.name
