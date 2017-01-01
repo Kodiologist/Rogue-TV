@@ -1,6 +1,6 @@
 #!/usr/bin/env hy
 
-;(import sys) (setv sys.path ["." "/usr/lib/python2.7" "/usr/lib/python2.7/lib-dynload"])
+;(import sys) (setv sys.path ["." "/usr/lib/python3.5" "/usr/lib/python3.5/lib-dynload"])
 
 (require [kodhy.macros [afind-or qw]])
 
