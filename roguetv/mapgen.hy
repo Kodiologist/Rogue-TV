@@ -5,7 +5,7 @@
   [random [choice randint normalvariate]]
   [heidegger.pos [Pos]]
   heidegger.digger
-  [kodhy.util [T F logit ilogit unique pairs concat shift ret weighted-choice merge-dicts]]
+  [kodhy.util [T F unique pairs concat shift ret weighted-choice merge-dicts]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [Generated Scheduled LevelTimer set-time-limit]]

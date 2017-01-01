@@ -13,6 +13,12 @@
   ; simulated time.
   (.isoformat (datetime.datetime.utcnow)))
 
+(defn logit [x]
+  (log (/ x (- 1 x))))
+
+(defn ilogit [x]
+  (/ 1 (+ 1 (exp (- x)))))
+
 (defn chance [x]
   (<= (random.random) x))
 
