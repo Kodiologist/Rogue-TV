@@ -81,7 +81,7 @@
         (msg "{:The} {:v:is} closed. You can't even see if there's anything in {:him}." t t t)
         (ret))
       (setv item (Item.at G.player.pos))
-      (when (nil? item)
+      (when (none? item)
         (msg "There's nothing here to pick up.")
         (ret))
       (when t.container
