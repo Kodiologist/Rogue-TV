@@ -20,7 +20,7 @@
   char "$"
 
   info-flavor "Big money! Really heavy money, in fact."
-  info-carry "Slows your walking speed to {carry_speed_factor} times normal."])
+  info-carry "Slows your walking speed to {carry-speed-factor} times normal."])
 
 (def-itemtype BigMoney "briefcase-cash" :name "briefcase full of cash"
   :color-fg :dark-green
@@ -58,7 +58,7 @@
   :ice-per-second 3
 
   :info-flavor "A frost-covered diamond the size of a baseball. You shiver just looking at it."
-  :info-constant "Produces ice around itself. An ice tile is generated within {ice_radius} squares about {ice_per_second} times per second."
+  :info-constant "Produces ice around itself. An ice tile is generated within {ice-radius} squares about {ice-per-second} times per second."
 
   :__init__ (meth [&kwargs kw]
     (apply CursedGem.__init__ [@@] kw)
