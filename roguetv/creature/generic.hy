@@ -104,7 +104,7 @@
               (break))
             (+= p-to d)
             (when (= (getattr p-to pa) (getattr p-from pa))
-              (.take-time self (seconds (/ dist (self.walk-speed))))
+              (.take-time self (seconds (/ dist (self.walk-speed None))))
               (msg 'tara "Looks like {p} doesn't have room to wrap around the level here.")
               (ret F))))))
     (when (or
@@ -129,7 +129,7 @@
       (.take-time self self.push-past-monster-time))
     ; Okay, we're clear to move.
     (.step-out-of (Tile.at p-from) self p-to)
-    (.take-time self (seconds (/ dist (self.walk-speed))))
+    (.take-time self (seconds (/ dist (self.walk-speed p-to))))
       ; Hence, a creature with walk-speed 1 takes 1 second to walk
       ; 1 unit of distance.
     (when cr
@@ -154,7 +154,7 @@
   walk-dist (fn [self p-from p-to]
     (dist-taxi p-from p-to))
 
-  walk-speed (fn [self]
+  walk-speed (fn [self p-to]
     ; Return the applicable multiplier for the creature's walking
     ; speed.
     1)

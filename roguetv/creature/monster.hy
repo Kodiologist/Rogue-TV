@@ -189,7 +189,7 @@
   color-fg :dark-green
   info-text "A mindless, oversized gastropod that slithers around the dungeon, leaving a trail of slime in its wake. It's very slow, but it isn't slowed any further by slime."
 
-  walk-speed (meth [] (/ 1 4))
+  walk-speed (meth [p-to] (/ 1 4))
   slime-immune T
 
   act (meth []
@@ -222,7 +222,7 @@
   color-fg :brown
   info-text "A massive clay humanoid given a semblance of life by magic. It's very slow and it moves in a fixed pattern, but it's too heavy to push past."
 
-  walk-speed (meth [] (/ 1 5))
+  walk-speed (meth [p-to] (/ 1 5))
   change-dir-time (seconds 2)
   heavy T
   spook-immune T

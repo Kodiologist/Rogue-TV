@@ -44,12 +44,12 @@
       (dist-cheb p-from p-to)
       (.walk-dist (super Player self) p-from p-to)))
 
-  walk-speed (fn [self]
+  walk-speed (fn [self p-to]
     (if G.super-speed 1e6 (product (+
       (amap (or it.carry-speed-factor 1) (active-inv))
       (amap
         (or
-          (if (. (Tile.at G.player.pos) smooth)
+          (if (and p-to (. (Tile.at p-to) smooth))
             it.carry-speed-factor-smooth-terrain
             it.carry-speed-factor-rough-terrain)
           1)
