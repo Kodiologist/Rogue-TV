@@ -94,7 +94,7 @@
   :info-flavor "\"Aurelia, old girl,\" said Archibald Mulliner in a clear, firm voice, \"you are the bee's roller skates.\" And at that she seemed to melt into his embrace. Her lovely face was raised to his. \"Archibald!\" she whispered."
 
   :carry-speed-factor-smooth-terrain 2
-  :carry-speed-factor-rough-terrain .5
+  :carry-speed-factor-rough-terrain .25
   :info-carry "You walk at {carry-speed-factor-smooth-terrain} times normal speed on smooth terrain, but {carry-speed-factor-rough-terrain} times on rough terrain.")
 
 (def-itemtype Clothing "cheb-boots" :name (pair-of "Chebyshev boots")
