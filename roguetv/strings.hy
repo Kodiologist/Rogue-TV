@@ -41,7 +41,11 @@
   "flimsy"
   "rugged"
   "plastic"
+  "Bakelite"
+  "nylon"
+  "PVC"
   "tiny"
+  "heavy"
   "boxy"
   "sleek"
   "bulky"
@@ -56,14 +60,28 @@
   "off-white"
   "red-checked"
   "houndstooth"
+  "paisley"
   "reddish-greenish"
   "tie-dye"
   "reflective"
+  ; The idea for the color words is to use ones that appear in
+  ; none of Rogue 5.4.4, NetHack, or Angband. Also, the weirder
+  ; the better.
   "cornflower-blue"
-  "chartreuse"
+  "periwinkle"
+  "verdigris"
+  "teal"
+  "lovat"
+  "luteous"
   "maroon"
+  "rufous"
   "scarlet"
-  "hot-pink"])
+  "hot-pink"
+  "mauve"
+  "gamboge"
+  "fulvous"
+  "goldenrod"
+  "nankeen"])
 
 (def gift-box-labels [
   "1.21GW"              ; Back to the Future
@@ -86,6 +104,7 @@
   "COSMICOSMO"          ; Cosmic Osmo
   "DOOTDOOT"            ; http://knowyourmeme.com/memes/skull-trumpet
   "E102G"               ; E-102 Gamma (Sonic Adventure)
+  "ETNOMAILGAT"         ; Paul Tagliamonte's (creator of Hy) last name backwards
   "FRINDLE"             ; The book of the same name
   "GIPEMOS"             ; "Some pig" (Charlotte's Web) backwards
   "GOOZACK"             ; Wayside School
@@ -107,4 +126,5 @@
   "WOHBANOBONGU"        ; http://cho.cyan.com/rawa/wohba.html
   "X3J13"               ; Common Lisp standardization committee
   "YAGRUMBAGARN"        ; http://www.uesp.net/wiki/Morrowind:Yagrum_Bagarn
-  "ZOOMBINI"])          ; Zoombinis video-game series
+  "ZOOMBINI"            ; Zoombinis video-game series
+  "ZXKUQYB"])           ; A spell in Ultima III
