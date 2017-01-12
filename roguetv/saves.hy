@@ -1,10 +1,10 @@
-(require kodhy.macros)
+(require [kodhy.macros [lc amap filt afind]])
 
 (import
   random
   gzip
   jsonpickle
-  [kodhy.util [concat]]
+  [kodhy.util [T F concat]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.types [MapObject Scheduled]]
@@ -46,12 +46,12 @@
 
   (setv (get x "Scheduled.queue") Scheduled.queue)
 
-  (with [[o (gzip.open path "wb")]]
-    (o.write (kwc jsonpickle.encode x :+warn :+keys))))
+  (with [o (gzip.open path "wt" :encoding "UTF-8")]
+    (o.write (jsonpickle.encode x :warn T :keys T))))
 
 (defn load-from-save-file [path]
-  (with [[o (gzip.open path "rb")]]
-    (setv x (kwc jsonpickle.decode (.read o) :+keys)))
+  (with [o (gzip.open path "rt" :encoding "UTF-8")]
+    (setv x (jsonpickle.decode (.read o) :keys T)))
 
   (for ([k v] (.items (get x "G")))
     (setattr G k v))
@@ -65,7 +65,7 @@
       (= it.apid apid)
       (get ItemAppearance.registry (afind (issubclass itype it) (.keys ItemAppearance.registry)))))
     (when known
-      (setv itype.appearance.known True)))
+      (setv itype.appearance.known T)))
 
   ; A bit of extra explicit initialization is necessary here
   ; because the omaps, FOV map, and G.player are redundant with
@@ -78,7 +78,7 @@
     (for [[xt t] (enumerate row)]
       (mset (Pos xt yt)
         (if (string? t) ((get inverted-tile-save-shorthand t)) t)
-        True)))
+        T)))
   (for [o (+ (get x "omaps" "Item") (get x "omaps" "Creature"))]
     (MapObject.__init__ o o.pos))
   (setv Scheduled.queue (get x "Scheduled.queue"))

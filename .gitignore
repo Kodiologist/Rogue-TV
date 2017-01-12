@@ -1,4 +1,3 @@
-/libtcodpy.pyc
-/libtcod.so
 *.pyc
 /roguetv_init.hy
+/build

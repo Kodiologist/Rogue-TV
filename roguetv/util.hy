@@ -1,17 +1,23 @@
-(require kodhy.macros)
+(require [kodhy.macros [lc filt]])
 
 (import
   [math [log sqrt exp ceil]]
   random
   datetime
   [heidegger.pos [Pos]]
-  [kodhy.util [signum seq keyword->str cat]]
+  [kodhy.util [T F signum seq keyword->str cat]]
   [roguetv.globals :as G])
 
 (defn real-timestamp []
   ; "Real" in the sense that this uses real time, not the game's
   ; simulated time.
   (.isoformat (datetime.datetime.utcnow)))
+
+(defn logit [x]
+  (log (/ x (- 1 x))))
+
+(defn ilogit [x]
+  (/ 1 (+ 1 (exp (- x)))))
 
 (defn chance [x]
   (<= (random.random) x))
@@ -36,7 +42,7 @@
 
 (defn seconds [x]
   ; Convert seconds to the internal time representation.
-  (if x (max 1 (long (round (* G.clock-factor x)))) 0))
+  (if x (max 1 (round (* G.clock-factor x))) 0))
     ; (max 1 …) ensures that no nonzero durations will be rounded
     ; to 0.
 (defn minutes [x]
@@ -44,13 +50,13 @@
 (defn round-to-second [duration]
   ; Rounds a duration (in the internal time representation)
   ; to the nearest second.
-  (* (long (round (/ duration G.clock-factor))) G.clock-factor))
+  (* (round (/ duration G.clock-factor))) G.clock-factor)
 
 (defn minsec [x]
-  (setv x (long (ceil (/ x G.clock-factor))))
+  (setv x (ceil (/ x G.clock-factor)))
   (.format "{}:{:02}" (// x 60) (% x 60)))
 
-(defn show-duration [x &optional [trunc-to-sec False] [abbreviate False]]
+(defn show-duration [x &optional [trunc-to-sec F] [abbreviate F]]
   (setv parts [])
   (.append parts ["h" "hour" (// x (* 60 60 G.clock-factor))])
   (%= x (* 60 60 G.clock-factor))
@@ -103,10 +109,10 @@
   (when steep?
     (setv p1 (Pos p1.y p1.x))
     (setv p2 (Pos p2.y p2.x)))
-  (setv swapped False)
+  (setv swapped F)
   (when (> p1.x p2.x)
     (setv [p1 p2] [p2 p1])
-    (setv swapped True))
+    (setv swapped T))
   (setv dx (- p2.x p1.x))
   (setv dy (- p2.y p1.y))
   (setv error (// dx 2))
@@ -126,7 +132,7 @@
   (minutes (+ 3 (/ dl 2))))
 
 (defn randexp-dl-div [divisor]
-  (long (randexp (/ (dl-time-limit G.dungeon-level) divisor))))
+  (int (randexp (/ (dl-time-limit G.dungeon-level) divisor))))
 
 (defn player? [cr]
   (is cr G.player))
@@ -136,12 +142,12 @@
 
 (defn msg [&rest args]
   (setv args (list args))
-  (setv mtype (when (keyword? (first args))
+  (setv mtype (when (symbol? (first args))
     (.pop args 0)))
   (when mtype
     (setv (get args 0) (.format "{} {}"
       (color-xml
-        (get {:tara "Tara:" :bob "Bob:" :aud "The audience"} mtype)
+        (get {'tara "Tara:" 'bob "Bob:" 'aud "The audience"} mtype)
         (get G.announcer-colors mtype))
       (get args 0))))
   (setv text
@@ -159,7 +165,7 @@
   ; count. When more messages are printed, we'll highlight them
   ; if they're new messages or if the last message had its count
   ; increased.
-  (setv G.message-log (slice G.message-log (- G.max-message-log-len)))
+  (setv G.message-log (cut G.message-log (- G.max-message-log-len)))
   (setv G.last-new-message-number (dec (len G.message-log)))
   (setv G.last-message-count (get G.message-log -1 0)))
 
@@ -174,7 +180,7 @@
     text))
 
 (defn soil-fov []
-  (setv G.fov-dirty? True))
+  (setv G.fov-dirty? T))
 
 (defn active-inv []
   (filt (.carry-effects-active? it) G.inventory))

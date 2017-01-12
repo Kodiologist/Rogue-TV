@@ -1,8 +1,8 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap afind-or block qw]] [roguetv.macros [*]])
 
 (import
   xml.sax.saxutils
-  [kodhy.util [ret ucfirst]]
+  [kodhy.util [T F ret ucfirst]]
   inflect)
 
 (def -inflect (inflect.engine))
@@ -23,7 +23,7 @@
   ; identifier. Similarly, we used underscores in place of spaces.
   ; Switch them back.
   (for [row (rest table)]
-    (setv (slice row) (amap (.replace (.replace it "’" "'") "_" " ") row)))
+    (setv (cut row) (amap (.replace (.replace it "’" "'") "_" " ") row)))
   ; Set 'd' to a dictionary mapping the :singular-they forms
   ; to dictionaries of all forms for that part of speech.
   (setv cols (first table))
@@ -51,13 +51,13 @@
 (def genders (, :male :female :neuter :singular-they))
 (def pronoun-bases (frozenset (.keys -pronoun-d)))
 
-(defn pronoun [base &optional [gender :neuter] [person 3] [plural False]]
+(defn pronoun [base &optional [gender :neuter] [person 3] [plural F]]
 ; Inflect the pronoun 'base' using 'gender', 'person', and 'plural'.
   (get -pronoun-d base (get
     (if plural [:p1 :p2 :p3] [:s1 :s2 gender])
     (dec person))))
 
-(defn verb [base &optional [gender :neuter] [person 3] [plural False]]
+(defn verb [base &optional [gender :neuter] [person 3] [plural F]]
 ; The 'base' should be in 3rd-person singular form
 ; (e.g., "is", "was", "does", "did", "swims").
   (when (= gender :singular-they)
@@ -71,20 +71,20 @@
       "was"]
     [(and (= person 3) (!= gender :singular-they) (not plural))
       base]
-    [True
+    [T
       (.plural-verb -inflect base)]))
 
 (defclass NounPhrase [object] [
 
-  [__init__ (fn [self stem &optional
+  __init__ (fn [self stem &optional
       plural
       [gender :neuter]
       article
-      [mass False]
-      [always-plural False]
+      [mass F]
+      [always-plural F]
       unit
-      [bare-proper False]
-      [the-proper False]] (block
+      [bare-proper F]
+      [the-proper F]] (block
 
     (when (instance? NounPhrase stem)
       ; Just clone.
@@ -106,7 +106,7 @@
         (if the-proper united stem)]
       [plural
         plural]
-      [True
+      [T
         (.plural-noun -inflect stem)]))
 
     (setv definite-singular
@@ -121,7 +121,7 @@
           (+ "some " stem)]
         [article
           (+ article " " stem)]
-        [True
+        [T
           (.a -inflect stem)]))
     (setv indefinite-plural
       (+ "some " pluralized))
@@ -133,25 +133,25 @@
     (set-self
       stem gender mass always-plural
       definite-singular definite-plural indefinite-singular indefinite-plural your count)
-    None))]
+    None))
 
-  [__format__ (fn [self formatstr]
+  __format__ (fn [self formatstr]
     (setv upper (not (none? (afind-or (.isupper it) formatstr))))
     (setv formatstr (.lower formatstr))
     ((if upper ucfirst identity) (cond
       [(in formatstr pronoun-bases)
-        (kwc pronoun formatstr
+        (pronoun formatstr
           :gender self.gender
           :plural self.always-plural)]
       [(.startswith formatstr "v:")
-        (kwc verb (slice formatstr (len "v:"))
+        (verb (cut formatstr (len "v:"))
           :gender self.gender
           :plural self.always-plural)]
       [(.startswith formatstr "p-v:")
-        (kwc verb (slice formatstr (len "p-v:"))
+        (verb (cut formatstr (len "p-v:"))
           :gender self.gender
           :plural (not self.mass))]
-      [True
+      [T
         (get
           {
             ""      self.stem
@@ -161,22 +161,22 @@
             "some"  self.indefinite-plural
             "your"  self.your
             "num"   self.count}
-          formatstr)])))]
+          formatstr)])))
 
-  [female (fn [self]
-    (= self.gender :female))]])
+  female (fn [self]
+    (= self.gender :female))])
 
 (defclass NounPhraseNamed [object] [
-  [name None]
-  [escape-xml-in-np-format False]
+  name None
+  escape-xml-in-np-format F
 
-  [escape (classmethod (fn [self s]
+  escape (classmethod (fn [self s]
     (if (and s self.escape-xml-in-np-format)
       (xml.sax.saxutils.escape s)
-      s)))]
+      s)))
 
-  [__format__ (fn [self formatstr]
-    (.escape self (.__format__ self.name formatstr)))]])
+  __format__ (fn [self formatstr]
+    (.escape self (.__format__ self.name formatstr)))])
 
 (defn english-list [l]
   (.join -inflect l))

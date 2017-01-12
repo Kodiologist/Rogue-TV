@@ -1,11 +1,11 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [lc amap fmap afind-or whenn]] [roguetv.macros [*]])
 
 (import
   [math [floor ceil]]
   textwrap
   curses
   [heidegger.pos [Pos]]
-  [kodhy.util [concat]]
+  [kodhy.util [T F concat]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [look-at-keys]]
@@ -25,9 +25,9 @@
         (G.T.addstr a1 a2 (curses-encode a3))]
       [(not (none? a2))
         (G.T.addstr (curses-encode a1) a2)]
-      [True
+      [T
         (G.T.addstr (curses-encode a1))])
-    (catch [_ curses.error] None)))
+    (except [curses.error] None)))
       ; http://bugs.python.org/issue8243
 
 (defn echo [str color-fg color-bg]
@@ -52,7 +52,7 @@
       (- tx G.map-border-width)]
     [(>= right (+ G.map-border-width G.map-width))
       (+ tx G.map-border-width G.map-width (- G.screen-width))]
-    [True
+    [T
       (+ (- tx (// G.screen-width 2)) focus-px)]))
 (defn ty->py [ty focus-py]
   (-= focus-py (int (ceil (/ G.bottom-border 2))))
@@ -66,13 +66,13 @@
       (- G.screen-height 1 G.map-border-width G.bottom-border ty)]
     [(>= top (+ G.map-border-width G.map-height))
       (- (+ G.map-height G.map-border-width) 1 ty)]
-    [True
+    [T
       (+ (- (// G.screen-height 2) ty) focus-py)]))
 
 (defn draw-map [focus ty-min ty-max]
   (when G.fov-dirty?
     (recompute-fov)
-    (setv G.fov-dirty? False))
+    (setv G.fov-dirty? F))
   (G.T.move 0 ty-min)
   (for [ty (seq ty-min ty-max)]
     (setv py (ty->py ty focus.y))
@@ -86,11 +86,11 @@
           (echo " " G.fg-color G.off-map-color)]
         [(get G.seen-map px py)
           ; Seen by the player.
-          (echo-drawable (let [[p (Pos px py)]] (or
+          (echo-drawable (do (setv p (Pos px py)) (or
             (Creature.at p)
             (.visible-item-at G.player p)
             (Tile.at p))))]
-        [True
+        [T
           ; Unseen.
           (echo " " G.fg-color G.unseen-color)])))
   focus-t-coords)
@@ -101,12 +101,11 @@
   (setv s (AttrStr.from-xml
     (.format "{} {} {}  DL:{: 2}  {:>6}{}  {}"
       (color-xml
-        (let [[w (* G.time-bar-width time-left-frac)]]
-          (cat
-            (* (get G.time-bar-chunk-chars -1) (int (floor w)))
-            (when (% w 1) (get G.time-bar-chunk-chars (int (round
-              (* (% w 1) (dec (len G.time-bar-chunk-chars)))))))
-            (* (get G.time-bar-chunk-chars 0) (- G.time-bar-width (int (ceil w))))))
+        (do (setv w (* G.time-bar-width time-left-frac)) (cat
+           (* (get G.time-bar-chunk-chars -1) (int (floor w)))
+           (when (% w 1) (get G.time-bar-chunk-chars (int (round
+             (* (% w 1) (dec (len G.time-bar-chunk-chars)))))))
+           (* (get G.time-bar-chunk-chars 0) (- G.time-bar-width (int (ceil w))))))
         None
         (whenn (afind-or (<= time-left-frac (first it)) G.time-warnings)
           (second it)))
@@ -128,17 +127,17 @@
   (G.T.move (- G.screen-height 1 G.message-lines) 0)
   (.draw (.trunc s G.screen-width)))
 
-(defn draw-message-log [&optional [fullscreen False]]
+(defn draw-message-log [&optional [fullscreen F]]
   (when fullscreen
     (G.T.erase))
   (setv height (if fullscreen G.screen-height G.message-lines))
   (setv lines (concat
-    (lc [[mn [count text-xml]] (slice (list (enumerate G.message-log)) (- height))]
+    (lc [[mn [count text-xml]] (cut (list (enumerate G.message-log)) (- height))]
       (amap (, mn count it) (.wrap
         (AttrStr.from-xml (cat text-xml (when (> count 1)
           (.format " [× {}]" count))))
         G.screen-width)))))
-  (setv lines (slice lines (- height)))
+  (setv lines (cut lines (- height)))
   (for [[i [mn count astr]] (enumerate lines)]
     (G.T.move (+ i (- G.screen-height height)) 0)
     (.draw astr (if (or
@@ -150,7 +149,7 @@
 
 (defn full-redraw [&optional focus]
   (G.T.erase)
-  (setv focus-t-coords (kwc draw-map
+  (setv focus-t-coords (draw-map
     :focus (or focus G.player.pos)
     :ty-min 0
     :ty-max (if (= G.screen-mode :normal)
@@ -174,13 +173,13 @@
     (.split text-xml "\n"))))
   (setv pages [])
   (setv i 0)
-  (while True
-    (.append pages {"text" (slice lines i (+ i G.screen-height))})
+  (while T
+    (.append pages {"text" (cut lines i (+ i G.screen-height))})
     (when (>= (+ i G.screen-height) (len lines))
       (break))
     ; Remove the bottom line to make room for a "more" prompt.
-    (setv (get pages -1 "text") (slice (get pages -1 "text") None -1))
-    (setv (get pages -1 "more") True)
+    (setv (get pages -1 "text") (cut (get pages -1 "text") None -1))
+    (setv (get pages -1 "more") T)
     (+= i (+ G.screen-height -1 (- G.text-screen-page-overlap))))
   pages)
 
@@ -201,7 +200,7 @@
     (rtv-get item.gadget.Gadget)
     (rtv-get item.soda.Soda)
     (rtv-get item.gadget.Battery)])))
-  (kwc .sort G.inventory :key (fn [item]
+  (.sort G.inventory :key (fn [item]
     (setv category (afind-or (instance? (second it) item) item-sort-order))
     (setv category (if category (first category) (len item-sort-order)))
     (,
@@ -268,6 +267,6 @@
         (msg "There is also {} {:a:full} here." (.xml-symbol tile) tile)))]
     [verbose
       (if (instance? Floor tile)
-        (msg :bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
+        (msg 'bob "Now the beetle-headed {} is snilching the floor. Wonder what {p:he's} looking for."
           (if (G.player.name.female) "dowdy" "cull"))
         (msg "There is {} {:a:full} here." (.xml-symbol tile) tile))]))

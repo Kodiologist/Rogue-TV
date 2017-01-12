@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [amap amap2 whenn λ qw]])
 
 (import
   sys
@@ -9,7 +9,7 @@
   [collections [OrderedDict]]
   argparse
   appdirs
-  [kodhy.util [ret by-ns concat keyword->str str->keyword]]
+  [kodhy.util [T F ret by-ns concat keyword->str str->keyword]]
   [roguetv.english [genders NounPhrase]]
   [roguetv.globals :as G])
 
@@ -18,18 +18,15 @@
   (whenn (os.getenv "ROGUETV_BUNDLE_INFO")
     (setv [l1 l2 l3] (.split it "\n"))
     (setv G.bundle-os l1)
-    (setv G.bundle-git (slice l2 (len "Git commit ")))
-    (setv (get G.dates "bundle_created") (slice l3 (len "Packaged at ")))
+    (setv G.bundle-git (cut l2 (len "Git commit ")))
+    (setv (get G.dates "bundle_created") (cut l3 (len "Packaged at ")))
     (setv G.version-info (.format "Bundle version {}-{} ({})"
-      (slice G.bundle-git 0 12) G.bundle-os (get G.dates "bundle_created")))))
+      (cut G.bundle-git 0 12) G.bundle-os (get G.dates "bundle_created")))))
 
 (def pronouns->genders (OrderedDict [
   (, "he" :male)
   (, "she" :female)
   (, "it" :neuter)]))
-
-(def max-seed sys.maxint)
-(def min-seed (- (- sys.maxint) (int 1)))
 
 (defn uni [s]
   (.decode s (sys.getfilesystemencoding)))
@@ -37,7 +34,7 @@
 (defn parse-args [&optional args]
   (setv desc (+ "Rogue TV by Kodi Arfer\n" G.version-info))
 
-  (setv parser (kwc argparse.ArgumentParser
+  (setv parser (argparse.ArgumentParser
     :formatter-class argparse.RawDescriptionHelpFormatter
     :description desc))
 
@@ -98,11 +95,7 @@
 
   (for [a ["map_seed" "general_seed"]]
     (unless (getattr p a)
-      (setattr p a (random.randrange min-seed (+ max-seed 1))))
-    (unless (<= min-seed (getattr p a) max-seed)
-      (sys.exit (.format "Seeds must lie between {} and {} inclusive." min-seed max-seed)))
-    (unless (is (type (getattr p a)) int)
-      (raise (ValueError (.format "Weird seed type: {!r}" (getattr p a))))))
+      (setattr p a (random.randrange (- (** 2 63)) (- (** 2 63) 1)))))
 
   (unless p.pronouns
     (when p.name
@@ -118,13 +111,13 @@
       [(= p.gender :female)
         (random.choice (qw Meg Jo Beth Amy))]
           ; Little Women
-      [True
+      [T
         (random.choice (+
            (qw Zorx Klax Jennifer)
              ; Captain Underpants and the Invasion of the Incredibly Naughty Cafeteria Ladies from Outer Space (and the Subsequent Assault of the Equally Evil Lunchroom Zombie Nerds)
            ["Robert'); DROP TABLE Players;--"]))])))
             ; http://www.xkcd.com/327/
-  (setv p.name (kwc NounPhrase p.name :+bare-proper :gender p.gender))
+  (setv p.name (NounPhrase p.name :bare-proper T :gender p.gender))
 
   p)
 
@@ -135,7 +128,7 @@
       (setv d (appdirs.user-data-dir "Rogue TV" "Kodiologist"))
       (try
         (os.makedirs d)
-        (catch [e OSError]
+        (except [e OSError]
           (unless (= e.errno errno.EEXIST)
             (raise))))
       d)))

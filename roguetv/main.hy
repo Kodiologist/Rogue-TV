@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt ecase block λ]] [roguetv.macros [*]])
 
 (import
   os
@@ -6,7 +6,7 @@
   curses
   [itertools [combinations]]
   [heidegger.pos [Pos]]
-  [kodhy.util [ret concat]]
+  [kodhy.util [T F ret concat]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -59,19 +59,19 @@
     (setv G.screen-mode :normal)
 
     (when special
-      (kwc show-scores G.scores-file-path :show-all (ecase special
-        [:show-scores False]
-        [:show-all-scores True]))
-      (ret :just-showing-scores))
+      (show-scores G.scores-file-path :show-all (ecase special
+        [:show-scores F]
+        [:show-all-scores T]))
+      (ret ':just-showing-scores))
 
     (unless (get G.dates "loaded")
       (unless G.debug
         (text-screen (.format "\nIn the far-distant future of the year 200X, the story of the lone hero who retrieved the mystical Amulet of Yendor from the depths of the Dungeon of Doom has passed into legend. But the legend lives on in <b>Rogue TV</b>, the hit new game show where one brave contestant races against the clock to collect fabulous prizes! Host {} and color commentator {} will be your guides as you navigate the perils of a family-friendly state-of-the-art dungeon (designed anew for every contestant, and constructed to the highest standards of safety) to the cheers of adoring fans. Will you reach <b>dungeon level {}</b>, where the Amulet of Yendor (worth a fabulous <b>${}</b>) lies? Or will you go home with a booby prize? It's up to you and the roll of the dice!"
-          (color-xml "Tara Tanner" (get G.announcer-colors :tara))
-          (color-xml "Robert Babaghanoush" (get G.announcer-colors :bob))
+          (color-xml "Tara Tanner" (get G.announcer-colors 'tara))
+          (color-xml "Robert Babaghanoush" (get G.announcer-colors 'bob))
           (inc G.max-dungeon-level)
           (. (get G.itypes "aoy") price))))
-      (msg :tara "The game begins on a level with {} by {} squares. Good luck, {p}."
+      (msg 'tara "The game begins on a level with {} by {} squares. Good luck, {p}."
         G.map-width G.map-height)
       (describe-tile G.player.pos))
 
@@ -93,13 +93,13 @@
       ; Yes, we're brute-forcing the knapsack problem here.
       ; This should be fine so long as the inventory is small.
       (setv winnings (list
-        (kwc max :key total
+        (max :key total
         (filt (<= (total it) (/ gross 2))
         (concat
         (amap (list (combinations winnings it))
         (range (inc (len winnings)))))))))
       (setv gross (total winnings)))
-    (kwc .sort winnings :key (λ (, (- it.price) it.tid)))
+    (.sort winnings :key (λ (, (- it.price) it.tid)))
     (unless G.debug
       (add-current-game-to-scores G.scores-file-path winnings gross))
     (msg "Game over. Your total winnings are ${}. Hit \"!\" to quit." gross)

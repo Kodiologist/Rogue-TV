@@ -1,25 +1,26 @@
 ; This file is for special items that have negative effects and
 ; high values.
 
-(require kodhy.macros)
+(require [kodhy.macros [meth]])
 
 (import
   random
+  [kodhy.util [T F]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.map [disc-taxi Tile Floor Ice mset]]
   [roguetv.item.generic [Item def-itemtype item-pos]])
 
-(defcls Burden [Item]
+(defclass Burden [Item] [
   rarity :rare
-  price-adj :burden)
+  price-adj :burden])
 
-(defcls BigMoney [Burden]
+(defclass BigMoney [Burden] [
   char "$"
 
   info-flavor "Big money! Really heavy money, in fact."
-  info-carry "Slows your walking speed to {carry_speed_factor} times normal.")
+  info-carry "Slows your walking speed to {carry-speed-factor} times normal."])
 
 (def-itemtype BigMoney "briefcase-cash" :name "briefcase full of cash"
   :color-fg :dark-green
@@ -42,14 +43,14 @@
   :level-lo 19
 
   :info-carry "You can't walk. At all."
-  :superheavy True)
+  :superheavy T)
 
-(defcls CursedGem [Burden]
+(defclass CursedGem [Burden] [
   char "*"
-  unique True)
+  unique T])
 
 (def-itemtype CursedGem "cursedgem-ice"
-  :name (kwc NounPhrase "White Ice" :+the-proper)
+  :name (NounPhrase "White Ice" :the-proper T)
   :color-fg :white
   :level-lo 4
 
@@ -57,15 +58,15 @@
   :ice-per-second 3
 
   :info-flavor "A frost-covered diamond the size of a baseball. You shiver just looking at it."
-  :info-constant "Produces ice around itself. An ice tile is generated within {ice_radius} squares about {ice_per_second} times per second."
+  :info-constant "Produces ice around itself. An ice tile is generated within {ice-radius} squares about {ice-per-second} times per second."
 
   :__init__ (meth [&kwargs kw]
-    (apply CursedGem.__init__ [@] kw)
+    (apply CursedGem.__init__ [@@] kw)
     (@schedule)
     None)
 
   :act (meth []
-    (setv p (random.choice (disc-taxi (item-pos @) @ice-radius)))
+    (setv p (random.choice (disc-taxi (item-pos @@) @ice-radius)))
     (when (instance? Floor (Tile.at p))
       (mset p (Ice)))
-    (@take-time (long (randexp (/ 1 (/ @ice-per-second G.clock-factor)))))))
+    (@take-time (int (randexp (/ 1 (/ @ice-per-second G.clock-factor)))))))

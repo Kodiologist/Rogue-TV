@@ -1,10 +1,10 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt afind-or whenn block λ meth]] [roguetv.macros [*]])
 
 (import
   [random [choice]]
   pypaths.astar
   [heidegger.pos [Pos]]
-  [kodhy.util [ret weighted-choice maxes]]
+  [kodhy.util [T F ret weighted-choice maxes]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -16,25 +16,25 @@
 (defclass Monster [Creature] [
   ; A class for all non-player creatures.
 
-  [walk-to (fn [self p-to]
+  walk-to (fn [self p-to]
     (unless (.walk-to (super Monster self) p-to)
-      (raise (ValueError (.format "{} tried to walk where it couldn't: {}" self p-to)))))]
+      (raise (ValueError (.format "{} tried to walk where it couldn't: {}" self p-to)))))
 
-  [player-repulsive? (fn [self]
+  player-repulsive? (fn [self]
     (or
       (.get-effect G.player Stink)
       (afind-or (instance? it.carry-repel-monster self)
-        (filt it.carry-repel-monster (active-inv)))))]
+        (filt it.carry-repel-monster (active-inv)))))
 
-  [flee-from-player (fn [self] (block
+  flee-from-player (fn [self] (block
     ; If the player is repulsive to us and we're in range, try to
-    ; run away (not very intelligently), and return True.
-    ; Otherwise, return False.
+    ; run away (not very intelligently), and return T.
+    ; Otherwise, return F.
     (unless (and
         (.player-repulsive? self)
         (<= (dist-taxi self.pos G.player.pos) G.repulsed-from-player-range))
-      (ret False))
-    (setv neighbors (kwc sorted
+      (ret F))
+    (setv neighbors (sorted
       (shuffle (clear-neighbors self.pos))
       :key (λ (,
         (- (/ (dist-taxi it G.player.pos) (dist-taxi it self.pos)))
@@ -44,7 +44,7 @@
         (dist-taxi self.pos G.player.pos)))
       (.walk-to self (first neighbors))
       (.wait self))
-    True))]])
+    T))])
 
 (defn extant-monsters []
   (filt (instance? Monster it) Scheduled.queue))
@@ -53,23 +53,23 @@
   (filt (room-for? Creature it)
     (amap (+ pos it) Pos.DIR8)))
 
-(defn wander [cr &optional [okay? (λ True)]] (block
+(defn wander [cr &optional [okay? (λ T)]] (block
   ; Try to step in a random direction. (Diagonal moves are half
   ; as likely as orthogonal moves.) Return a boolean indicating
   ; whether we succeeded.
   (setv neighbors (filt (okay? it) (clear-neighbors cr.pos)))
   (unless neighbors
-    (ret False))
+    (ret F))
   (setv p-to (weighted-choice (amap
     (, (/ 1 (dist-taxi cr.pos it)) it)
     neighbors)))
   (.walk-to cr p-to)
-  True))
+  T))
 
 (defn find-path [p-from p-to &optional [max-cost (int 1e6)]] (block
   (when (= p-from p-to)
     (ret [p-to]))
-  (setv searcher (kwc pypaths.astar.pathfinder
+  (setv searcher (pypaths.astar.pathfinder
     :neighbors (fn [p] (+ (clear-neighbors p)
       (if (adjacent? p p-to) [p-to] [])))
     :distance dist-euclid
@@ -77,10 +77,10 @@
       ; Euclidean distance is an admissible heuristic for taxicab
       ; geometry.
     :cost dist-taxi))
-  (slice (second (searcher p-from p-to max-cost)) 1)))
+  (cut (second (searcher p-from p-to max-cost)) 1)))
 
 (defn find-path-thru-creatures [p-from p-to &optional [max-cost (int 1e6)]]
-  (setv searcher (kwc pypaths.astar.pathfinder
+  (setv searcher (pypaths.astar.pathfinder
     :neighbors (fn [p] (+
        (filt (and (on-map it) (not (. (Tile.at it) blocks-movement)))
          (amap (+ p it) Pos.DIR8))
@@ -95,40 +95,40 @@
         (raise (ValueError [p1 p2 p-to])))
       (+ (dist-taxi p1 p2)
         (* 2 (bool (and (Creature.at p2) (!= p2 p-to))))))))
-  (slice (second (searcher p-from p-to max-cost)) 1))
+  (cut (second (searcher p-from p-to max-cost)) 1))
 
 (defclass Bee [Monster] [
-  [name (NounPhrase "bumblebee")]
-  [char "a"]
-  [color-fg :yellow]
-  [info-text "A jolly little insect that buzzes about aimlessly. Your standard-issue contestant protective gear will protect you from stings. Bees can still kind of get in the way, though."]
+  name (NounPhrase "bumblebee")
+  char "a"
+  color-fg :yellow
+  info-text "A jolly little insect that buzzes about aimlessly. Your standard-issue contestant protective gear will protect you from stings. Bees can still kind of get in the way, though."
 
-  [flying True]
+  flying T
 
-  [act (fn [self]
+  act (fn [self]
     (or
       (.flee-from-player self)
       (wander self)
-      (.wait self)))]])
+      (.wait self)))])
 
 (defclass Cat [Monster] [
-  [name (NounPhrase "cat")]
-  [char "f"]
-  [color-fg :dark-orange]
-  [info-text "A regal creature with little concern for you or your affairs. It moves when the mood strikes it, or to avoid dirtying its dainty paws."]
+  name (NounPhrase "cat")
+  char "f"
+  color-fg :dark-orange
+  info-text "A regal creature with little concern for you or your affairs. It moves when the mood strikes it, or to avoid dirtying its dainty paws."
 
-  [move-chance (/ 1 30)]
+  move-chance (/ 1 30)
 
-  [unpleasant? (fn [self pos]
+  unpleasant? (fn [self pos]
     ; Check whether a tile has an unpleasant terrain or is in
     ; the range of a spooky tile.
     (or
       (. (Tile.at pos) unpleasant)
       (any (amap
         (. (Tile.at it) spooky)
-        (disc-taxi pos G.spook-radius)))))]
+        (disc-taxi pos G.spook-radius)))))
 
-  [act (fn [self] (block
+  act (fn [self] (block
     (when (.flee-from-player self)
       (ret))
     ; Usually just sit there. Occasionally, wander in a random
@@ -138,17 +138,17 @@
           (chance self.move-chance))
         (or (wander self (λ (not (.unpleasant? self it))))
           (wander self)))
-      (.wait self))))]])
+      (.wait self))))])
 
 (defclass Dog [Monster] [
-  [name (NounPhrase "dog")]
-  [char "d"]
-  [color-fg :brown]
-  [info-text "A clingy, fawning mongrel that will cheerfully chase you and get underfoot. Fortunately, it's not the sharpest cheese in the pantry."]
+  name (NounPhrase "dog")
+  char "d"
+  color-fg :brown
+  info-text "A clingy, fawning mongrel that will cheerfully chase you and get underfoot. Fortunately, it's not the sharpest cheese in the pantry."
 
-  [detect-player-range 12]
+  detect-player-range 12
 
-  [act (fn [self] (block
+  act (fn [self] (block
     (when (.flee-from-player self)
       (ret))
     ; If the player is close, try to chase after them, not very
@@ -181,54 +181,54 @@
           (.wait self))
         (ret)))
     ; Otherwise, wander.
-    (or (wander self) (.wait self))))]])
+    (or (wander self) (.wait self))))])
 
-(defcls Snail [Monster]
+(defclass Snail [Monster] [
   name (NounPhrase "giant snail")
   char "S"
   color-fg :dark-green
   info-text "A mindless, oversized gastropod that slithers around the dungeon, leaving a trail of slime in its wake. It's very slow, but it isn't slowed any further by slime."
 
-  walk-speed (meth [] (/ 1 4))
-  slime-immune True
+  walk-speed (meth [p-to] (/ 1 4))
+  slime-immune T
 
   act (meth []
     (when (instance? Floor (Tile.at @pos))
       (mset @pos (Slime)))
     (or
       (@flee-from-player)
-      (wander @)
-      (@wait))))
+      (wander @@)
+      (@wait)))])
 
-(defcls Spider [Monster]
+(defclass Spider [Monster] [
   name (NounPhrase "giant spider")
   char "s"
   color-fg :red
   info-text "It doesn't bite, but it leaves webs wherever it goes."
 
-  web-immune True
+  web-immune T
 
   act (meth []
     (when (instance? Floor (Tile.at @pos))
       (mset @pos (Web)))
     (or
       (@flee-from-player)
-      (wander @)
-      (@wait))))
+      (wander @@)
+      (@wait)))])
 
-(defcls Golem [Monster]
+(defclass Golem [Monster] [
   name (NounPhrase "golem")
   char "g"
   color-fg :brown
   info-text "A massive clay humanoid given a semblance of life by magic. It's very slow and it moves in a fixed pattern, but it's too heavy to push past."
 
-  walk-speed (meth [] (/ 1 5))
+  walk-speed (meth [p-to] (/ 1 5))
   change-dir-time (seconds 2)
-  heavy True
-  spook-immune True
+  heavy T
+  spook-immune T
 
   __init__ (meth [&optional pos]
-    (.__init__ (super Golem @) pos)
+    (.__init__ (super Golem @@) pos)
     (setv @dir None)
     None)
 
@@ -241,19 +241,19 @@
     (unless @dir
       (setv @dir (first (maxes (shuffle Pos.ORTHS) (λ
         (setv n 1)
-        (while (room-for? @ (+ @pos (* n it)))
+        (while (room-for? @@ (+ @pos (* n it)))
           (+= n 1))
         n)))))
     ; If we have room, walk forward. Otherwise, turn around.
     ; (When trapped, we'll just spend all our time turning back
     ; and forth.)
-    (if (room-for? @ (+ @pos @dir))
+    (if (room-for? @@ (+ @pos @dir))
       (@walk-to (+ @pos @dir))
       (do
         (setv @dir (* -1 @dir))
-        (@take-time @change-dir-time)))))
+        (@take-time @change-dir-time))))])
 
-(defcls UmberHulk [Monster]
+(defclass UmberHulk [Monster] [
   name (NounPhrase "umber hulk")
   char "U"
   color-fg :brown
@@ -271,9 +271,9 @@
         (@take-time @dig-time)
         (@walk-to p)
         (ret)))
-    (or (wander @) (@wait)))))
+    (or (wander @@) (@wait))))])
 
-(defcls Nymph [Monster]
+(defclass Nymph [Monster] [
   name (NounPhrase "nymph")
   gender :female
   char "n"
@@ -285,7 +285,7 @@
   drop-item-time (seconds 1)
 
   __init__ (meth [&optional pos item]
-    (.__init__ (super Nymph @) pos)
+    (.__init__ (super Nymph @@) pos)
     (setv @item None)
     (when item
       (@get-item item))
@@ -311,7 +311,7 @@
         (@take-time @drop-item-time)
         (.move @item it)
         (when (seen @pos)
-          (msg "{:The} drops {:a}." @ @item))
+          (msg "{:The} drops {:a}." @@ @item))
         (setv @item None)
         (ret)))
     ; If we don't have an item, and there's an item we're not
@@ -319,7 +319,7 @@
     ; range that we can see, go to it.
     (when (not @item)
       (setv ps
-        (kwc sorted :key (λ (len (second it)))
+        (sorted :key (λ (len (second it)))
         (shuffle
         (filt (second it)
         (amap (, it
@@ -340,7 +340,7 @@
             (@get-item (Item.at @pos))
             (.move @item None)
             (when (seen @pos)
-              (msg "{:The} picks up {:a}." @ @item)))]
+              (msg "{:The} picks up {:a}." @@ @item)))]
           [(and
               (= dest G.player.pos)
               (not (@player-repulsive?))
@@ -351,12 +351,12 @@
             (@take-time @take-item-time)
             (@get-item (choice (filt (@item-attractive? it) G.inventory)))
             (.remove G.inventory @item)
-            (msg "{:The} stole {:your}." @ @item))]
-          [(room-for? @ (first path))
+            (msg "{:The} stole {:your}." @@ @item))]
+          [(room-for? @@ (first path))
             ; We have a usable path to an item. Take the next step.
             (@walk-to (first path))]
-          [True
+          [T
             (@wait)])
         (ret)))
     ; Otherwise, wander.
-    (or (wander @) (@wait)))))
+    (or (wander @@) (@wait))))])

@@ -1,9 +1,9 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt afind ecase block]] [roguetv.macros [*]])
 
 (import
   [random [choice]]
   [heidegger.pos [Pos]]
-  [kodhy.util [ret]]
+  [kodhy.util [T F ret]]
   [roguetv.globals :as G]
   [roguetv.util [*]])
 
@@ -16,7 +16,7 @@
   (= (G.T.getkey) "!"))
 
 (defn hit-key-to-continue [keys]
-  (while True
+  (while T
     (when (in (G.T.getkey) keys)
       (break))))
 
@@ -48,7 +48,7 @@
   "3" Pos.SE
   "n" Pos.SE})
 
-(defn get-direction [key &optional [pure False]]
+(defn get-direction [key &optional [pure F]]
   (setv d (get direction-keys key))
   (if (and (not pure) (.get-effect G.player (rtv-get creature.Confusion))
       (chance G.confusion-misdirect-prob))
@@ -59,7 +59,7 @@
   (msg "In what direction?")
   (rtv display.full-redraw)
   (update-msg-highlighting)
-  (while True
+  (while T
     (setv key (G.T.getkey))
     (when (in key direction-keys)
       (ret (get-direction key)))
@@ -82,7 +82,7 @@
   ["R" :reset-level :debug]])
 
 (defn get-normal-command [] (block
-  (while True
+  (while T
     (setv key (G.T.getkey))
     (setv inp (cond
       [(in key direction-keys)
@@ -101,27 +101,27 @@
 
   (for [page (rtv display.render-text-screen text)]
     (rtv display.draw-text-screen-page page)
-    (while True
+    (while T
       (when (in (G.T.getkey) cancel-keys)
         (break)))))
 
 (defn message-log-screen []
 
-  (rtv display.draw-message-log True)
+  (rtv display.draw-message-log T)
   (G.T.refresh)
 
-  (while True
+  (while T
     (when (in (G.T.getkey) cancel-keys)
       (break))))
 
-(defn inventory-loop [prompt &optional [select True]]
+(defn inventory-loop [prompt &optional [select T]]
 
   (rtv display.draw-inventory prompt)
   (G.T.refresh)
 
   (setv il (amap it.invlet G.inventory))
 
-  (while True
+  (while T
     (setv key (G.T.getkey))
     (setv inp (cond
 
@@ -150,7 +150,7 @@
   (setv prev-screen-mode G.screen-mode)
   (setv G.screen-mode :look)
   (setv focus G.player.pos)
-  (while True
+  (while T
     (rtv display.full-redraw focus)
     (setv key (G.T.getkey))
     (cond
@@ -160,7 +160,7 @@
         (break)]
 
       [(in key direction-keys) (do
-        (setv new-focus (+ focus (kwc get-direction key :+pure)))
+        (setv new-focus (+ focus (get-direction key :pure T)))
         (unless (rtv map.on-map new-focus)
           (continue))
         (setv focus new-focus))]

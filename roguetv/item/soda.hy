@@ -1,4 +1,4 @@
-(require kodhy.macros roguetv.macros)
+(require [kodhy.macros [amap filt afind-or block]] [roguetv.macros [*]])
 
 (import
   [heidegger.pos [Pos]]
@@ -12,12 +12,12 @@
   [roguetv.creature [Creature Stink Haste Confusion Strength Passwall]])
 
 (defclass Soda [Item] [
-  [apply-time (seconds 1)]
-  [char "!"]
+  apply-time (seconds 1)
+  char "!"
 
-  [info-unidentified "A Rogue TV-branded insulated miniature aluminum can of some unidentifiable beverage. 'a'pply it to chug it and find out what it is."]
+  info-unidentified "A Rogue TV-branded insulated miniature aluminum can of some unidentifiable beverage. 'a'pply it to chug it and find out what it is."
 
-  [applied (fn [self] (block
+  applied (fn [self] (block
     (setv was-id? (.identified? self))
     (.identify self)
     (unless was-id?
@@ -26,25 +26,25 @@
       (.take-time G.player self.apply-time))
     (.remove G.inventory self)
     (.destroy self)
-    (self.soda-effect)))]])
+    (self.soda-effect)))])
 
 (defclass EffectSoda [Soda] [
-  [effect None]
-  [effect-time (seconds 1)]
-  [start-msg None]
-  [lengthen-msg None]
+  effect None
+  effect-time (seconds 1)
+  start-msg None
+  lengthen-msg None
 
-  [soda-effect (fn [self]
+  soda-effect (fn [self]
     (.add-to-player self.effect self.effect-time
       (fn [] (if (string? self.start-msg)
         (msg self.start-msg)
         (apply msg self.start-msg)))
       (fn [] (if (string? self.lengthen-msg)
         (msg self.lengthen-msg)
-        (apply msg self.lengthen-msg)))))]])
+        (apply msg self.lengthen-msg)))))])
 
 (defn can-of [s]
-  (kwc NounPhrase
+  (NounPhrase
     :stem (+ "can of " s)
     :article "a"))
 
@@ -59,7 +59,7 @@
 
     (for [p (shuffle (disc-taxi (upelevator-pos) self.radius-around-upelv))]
       (when (= p G.player.pos)
-        (msg :bob "You've always had the power to go back to Kansas.")
+        (msg 'bob "You've always had the power to go back to Kansas.")
           ; The Wizard of Oz
         (ret))
       (when (room-for? G.player p)
@@ -102,8 +102,8 @@
   :info-apply "You'll stink for {effect-time}. While you stink, monsters within {G.repulsed-from-player-range} squares will run away from you."
   :effect Stink
   :effect-time (seconds 30)
-  :start-msg [:aud "cries out in disgust at the pungent odor."]
-  :lengthen-msg [:tara "Smells like {p:the} is going to keep on smelling for a while."])
+  :start-msg ['aud "cries out in disgust at the pungent odor."]
+  :lengthen-msg ['tara "Smells like {p:the} is going to keep on smelling for a while."])
 
 (def-itemtype EffectSoda "speed-soda" :name (can-of "5-second ENERGY™")
   ; In reference to the real dietary supplement 5-hour Energy.
@@ -136,7 +136,7 @@
   :effect Confusion
   :effect-time (seconds 45)
   :start-msg "Wow, that'shh good shhtuff."
-  :lengthen-msg [:tara "Keep your head in the game, {p}."])
+  :lengthen-msg ['tara "Keep your head in the game, {p}."])
 
 (def-itemtype EffectSoda "strength-soda" :name (can-of "Daffy's Elixir")
   ; A name for several patent medicines.
@@ -176,7 +176,7 @@
   :soda-effect (fn [self]
 
     (.fall-asleep G.player self.sleep-time)
-    (msg :tara "Oh no! {p:The} has fallen asleep!")))
+    (msg 'tara "Oh no! {p:The} has fallen asleep!")))
 
 (setv (get ItemAppearance.registry Soda) (amap
   (ItemAppearance it (NounPhrase (+ it " soda can")))

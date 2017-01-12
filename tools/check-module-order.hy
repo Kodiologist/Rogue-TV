@@ -7,10 +7,10 @@
 ; canonical load order (and import order) helps to clarify which
 ; modules are allowed to import from which others.
 
-(require kodhy.macros)
+(require [kodhy.macros [lc amap filt whenn]])
 (import re os.path)
 
-(setv modules (with [[o (open "module-order.txt")]]
+(setv modules (with [o (open "module-order.txt")]
   (filt it (.split (o.read) "\n"))))
 
 (for [module (filt (.startswith it "roguetv.") modules)]
@@ -22,7 +22,7 @@
     (when (os.path.exists (+ fname ".py"))
       (continue))
     (+= fname ".hy")
-    (with [[o (open fname)]] (o.read))))
+    (with [o (open fname)] (o.read))))
 
   (whenn (re.search r"\(import\n((?:  .+\n)+)" text)
     (setv imports-from

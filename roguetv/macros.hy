@@ -1,4 +1,4 @@
-(require kodhy.macros)
+(require [kodhy.macros [amap]])
 
 (import
   [hy [HySymbol HyString]])
@@ -11,8 +11,8 @@
 
 (defmacro rtv-get [x]
   (setv i (.rindex x "."))
-  (setv xname (HySymbol (slice x (+ 1 i))))
-  (setv module (HySymbol (+ "roguetv." (slice x 0 i))))
+  (setv xname (HySymbol (cut x (+ 1 i))))
+  (setv module (HySymbol (+ "roguetv." (cut x 0 i))))
   (setv g (gensym))
   `(do (import [~module :as ~g]) (. ~g ~xname)))
 
