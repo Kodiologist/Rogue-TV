@@ -10,7 +10,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [input-direction inventory-loop]]
-  [roguetv.map [Tile Floor Wall Door Chest Ice Web on-map room-for? mset mget ray-taxi disc-taxi]]
+  [roguetv.map [Tile Floor Wall Door Chest Ice Web Elevator on-map room-for? mset mget ray-taxi disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype get-other-item]]
   [roguetv.creature [Creature]])
 
@@ -224,6 +224,43 @@
     (.move G.player p-to)
     (msg "You switch places with {:the}." cr))))
 
+(def-itemtype Gadget "pogo-stick" :name (NounPhrase "pogo stick")
+  :color-fg :white
+  :level-lo 10
+  :info-flavor "Another handy-dandy springy thingie."
+  :max-charges 10
+  :pogo-travel-speed 2
+
+  :info-apply "Moves you to the tile after the next in the selected direction, or, if that's unavailable, just the next tile. You can jump over monsters, but not walls. You move through the air at {pogo-travel-speed} times normal speed."
+  :gadget-effect (meth [unid] (block :gadget
+
+    (setv d (if unid (choice Pos.DIR8) (or (input-direction) (ret))))
+    (@use-time-and-charge)
+
+    ; Find the destination square.
+    (setv near (+ G.player.pos d))
+    (setv far (+ near d))
+    (setv p-to (cond
+      [(and (not (. (mget near) blocks-movement))
+          (room-for? G.player far))
+        (msg "You spring away.")
+        far]
+      [(room-for? G.player near)
+        (msg "You spring away, but crash into {:the}."
+          (or (Creature.at far) (mget far)))
+        near]
+      [T
+        (msg "No sooner are you in the air before you run smack into {:the}."
+          (or (Creature.at near) (mget near)))
+        None]))
+
+    ; And away we go.
+    (when p-to
+      (.take-time G.player (seconds (/
+        (len-taxi (- p-to G.player.pos))
+        self.pogo-travel-speed)))
+      (.move G.player p-to)))))
+
 (def-itemtype Gadget "chainsaw"
   :color-fg :yellow
   :level-hi 7
@@ -295,6 +332,24 @@
         (msg 'aud "gasps. You can't use a drill like that on a family show.")]
       [T
         (msg "Your drill proves ineffective against {:the}." t)]))))
+
+(def-itemtype Gadget "exploding-machine" :name (NounPhrase "amazing exploding machine")
+  :color-fg :red
+  :level-lo 13
+  :info-flavor "It can explode twice. Or more!"
+  :max-charges 5
+  :explosion-range 5
+
+  :info-apply "Destroys all obstacles and unattended items within {explosion-range} squares."
+  :gadget-effect (meth [unid]
+
+    (@use-time-and-charge)
+    (msg "You're engulfed in an explosion.")
+    (for [p (disc-taxi G.player.pos @explosion-range)]
+      (unless (instance? Elevator (Tile.at p))
+        (mset p (Floor)))
+      (whenn (Item.at p)
+        (.delete it)))))
 
 (def-itemtype Gadget "web-machine" :name "Silly-O-Matic®"
   :color-fg :dark-blue
