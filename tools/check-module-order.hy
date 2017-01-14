@@ -7,33 +7,41 @@
 ; canonical load order (and import order) helps to clarify which
 ; modules are allowed to import from which others.
 
-(require [kodhy.macros [lc amap filt whenn]])
-(import re os.path)
+(require [kodhy.macros [lc amap filt]])
+(import os.path)
 
 (setv modules (with [o (open "module-order.txt")]
-  (filt it (.split (o.read) "\n"))))
+  (filt it (.split (.read o) "\n"))))
 
 (for [module (filt (.startswith it "roguetv.") modules)]
 
-  (setv text (do
+  (setv import-form (do
     (setv fname (.replace (.replace module "." "/") "-" "_"))
     (when (and (os.path.exists fname) (os.path.isdir fname))
       (continue))
     (when (os.path.exists (+ fname ".py"))
       (continue))
     (+= fname ".hy")
-    (with [o (open fname)] (o.read))))
+    (setv form None)
+    (with [o (open fname)]
+      (try
+        (while True
+          (setv form (read o))
+          (when (= (first form) 'import)
+            (break)))
+        (except [EOFError])))
+    form))
 
-  (whenn (re.search r"\(import\n((?:  .+\n)+)" text)
-    (setv imports-from
-      (filt (in it modules)
-      (amap (.group (re.match r"\A\s*\[?(\S+)" it) 1)
-      (filt it
-      (.split (.group it 1) "\n")))))
-    (setv ix (amap (.index modules it) imports-from))
-    (setv sorted? (all (lc [[a b] (zip ix (rest ix))] (< a b))))
-    (unless sorted?
-      (print (.format "{} import order - WRONG: {}" module (list (zip imports-from ix)))))
-    (setv backwards-deps? (any (amap (>= it (.index modules module)) ix)))
-    (when backwards-deps?
-      (print module "no backwards deps - WRONG"))))
+  (unless import-form (continue))
+
+  (setv imports-from
+    (filt (in it modules)
+    (amap (if (instance? list it) (first it) it)
+    (cut import-form 1))))
+  (setv ix (amap (.index modules it) imports-from))
+  (setv sorted? (all (lc [[a b] (zip ix (rest ix))] (< a b))))
+  (unless sorted?
+    (print (.format "{} import order - WRONG: {}" module (list (zip imports-from ix)))))
+  (setv backwards-deps? (any (amap (>= it (.index modules module)) ix)))
+  (when backwards-deps?
+    (print module "no backwards deps - WRONG")))

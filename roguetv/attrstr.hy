@@ -5,8 +5,8 @@
   xml.etree.ElementTree
   curses
   [kodhy.util [str->keyword keyword->str]]
-  [roguetv.globals :as G]
-  roguetv.xterm-colors)
+  roguetv.xterm-colors
+  [roguetv.globals :as G])
 
 (defn get-color [fg &optional bg]
   (when (none? fg)

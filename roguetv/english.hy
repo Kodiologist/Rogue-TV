@@ -2,8 +2,8 @@
 
 (import
   xml.sax.saxutils
-  [kodhy.util [T F ret ucfirst]]
-  inflect)
+  inflect
+  [kodhy.util [T F ret ucfirst]])
 
 (def -inflect (inflect.engine))
 
