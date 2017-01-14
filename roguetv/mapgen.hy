@@ -155,7 +155,7 @@
       (issubclass (second it) x.carry-gen-item)
       (amap
         (, (it.generation-weight dl) it)
-        (.values G.itypes)))))
+        (values-sorted-by-keys G.itypes)))))
     (itype :pos (shift free-floors)))
 
   ; Finishing touches.
@@ -202,10 +202,10 @@
 (defn select-items [dl]
   (setv weighted-itypes (amap
     (, (it.generation-weight dl) it)
-    (.values G.itypes)))
+    (values-sorted-by-keys G.itypes)))
   (setv weighted-itypes-chest (amap
     (, (it.generation-weight dl :in-chest T) it)
-    (.values G.itypes)))
+    (values-sorted-by-keys G.itypes)))
   (replicate (gen-count-for dl "items")
     (setv in-chest (1-in 8))
     (, in-chest (weighted-choice (if in-chest

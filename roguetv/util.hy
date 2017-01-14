@@ -40,6 +40,9 @@
 (defn randpop [l]
   (l.pop (random.randrange (len l))))
 
+(defn values-sorted-by-keys [x]
+  (list-comp v [[_ v] (sorted (.items x))]))
+
 (defn seconds [x]
   ; Convert seconds to the internal time representation.
   (if x (max 1 (round (* G.clock-factor x))) 0))

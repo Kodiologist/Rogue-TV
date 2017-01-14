@@ -284,7 +284,7 @@
      (setv unused-apps (dict (lc
        [[c apps] (.items self.registry)]
        (, c (list apps)))))
-     (for [itype (.values G.itypes)]
+     (for [itype (values-sorted-by-keys G.itypes)]
        (whenn (afind-or (issubclass itype it) (.keys unused-apps))
          (.set-appearance itype (randpop (get unused-apps it)))))))])
 
