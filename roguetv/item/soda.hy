@@ -2,12 +2,12 @@
 
 (import
   [heidegger.pos [Pos]]
-  [kodhy.util [ret]]
+  [kodhy.util [ret weighted-choice]]
   [roguetv.strings [soda-cans]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.map [Tile upelevator-pos room-for? disc-taxi]]
+  [roguetv.map [Tile all-pos upelevator-pos room-for? disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
   [roguetv.creature [Creature Stink Haste Confusion Strength Passwall]])
 
@@ -67,6 +67,25 @@
         (.move G.player p)
         (ret)))
     (msg "You feel homesick."))))
+
+(def-itemtype Soda "elsewhere-soda" :name (can-of "elsewhere eggnog")
+  :color-fg :white
+  :level-lo 8
+  :info-flavor "It's always Christmas somewhere, right? Isn't that how time zones work?"
+
+  :info-apply None
+  :soda-effect (fn [self] (block
+
+    (setv candidates
+      (amap (, (** (dist-taxi G.player.pos it) 4) it)
+      (filt (room-for? G.player it)
+      (all-pos))))
+    (unless candidates
+      (msg "You feel cramped.")
+      (ret))
+    (setv p-to (weighted-choice candidates))
+    (.move G.player p-to)
+    (msg "You teleport away."))))
 
 (def-itemtype Soda "heeling-potion" :name "potion of extra heeling"
   ; A pun on Rogue's potion of extra healing.

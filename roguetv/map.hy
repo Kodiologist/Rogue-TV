@@ -1,4 +1,4 @@
-(require [kodhy.macros [afind-or whenn block meth]] [roguetv.macros [*]])
+(require [kodhy.macros [afind-or whenn block meth lc]] [roguetv.macros [*]])
 
 (import
   [random [randint uniform]]
@@ -107,6 +107,9 @@
 (defn outer-corner-pos []
   [(Pos -1 -1) (Pos G.map-width -1)
     (Pos -1 G.map-height) (Pos G.map-width G.map-height)])
+
+(defn all-pos []
+  (lc [x (range G.map-width) y (range G.map-height)] (Pos x y)))
 
 (defn room-for? [mo-class pos]
   (and
