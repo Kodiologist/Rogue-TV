@@ -185,6 +185,37 @@
   :start-msg "You feel ethereal."
   :lengthen-msg "You feel more subtle.")
 
+(def-itemtype Soda "effect-extend-soda" :name (can-of "effect-extending elixir")
+  :color-fg :dark-red
+  :level-lo 11
+  :info-flavor "Get the extra mile out of your magic potions."
+
+  :info-apply "Doubles the durations of all active status effects."
+  :soda-effect (meth [] (block
+ 
+    (unless G.player.effects
+      (msg 'bob "Oooh, that was a waste.")
+      (ret))
+
+    (for [effect G.player.effects]
+      (.take-time effect (- effect.next-turn G.current-time)))
+    (msg "You feel more special."))))
+
+(def-itemtype Soda "effect-end-soda" :name (can-of "effect-ending elixir")
+  :color-fg :dark-red
+  :level-lo 9
+  :info-flavor "Cures what ails ya, but also what benefits ya, so watch out for that."
+
+  :info-apply "Ends all active status effects."
+  :soda-effect (meth [] (block
+ 
+    (unless G.player.effects
+      (msg "You have a normal feeling for a moment; then it passes.")
+      (ret))
+
+    (for [effect G.player.effects]
+      (.destroy effect)))))
+
 (def-itemtype Soda "sleep-soda" :name (can-of "Ovaltine®")
   :color-fg :dark-orange
   :price-adj :bad-flavor
