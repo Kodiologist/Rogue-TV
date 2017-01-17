@@ -1,8 +1,9 @@
-(require [kodhy.macros [amap filt afind-or block]] [roguetv.macros [*]])
+(require [kodhy.macros [amap filt afind-or block meth]] [roguetv.macros [*]])
 
 (import
+  [random [choice]]
   [heidegger.pos [Pos]]
-  [kodhy.util [ret weighted-choice]]
+  [kodhy.util [ret]]
   [roguetv.strings [soda-cans]]
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
@@ -72,19 +73,22 @@
   :color-fg :white
   :level-lo 8
   :info-flavor "It's always Christmas somewhere, right? Isn't that how time zones work?"
+  :dist-min-quantile 2/3
 
-  :info-apply None
-  :soda-effect (fn [self] (block
+  :info-apply "Teleports you to a faraway part of the level. Specifically, the distances of all available tiles from you are checked, and you are teleported to a tile with a distance beyond the {dist-min-quantile} quantile."
+  :soda-effect (meth [] (block
 
     (setv candidates
-      (amap (, (** (dist-taxi G.player.pos it) 4) it)
+      (amap (, (dist-taxi G.player.pos it) it)
       (filt (room-for? G.player it)
       (all-pos))))
     (unless candidates
       (msg "You feel cramped.")
       (ret))
-    (setv p-to (weighted-choice candidates))
-    (.move G.player p-to)
+    (setv candidates (cut (sorted :key first candidates) (min
+      (dec (len candidates))
+      (round (* (len candidates) @dist-min-quantile)))))
+    (.move G.player (second (choice candidates)))
     (msg "You teleport away."))))
 
 (def-itemtype Soda "heeling-potion" :name "potion of extra heeling"
