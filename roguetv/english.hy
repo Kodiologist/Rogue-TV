@@ -107,7 +107,9 @@
       [plural
         plural]
       [T
-        (.plural-noun -inflect stem)]))
+        ; Work around https://github.com/pwdyson/inflect.py/issues/40
+        (setv [a b c] (.partition stem " of "))
+        (+ (.plural-noun -inflect a) b c)]))
 
     (setv definite-singular
       (if bare-proper stem (+ "the " stem)))

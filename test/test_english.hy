@@ -208,7 +208,14 @@
     (npf= np :is   "The Eyes of the Overworld are here.")
     (npf= np :ip   "Some pairs of the Eyes of the Overworld are here.")
     (npf= np :p    "The Eyes of the Overworld are destroyed.")
-    (npf= np :n    "You won 2 pairs of the Eyes of the Overworld."))])
+    (npf= np :n    "You won 2 pairs of the Eyes of the Overworld."))
+
+  test-npformat-stem-with-unit (fn [self]
+    (defn f [x y] (a= .format "{:p-the}" (NounPhrase x) (+ "the " y)))
+    (f "slice of cake"      "slices of cake")
+    (f "mug of coffee"      "mugs of coffee")
+    (f "can of Coke"        "cans of Coke")
+    (f "box of Froot Loops" "boxes of Froot Loops"))])
 
 (when (= __name__ "__main__")
   (setv suite (.loadTestsFromTestCase (unittest.TestLoader) C))
