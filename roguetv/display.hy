@@ -119,7 +119,7 @@
         (len "(1.151)"))
       (inc G.dungeon-level)
       (+ "$" (string (sum
-        (fmap (.apparent-price it) (.identified? it) G.inventory))))
+        (fmap (.apparent-price it) (numeric? (.apparent-price it)) G.inventory))))
       (if (afind-or (not (.identified? it)) G.inventory)
         " + ?"
         "    ")
@@ -200,7 +200,7 @@
     (rtv-get item.gadget.Gadget)
     (rtv-get item.soda.Soda)
     (rtv-get item.gadget.Battery)])))
-  (.sort G.inventory :key (fn [item]
+  (.sort G.inventory :key (fn [item] (if (hallu) (.lower (.format "{}" item)) (do
     (setv category (afind-or (instance? (second it) item) item-sort-order))
     (setv category (if category (first category) (len item-sort-order)))
     (,
@@ -212,7 +212,7 @@
       (when (hasattr item "boxed")
         item.boxed)
       item.curse
-      item.invlet)))
+      item.invlet)))))
   (setv names (amap (.format "{:a:most}" it) G.inventory))
   (setv prices (amap (.apparent-price it) G.inventory))
   (setv lines (amap (AttrStr.from-xml it) (+

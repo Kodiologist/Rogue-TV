@@ -10,7 +10,7 @@
   [roguetv.util [*]]
   [roguetv.map [Tile all-pos upelevator-pos room-for? disc-taxi]]
   [roguetv.item.generic [Item ItemAppearance def-itemtype]]
-  [roguetv.creature [Creature Stink Haste Confusion Strength Passwall]])
+  [roguetv.creature [Creature Stink Haste Confusion Strength Passwall Hallucinating]])
 
 (defclass Soda [Item] [
   apply-time (seconds 1)
@@ -184,6 +184,18 @@
   :effect-time (seconds 45)
   :start-msg "You feel ethereal."
   :lengthen-msg "You feel more subtle.")
+
+(def-itemtype EffectSoda "hallu-soda" :name (can-of "Mountain Dew®")
+  :color-fg :dark-green
+  :rarity :uncommon
+  :price-adj :bad-flavor
+  :info-flavor "DO THE DEW®"
+
+  :info-apply "Makes you MLG for {effect-time}. What does MLG stand for, anyway?"
+  :effect Hallucinating
+  :effect-time (minutes 3)
+  :start-msg "You feel ready to rek some scrublords."
+  :lengthen-msg ['bob "Wombo combo!"])
 
 (def-itemtype Soda "effect-extend-soda" :name (can-of "effect-extending elixir")
   :color-fg :dark-red

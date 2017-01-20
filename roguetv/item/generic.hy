@@ -9,7 +9,7 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [inventory-loop]]
-  [roguetv.types [MapObject Generated Drawable Scheduled]]
+  [roguetv.types [MapObject Generated Drawable Scheduled Hallucination]]
   [roguetv.map [Tile room-for?]])
 
 (defclass Item [MapObject Generated Scheduled NounPhraseNamed Drawable] [
@@ -77,6 +77,7 @@
     (setv self.invlet None)
     (setv self.curse None)
       ; Cursed items can't be dropped.
+    (setv self.hallucination None)
     None)
 
   clone-setup (fn [self orig]
@@ -96,8 +97,13 @@
       (.destroy self.curse))
     (.destroy (super Item self)))
 
+  get-char (fn [self]
+    (if (hallu)
+      (. (get Hallucination.items (.hallucinate self)) char)
+      self.char))
+
   get-color-fg (fn [self]
-    (if (.identified? self)
+    (if (and (.identified? self) (not (hallu)))
       (.get-color-fg (super Item self))
       G.unid-item-color))
 
@@ -128,8 +134,8 @@
     (setv name (if (in "true" tags) self.name (self.apparent-name)))
     (.escape self (cat :sep " " (.__format__ name np-args)
       (when (or (in "most" tags) (in "full" tags)) (cat :sep " "
-        (self.name-suffix)
-        (when self.curse "(cursed)")
+        (unless (hallu) (self.name-suffix))
+        (when (and (not (hallu)) self.curse) "(cursed)")
         (when (in "full" tags)
           (.format "[${}]" (self.apparent-price))))))))
 
@@ -138,8 +144,12 @@
       (.xml-symbol self)
       self
       (apply .format
-        [(if (.identified? self)
-          (cat :sep "\n\n"
+        [(cond
+          [(hallu)
+            (. (get Hallucination.items (.hallucinate self)) info)]
+          [(not (.identified? self))
+            self.info-unidentified]
+          [T (cat :sep "\n\n"
             self.info-flavor
             (when self.unique "<b>This item is unique.</b>")
             (when self.indestructible "<b>This item is indestructible.</b>")
@@ -147,8 +157,7 @@
             (self.info-extra)
             (when self.info-apply (+ "<b>Effect when applied:</b> " self.info-apply))
             (when self.info-carry (+ "<b>Effect when carried:</b> " self.info-carry))
-            (when self.info-constant (+ "<b>Constant effect:</b> " self.info-constant)))
-          self.info-unidentified)]
+            (when self.info-constant (+ "<b>Constant effect:</b> " self.info-constant)))])]
         ; This bit of magic below is to let you use an info
         ; string like "Does {foo-bar} and {G.baz-bing}." and
         ; these will be replaced with self.foo_bar and
@@ -169,13 +178,23 @@
   info-extra (fn [self]
     None)
 
+  hallucinate (fn [self]
+    (unless self.hallucination
+      (setv self.hallucination (random.choice
+        (list (.keys Hallucination.items)))))
+    self.hallucination)
+
   apparent-name (fn [self]
-    (if (.identified? self)
-      self.name
-      self.appearance.name))
+    (cond
+      [(hallu)
+        (. (get Hallucination.items (.hallucinate self)) name)]
+      [(.identified? self)
+        self.name]
+      [T
+        self.appearance.name]))
 
   apparent-price (fn [self]
-    (if (.identified? self)
+    (if (and (.identified? self) (not (hallu)))
       self.price
       "?"))
 

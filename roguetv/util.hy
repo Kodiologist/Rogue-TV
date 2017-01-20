@@ -1,4 +1,4 @@
-(require [kodhy.macros [lc filt]])
+(require [kodhy.macros [lc filt]] [roguetv.macros [*]])
 
 (import
   [math [log sqrt exp ceil]]
@@ -187,3 +187,6 @@
 
 (defn active-inv []
   (filt (.carry-effects-active? it) G.inventory))
+
+(defn hallu []
+  (.get-effect G.player (rtv-get creature.generic.Hallucinating)))

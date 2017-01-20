@@ -1,10 +1,12 @@
 (require [kodhy.macros [amap afind-or whenn ecase λ meth cmeth]])
 
 (import
+  hashlib
   [random [choice]]
   xml.sax.saxutils
   [kodhy.util [T F mins]]
-  [roguetv.strings [bob-too-bad]]
+  [roguetv.strings [bob-too-bad hallucinated-item-strs]]
+  [roguetv.english [NounPhraseNamed NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]])
 
@@ -171,3 +173,35 @@
           [(and (not (none? @level-hi)) (> dl @level-hi))
             (inc (- dl @level-hi))]
           [T 1])))))])
+
+(defclass Hallucination [NounPhraseNamed Drawable] [
+  items {}
+
+  __init__ (meth [kind halluid]
+    (assert (= kind "item"))
+    (defn match [s &kwargs kwargs]
+      (when (.startswith halluid s)
+        (apply NounPhrase [(cut halluid (len s))] kwargs)))
+    (setv @name (or
+      (when (= halluid "the thing that your aunt gave you")
+        (NounPhrase "thing that your aunt gave you"
+          :plural "things that your aunt gave you"
+          :the-proper T))
+      (match "a "
+        :article "a")
+      (match "an "
+        :article "an")
+      (match "some "
+        :mass T :unit "thingies")
+      (match "the "
+        :the-proper T)
+      (NounPhrase halluid :bare-proper T)))
+    (setv @char (get
+      "/[]()*!$"
+      (% (int (first (.hexdigest (hashlib.md5 (.encode halluid "UTF-8")))) 16) 8)))
+    (setv @info (get hallucinated-item-strs halluid))
+    (assert (not-in halluid Hallucination.items))
+    (setv (get Hallucination.items halluid) @@))])
+
+(for [k hallucinated-item-strs]
+  (Hallucination "item" k))

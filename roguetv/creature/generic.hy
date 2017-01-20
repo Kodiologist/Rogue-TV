@@ -232,3 +232,7 @@
               (ret))))
         ; There's no room anywhere on the level!
         (msg 'tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at G.player.pos)))))])
+
+(defclass Hallucinating [Effect] [
+  status "MLG"
+  end-msg "Everything looks SO boring now."])
