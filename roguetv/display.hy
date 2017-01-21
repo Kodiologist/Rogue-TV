@@ -123,7 +123,7 @@
       (if (afind-or (not (.identified? it)) G.inventory)
         " + ?"
         "    ")
-      (.join " " (amap it.status G.player.effects)))))
+      (.join " " (amap (if (hallu) it.hallu-status it.status) G.player.effects)))))
   (G.T.move (- G.screen-height 1 G.message-lines) 0)
   (.draw (.trunc s G.screen-width)))
 

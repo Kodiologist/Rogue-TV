@@ -170,6 +170,8 @@
 
   status "???"
     ; Text shown in the status bar.
+  hallu-status "???"
+    ; Text show in the status bar during hallucination.
   end-msg None
 
   __init__ (meth [duration]
@@ -199,23 +201,28 @@
 
 (defclass Stink [Effect] [
   status "PU"
+  hallu-status "Ugly"
   end-msg "You smell presentable again."])
 
 (defclass Haste [Effect] [
   status "Fast"
+  hallu-status "Sanic"
   end-msg "The rush of energy fades."])
 
 (defclass Confusion [Effect] [
   status "Conf"
+  hallu-status "Tired"
   end-msg "Your mind clears."])
 
 (defclass Strength [Effect] [
   status "Str"
+  hallu-status "FaZe"
   end-msg "You feel like a 98-pound weakling."])
     ; Charles Atlas ads
 
 (defclass Passwall [Effect] [
   status "Pass"
+  hallu-status "Spooky"
   end-msg "You feel solid again."
 
   destroy (meth []
@@ -234,5 +241,6 @@
         (msg 'tara "Oh no! Is {p:the} trapped inside {:the}?" (Tile.at G.player.pos)))))])
 
 (defclass Hallucinating [Effect] [
-  status "MLG"
+  status "Hallu"
+  hallu-status "MLG"
   end-msg "Everything looks SO boring now."])
