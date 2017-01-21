@@ -251,3 +251,19 @@
 ;  "more cowbell"
 ;    ; https://en.wikipedia.org/wiki/More_cowbell
 ;    "If you've got a fever…"
+
+(def hallucinated-announcer-names {
+  ; Each key is a possible hallucinated name for Tara. The value is
+  ; the corresponding name for Bob.
+  "Abbot"      "Costello"
+  "Akbar"      "Jeff"     ; Life in Hell
+  "Bugs"       "Daffy"
+  "Cher"       "Sonny"
+  "George"     "Harold"   ; Captain Underpants
+  "Ginger"     "Fred"
+  "Holmes"     "Watson"   ; Sherlock Holmes
+  "Kahneman"   "Tversky"
+  "Kathie Lee" "Regis"
+  "Mitchell"   "Webb"
+  "Tom"        "Jerry"
+  "Vic"        "Ken"})   ; MXC

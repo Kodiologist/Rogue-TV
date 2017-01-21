@@ -7,7 +7,7 @@
   [itertools [combinations]]
   [heidegger.pos [Pos]]
   [kodhy.util [T F ret concat]]
-  [roguetv.english [NounPhrase]]
+  [roguetv.strings]
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [hit-key-to-continue text-screen]]
@@ -33,6 +33,9 @@
   (random.seed (get G.seeds "map"))
   (ItemAppearance.randomize-appearances)
   (random.seed (get G.seeds "general"))
+
+  (setv G.hallucinated-tara (random.choice
+    (sorted (.keys hallucinated-announcer-names))))
 
   (setv G.dungeon-level (or p.start-at-dl 0))
   (reset-level)

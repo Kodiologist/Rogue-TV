@@ -1,4 +1,4 @@
-(require [kodhy.macros [lc filt]] [roguetv.macros [*]])
+(require [kodhy.macros [lc filt ecase]] [roguetv.macros [*]])
 
 (import
   [math [log sqrt exp ceil]]
@@ -6,6 +6,7 @@
   datetime
   [heidegger.pos [Pos]]
   [kodhy.util [T F signum seq keyword->str cat]]
+  [roguetv.strings [hallucinated-announcer-names]]
   [roguetv.globals :as G])
 
 (defn real-timestamp []
@@ -148,10 +149,15 @@
   (setv mtype (when (symbol? (first args))
     (.pop args 0)))
   (when mtype
+    (setv announcer (ecase mtype
+      ['tara
+        (+ (if (hallu) G.hallucinated-tara "Tara") ":")]
+      ['bob
+        (+ (if (hallu) (get hallucinated-announcer-names G.hallucinated-tara) "Bob") ":")]
+      ['aud
+        "The audience"]))
     (setv (get args 0) (.format "{} {}"
-      (color-xml
-        (get {'tara "Tara:" 'bob "Bob:" 'aud "The audience"} mtype)
-        (get G.announcer-colors mtype))
+      (color-xml announcer (get G.announcer-colors mtype))
       (get args 0))))
   (setv text
     (apply .format args {"p" G.player}))

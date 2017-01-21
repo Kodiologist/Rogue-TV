@@ -135,6 +135,8 @@
 (defs last-action-duration 0)
 (def super-low-time-threshold (* clock-factor 5))
 
+(defs hallucinated-tara None)
+
 (def fov-dirty? True)
 (defs seen-map [])
 
