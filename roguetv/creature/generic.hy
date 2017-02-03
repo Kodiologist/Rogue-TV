@@ -136,7 +136,7 @@
       ; Hence, a creature with walk-speed 1 takes 1 second to walk
       ; 1 unit of distance.
     (when cr
-      (msg "You push past {:the}." cr))
+      (push-past-msg cr))
     (.move self p-to :clobber T)
     (when cr
       (.move cr p-from))
@@ -164,6 +164,19 @@
 
   spook-time (fn [self]
     (seconds (random.randint 1 (inc G.dungeon-level))))])
+
+(defn push-past-msg [cr]
+  (setv verb (if (hallu)
+    (random.choice [
+      "rek" "no-scope" "quickscope" "rek" "MLG" "pwn" "blaze"
+      "friendzone" "faze" "meme" "accidentally"
+      "You set up {:the} the bomb."])
+    "push past"))
+  (msg 
+    (if (in "{" verb)
+      verb
+      (+ "You " verb " {:the}."))
+    cr))
 
 (defclass Effect [Scheduled] [
 ; Despite that this class is in creature.generic instead of
