@@ -30,6 +30,9 @@
     (self.reset-ice-slipping)
     None)
 
+  get-info-text (fn [self]
+    self.info-text)
+
   reset-ice-slipping (fn [self]
     (setv self.ice-slip-time 0)
     (setv self.ice-slip-towards None))
@@ -56,7 +59,7 @@
     (.format "\n  {} {:a}\n\n{}"
       (.xml-symbol self)
       self
-      (apply .format [self.info-text] (. (type self) __dict__))))
+      (apply .format [(.get-info-text self)] (. (type self) __dict__))))
 
   take-time (fn [self duration]
     (.take-time Scheduled self duration)

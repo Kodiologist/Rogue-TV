@@ -8,13 +8,23 @@
   [roguetv.english [NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
-  [roguetv.types [Scheduled]]
+  [roguetv.types [Scheduled CanBeHallucinated]]
   [roguetv.map [Tile Wall Floor Slime Web room-for? mget mset on-map disc-taxi in-los?]]
   [roguetv.item [Item drop-pos]]
   [roguetv.creature [Creature Stink]])
 
-(defclass Monster [Creature] [
+(defclass Monster [CanBeHallucinated Creature] [
   ; A class for all non-player creatures.
+  hallu-kind "monster"
+
+  __init__ (fn [self &optional pos]
+   (Creature.__init__ self pos)
+   (CanBeHallucinated.__init__ self))
+
+  get-info-text (fn [self]
+    (if (hallu)
+      (. (.hallucinate self) info)
+      (Creature.get-info-text self)))
 
   walk-to (fn [self p-to]
     (unless (.walk-to (super Monster self) p-to)

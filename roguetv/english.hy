@@ -177,8 +177,11 @@
       (xml.sax.saxutils.escape s)
       s)))
 
+  get-name (fn [self]
+    self.name)
+
   __format__ (fn [self formatstr]
-    (.escape self (.__format__ self.name formatstr)))])
+    (.escape self (.__format__ (.get-name self) formatstr)))])
 
 (defn english-list [l]
   (.join -inflect l))

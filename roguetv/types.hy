@@ -1,11 +1,12 @@
 (require [kodhy.macros [amap afind-or whenn ecase λ meth cmeth]])
 
 (import
+  [string [ascii-letters]]
   hashlib
   [random [choice]]
   xml.sax.saxutils
-  [kodhy.util [T F mins]]
-  [roguetv.strings [bob-too-bad hallucinated-item-strs]]
+  [kodhy.util [T F mins merge-dicts]]
+  [roguetv.strings [bob-too-bad hallucinated-object-strs]]
   [roguetv.english [NounPhraseNamed NounPhrase]]
   [roguetv.globals :as G]
   [roguetv.util [*]])
@@ -175,15 +176,23 @@
           [T 1])))))])
 
 (defclass Hallucination [NounPhraseNamed Drawable] [
-  items {}
+  all {"item" {} "monster" {}}
 
   __init__ (meth [kind halluid]
-    (assert (= kind "item"))
+    (assert (in kind ["item" "monster"]))
+
+    (setv [gender stem] (cond
+      [(.startswith halluid "m:") [:male   (cut halluid (len "m:"))]]
+      [(.startswith halluid "f:") [:female (cut halluid (len "f:"))]]
+      [True                       [:neuter halluid]]))
+
     (defn match [s &kwargs kwargs]
-      (when (.startswith halluid s)
-        (apply NounPhrase [(cut halluid (len s))] kwargs)))
+      (when (.startswith stem s)
+        (apply NounPhrase
+          [(cut stem (len s))]
+          (merge-dicts {"gender" gender} kwargs))))
     (setv @name (or
-      (when (= halluid "the thing that your aunt gave you")
+      (when (= stem "the thing that your aunt gave you")
         (NounPhrase "thing that your aunt gave you"
           :plural "things that your aunt gave you"
           :the-proper T))
@@ -195,13 +204,48 @@
         :mass T :unit "thingies")
       (match "the "
         :the-proper T)
-      (NounPhrase halluid :bare-proper T)))
-    (setv @char (get
-      "/[]()*!$"
-      (% (int (first (.hexdigest (hashlib.md5 (.encode halluid "UTF-8")))) 16) 8)))
-    (setv @info (get hallucinated-item-strs halluid))
-    (assert (not-in halluid Hallucination.items))
-    (setv (get Hallucination.items halluid) @@))])
+      (NounPhrase stem :bare-proper T :gender gender)))
 
-(for [k hallucinated-item-strs]
-  (Hallucination "item" k))
+    (setv legal-chars (ecase kind
+      ["item" "/[]()*!$"]
+      ["monster" ascii-letters]))
+    (setv @char (get legal-chars (%
+      ; Randomly choose a character for the hallucinated object,
+      ; using `halluid` as the seed (so it's consistent between
+      ; launches of Rogue TV).
+      (int.from-bytes :byteorder "big"
+        (.digest (hashlib.md5 (.encode halluid "UTF-8"))))
+      (len legal-chars))))
+    (setv @info (get hallucinated-object-strs kind halluid))
+    (assert (not-in halluid (get Hallucination.all kind)))
+    (setv (get Hallucination.all kind halluid) @@))])
+
+(for [[kind d] (.items hallucinated-object-strs) halluid d]
+  (Hallucination kind halluid))
+
+(defclass CanBeHallucinated [] [
+  hallu-kind None
+
+  __init__ (meth []
+    (setv @halluid None))
+
+  hallucinate (meth []
+    (unless @halluid
+      (setv @halluid (random.choice
+        (list (.keys (get Hallucination.all @hallu-kind))))))
+    (get Hallucination.all @hallu-kind @halluid))
+
+  get-name (meth []
+    (if (hallu)
+      (. (@hallucinate) name)
+      (.get-name (super CanBeHallucinated @@))))
+
+  get-char (meth []
+    (if (hallu)
+      (. (@hallucinate) char)
+      (.get-char (super CanBeHallucinated @@))))
+
+  get-color-fg (meth []
+    (if (hallu)
+      G.hallucinated-object-color
+      (.get-color-fg (super CanBeHallucinated @@))))])

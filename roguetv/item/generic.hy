@@ -9,11 +9,12 @@
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [inventory-loop]]
-  [roguetv.types [MapObject Generated Drawable Scheduled Hallucination]]
+  [roguetv.types [MapObject Generated Scheduled Drawable NounPhraseNamed CanBeHallucinated]]
   [roguetv.map [Tile room-for?]])
 
-(defclass Item [MapObject Generated Scheduled NounPhraseNamed Drawable] [
+(defclass Item [MapObject Generated Scheduled Drawable NounPhraseNamed CanBeHallucinated] [
   escape-xml-in-np-format T
+  hallu-kind "item"
   tid None
     ; A string.
   appearance None
@@ -74,10 +75,10 @@
   __init__ (fn [self &kwargs kw]
     (Generated.__init__ self)
     (MapObject.__init__ self (.get kw "pos"))
+    (CanBeHallucinated.__init__ self)
     (setv self.invlet None)
     (setv self.curse None)
       ; Cursed items can't be dropped.
-    (setv self.hallucination None)
     None)
 
   clone-setup (fn [self orig]
@@ -97,15 +98,11 @@
       (.destroy self.curse))
     (.destroy (super Item self)))
 
-  get-char (fn [self]
-    (if (hallu)
-      (. (get Hallucination.items (.hallucinate self)) char)
-      self.char))
-
   get-color-fg (fn [self]
-    (if (and (.identified? self) (not (hallu)))
-      (.get-color-fg (super Item self))
-      G.unid-item-color))
+    (cond
+      [(hallu)             (CanBeHallucinated.get-color-fg self)]
+      [(.identified? self) (.get-color-fg (super Item self))]
+      [True                G.unid-item-color]))
 
   set-appearance (classmethod (fn [self iapp]
     (setv self.appearance iapp)))
@@ -131,8 +128,9 @@
       formatstr
       re.VERBOSE)))
     (setv tags (set (if tags (.split tags ",") [])))
-    (setv name (if (in "true" tags) self.name (self.apparent-name)))
-    (.escape self (cat :sep " " (.__format__ name np-args)
+    (setv name (if (in "true" tags) self.name (.get-name self)))
+    (.escape self (cat :sep " "
+      (.__format__ name np-args)
       (when (or (in "most" tags) (in "full" tags)) (cat :sep " "
         (unless (hallu) (self.name-suffix))
         (when (and (not (hallu)) self.curse) "(cursed)")
@@ -146,7 +144,7 @@
       (apply .format
         [(cond
           [(hallu)
-            (. (get Hallucination.items (.hallucinate self)) info)]
+            (. (.hallucinate self) info)]
           [(not (.identified? self))
             self.info-unidentified]
           [T (cat :sep "\n\n"
@@ -178,16 +176,10 @@
   info-extra (fn [self]
     None)
 
-  hallucinate (fn [self]
-    (unless self.hallucination
-      (setv self.hallucination (random.choice
-        (list (.keys Hallucination.items)))))
-    self.hallucination)
-
-  apparent-name (fn [self]
+  get-name (fn [self]
     (cond
       [(hallu)
-        (. (get Hallucination.items (.hallucinate self)) name)]
+        (CanBeHallucinated.get-name self)]
       [(.identified? self)
         self.name]
       [T

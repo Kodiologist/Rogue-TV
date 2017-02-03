@@ -41,6 +41,7 @@
   'bob :red
   'aud :dark-green})
 (def unid-item-color :purple)
+(def hallucinated-object-color :purple)
 
 (def time-bar-width 10)
 (setv time-bar-chunk-chars " ▏▎▍▌▋▊▉█")
