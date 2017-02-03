@@ -124,14 +124,29 @@
 
   act (meth []
     (setv seconds-left (// (- G.time-limit G.current-time) G.clock-factor))
-    (if seconds-left
-      (msg 'aud "chants \"{}!\""
-        (get [None "One" "Two" "Three" "Four" "Five"] seconds-left))
-      (do
+    (cond
+      [seconds-left
+        (msg 'aud "chants \"{}!\""
+          (get
+            (if (hallu)
+              ["Fortune" "Of" "Wheel" "Pants" "Fish"]
+              ["One" "Two" "Three" "Four" "Five"])
+            (dec seconds-left)))]
+      [(and
+        ; Hallucination has a chance of preventing a game-over, by
+        ; extending the time limit just as it runs out.
+        ; This works only once per game.
+          (hallu)
+          (not G.hallu-prevented-gameover)
+          (1-in G.hallu-prevent-gameover-1in))
+        (msg 'bob "But what if xXx_{p:}_xXx is not kill?")
+        (set-time-limit (+ G.time-limit (seconds G.hallu-prevent-gameover-extra-seconds)))
+        (setv G.hallu-prevented-gameover T)]
+      [T
         (msg 'tara "Alas! {p:The} is out of time. {p:He} may keep only half {p:his} winnings.")
         (msg 'bob (choice bob-too-bad))
         (setv G.time-limit None)
-        (setv G.endgame :out-of-time)))
+        (setv G.endgame :out-of-time)])
     (@wait))])
 
 (defn set-time-limit [x]

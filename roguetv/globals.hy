@@ -89,6 +89,8 @@
 (def haste-factor 10)
 (def confusion-misdirect-prob .25)
 (def spook-radius 5)
+(def hallu-prevent-gameover-1in 10)
+(def hallu-prevent-gameover-extra-seconds 60)
 
 ;; * Declarations
 
@@ -137,6 +139,7 @@
 (def super-low-time-threshold (* clock-factor 5))
 
 (defs hallucinated-tara None)
+(defs hallu-prevented-gameover False)
 
 (def fov-dirty? True)
 (defs seen-map [])
