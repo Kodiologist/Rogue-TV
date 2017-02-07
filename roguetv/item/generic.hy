@@ -165,13 +165,9 @@
         ; with "_time" are displayed with `show-duration`, so
         ; "Waits for {wait-time}." becomes "Waits for 2 minutes."
         ; or whatever.
-        (dict (+ [(, "G" self.information-G)] (lc [[k v] (.items (. (type self) __dict__))] (,
+        (dict (+ [(, "G" information-G)] (lc [[k v] (.items (. (type self) __dict__))] (,
           (.replace k "_" "-")
           (if (.endswith k "_time") (show-duration v) v))))))))
-
-  information-G ((type "information-G" (, object) {
-    "__getattr__" (fn [self name]
-      (getattr G (.replace name "-" "_")))}))
 
   info-extra (fn [self]
     None)

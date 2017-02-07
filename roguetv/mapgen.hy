@@ -106,6 +106,14 @@
   (.remove free-floors upelv-pos)
   ; The down elevator is placed randomly.
   (mset (shift free-floors) (DownElevator))
+  ; Possibly also place an express elevator.
+  (when (and (< dl (dec G.max-dungeon-level)) (1-in 10))
+    (mset (shift free-floors)
+      (if (and (= dl 0) (1-in 10))
+        (Hellevator)
+        (ExpressElevator :depth (randint
+          G.express-elevator-min-depth
+          G.express-elevator-max-depth)))))
 
   ; Generate the Amulet if the player is on the last level.
   (when (= dl G.max-dungeon-level)

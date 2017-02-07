@@ -85,6 +85,8 @@
 (def clock-unit-abbr "ms")
 
 (def vision-radius 20)
+(def express-elevator-min-depth 2)
+(def express-elevator-max-depth 8)
 (def repulsed-from-player-range 20)
 (def haste-factor 10)
 (def confusion-misdirect-prob .25)

@@ -40,7 +40,8 @@
     (.format "\n  {} {:a:full}\n\n{}"
       (.xml-symbol self)
       self
-      (apply .format [self.info-text] (. (type self) __dict__))))
+      (apply .format [self.info-text] (dict
+        (+ [(, "G" information-G)] (list (.__dict__.items (type self))))))))
 
   name-suffix (fn [self]
     ; This method can be overridden to provide extra information
@@ -210,6 +211,9 @@
   color-bg :yellow
   info-text "This elevator leads to a new, unexplored level. The time limit will be reset, but you won't be able to return to this level, so make sure you're carrying whatever you intend to keep."
 
+  get-depth (fn [self]
+    1)
+
   use-tile (fn [self]
     (if (= G.dungeon-level G.max-dungeon-level)
       (if (afind-or (instance? (get G.itypes "aoy") it) G.inventory)
@@ -224,13 +228,36 @@
           ; The audience was counting down when the player got
           ; to the down elevator.
           (msg 'aud "cheers. You made it!"))
-        (+= G.dungeon-level 1)
+        (setv G.dungeon-level (min G.max-dungeon-level
+          (+ G.dungeon-level (.get-depth self))))
         (rtv mapgen.reset-level)
         (msg 'tara
           (if (= G.dungeon-level G.max-dungeon-level)
             "{p} has reached level {}, the final level. It's {} by {} squares. {p} must now find the mystical Amulet of Yendor and take the final down elevator to win Rogue TV!"
             "And {p:he's} on to level {}. It spans {} by {} squares.")
           (inc G.dungeon-level) G.map-width G.map-height))))])
+
+(defclass ExpressElevator [DownElevator] [
+  name (NounPhrase "express elevator")
+  color-bg :orange
+
+  info-text "A down elevator that will take you {G.express-elevator-min-depth} to {G.express-elevator-max-depth} floors down, instead of just one. You'd better be prepared."
+
+  __init__ (meth [depth]
+    (DownElevator.__init__ @@)
+    (setv @depth depth))
+
+  get-depth (meth []
+    @depth)])
+
+(defclass Hellevator [DownElevator] [
+  name (NounPhrase "hellevator")
+  color-bg :red
+
+  info-text "A down elevator for the really brave that will take you all the way to the bottom floor. (No relation to the competing game show.)"
+
+  get-depth (meth []
+    G.max-dungeon-level)])
 
 (defclass Door [Tile] [
   color-fg :brown

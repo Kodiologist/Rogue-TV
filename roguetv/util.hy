@@ -188,6 +188,10 @@
       text)
     text))
 
+(setv information-G ((type "information-G" (, object) {
+  "__getattr__" (fn [self name]
+    (getattr G (.replace name "-" "_")))})))
+
 (defn soil-fov []
   (setv G.fov-dirty? T))
 
