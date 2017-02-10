@@ -39,7 +39,7 @@
       (filt (not (none? it)) (concat it.omap)))
     [Item Creature])))
   (setv (get x "map") (list (reversed (amap (list it) (apply zip (amap
-    (amap (if (and (in (type it) tile-save-shorthand) (= (.keys it.__dict__) ["pos"]))
+    (amap (if (and (in (type it) tile-save-shorthand) (= (tuple (.keys it.__dict__)) (, "pos")))
       (get tile-save-shorthand (type it))
       it) it)
     Tile.omap))))))

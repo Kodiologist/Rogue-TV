@@ -550,4 +550,7 @@
       (continue))
     (when (> (get counts char) 1)
       (del (get d cls))))
+  ; But use ">" for plain DownElevators, even though it's the char for
+  ; subtypes too. It's much more common than its subtypes.
+  (setv (get d DownElevator) ">")
   d)))
