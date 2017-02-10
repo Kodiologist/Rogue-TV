@@ -171,11 +171,14 @@
       (.append G.uniques-generated tname))
     None)
 
+  unique-and-already-generated (cmeth []
+    (and @unique (in @__name__ G.uniques-generated)))
+
   generation-weight (cmeth [dl &optional [in-chest F]]
     (when in-chest
       ; Chests generate deeper items.
       (+= dl 3))
-    (if (or (= @rarity :nongen) (and @unique (in @__name__ G.uniques-generated)))
+    (if (= @rarity :nongen)
       0
       (*
         (/ 1 (ecase @rarity

@@ -136,8 +136,9 @@
     (.f b-type))
 
   ; Add items.
-  (for [[in-chest itype] (select-items dl)]
+  (for [[in-chest itype1 itype2] (select-items dl)]
     (setv p (shift free-floors))
+    (setv itype (if (.unique-and-already-generated itype1) itype2 itype1))
     (itype :pos p)
     (when in-chest
       (mset p (Chest))))
@@ -208,17 +209,20 @@
     (weighted-choice weighted-btypes)))
 
 (defn select-items [dl]
-  (setv weighted-itypes (amap
-    (, (it.generation-weight dl) it)
-    (values-sorted-by-keys G.itypes)))
-  (setv weighted-itypes-chest (amap
-    (, (it.generation-weight dl :in-chest T) it)
-    (values-sorted-by-keys G.itypes)))
   (replicate (gen-count-for dl "items")
     (setv in-chest (1-in 8))
-    (, in-chest (weighted-choice (if in-chest
-      weighted-itypes-chest
-      weighted-itypes)))))
+    (setv itype1 (weighted-choice (amap
+      (, (it.generation-weight dl :in-chest in-chest) it)
+      (values-sorted-by-keys G.itypes))))
+    (setv itype2 (when itype1.unique
+      ; Pick a non-unique substitute in case item1 has already
+      ; been generated. We always do this weighted-choice, even
+      ; if itype1 is new, so that which unique items exist doesn't
+      ; affect the evolution of the map seed.
+      (weighted-choice (amap
+        (, (it.generation-weight dl :in-chest in-chest) it)
+        (filt (not it.unique) (values-sorted-by-keys G.itypes))))))
+    (, in-chest itype1 itype2)))
 
 (defclass Obstacle [Generated] [
   types []])
