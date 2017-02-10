@@ -168,7 +168,7 @@
       (setv tname (. (type @@) __name__))
       (when (in tname G.uniques-generated)
         (raise (ValueError (+ "Tried to generate a second instance of a unique type: " tname))))
-      (.append G.uniques-generated tname))
+      (.add G.uniques-generated tname))
     None)
 
   unique-and-already-generated (cmeth []
