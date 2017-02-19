@@ -272,6 +272,9 @@
       "I remember when my high-school English class was reading The Miller's Tale and the teacher explained to us what a cuckold was. Little did I suspect that, a decade later, the word \"cuck\" would end up as a central term of art of a new generation of American white nationalists. These are strange times we live in."
     "Barney the Dinosaur"
       "Watch out for its deadly singing attack."
+    "m:Cool Cat"
+      ; http://knowyourmeme.com/memes/subcultures/cool-cat-saves-the-kids
+      "There he is!"
     "a gnome child"
       ; http://knowyourmeme.com/memes/dank-memes
       "Born too late to explore the earth. Born too soon to explore the galaxy. Born just in time to be a dank meme."
@@ -288,9 +291,12 @@
     "f:Rainbow Dash"
       "A small winged horse known for her speed, agility, guts, style, coolness, awesomeness, and radicalness."
     "a calzone golem"
-     ; http://web.archive.org/web/20150714000709/http://www.albinjohnson.com/d&d/resources/downloaded%20adventures/2%20-%20Cooking.pdf
+      ; http://web.archive.org/web/20150714000709/http://www.albinjohnson.com/d&d/resources/downloaded%20adventures/2%20-%20Cooking.pdf
       "Now that's what I call dangerously cheesy."
         ; A slogan of Cheetos.
+    "a gazebo"
+      ; http://www.comedycorner.org/90.html
+      "It looks fierce."
     "a pizza angel"
       ; VeggieTales
       "  Pizza angel, please come to me.\n  Tomato sauce and cheese so gooey.\n  Pizza angel, I'm on my knees.\n  You're my number one pie from Sicily!"
