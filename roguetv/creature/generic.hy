@@ -128,7 +128,11 @@
       (unless (player? self)
         (ret F))
       (when cr.heavy
-        (msg "You're far too puny to push past {:the}." cr)
+        (msg
+          (if (hallu)
+            "A casual like you can't even handle {:a} right now."
+            "You're far too puny to push past {:the}.")
+          cr)
         (ret F))
       (.take-time self self.push-past-monster-time))
     ; Okay, we're clear to move.
