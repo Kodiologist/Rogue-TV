@@ -408,3 +408,16 @@
   "Mitchell"   "Webb"
   "Tom"        "Jerry"
   "Vic"        "Ken"})   ; MXC
+
+(def hallucinated-push-past-verbs [
+  "rek"
+  "no-scope"
+  "quickscope"
+  "MLG"
+  "pwn"
+  "blaze"
+  "friendzone"
+  "faze"
+  "meme"
+  "accidentally"
+  "You set up {:the} the bomb."])

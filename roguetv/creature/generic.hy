@@ -3,6 +3,7 @@
 (import
   random
   [kodhy.util [T F ret]]
+  roguetv.strings
   [roguetv.english [NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -167,10 +168,7 @@
 
 (defn push-past-msg [cr]
   (setv verb (if (hallu)
-    (random.choice [
-      "rek" "no-scope" "quickscope" "rek" "MLG" "pwn" "blaze"
-      "friendzone" "faze" "meme" "accidentally"
-      "You set up {:the} the bomb."])
+    (random.choice roguetv.strings.hallucinated-push-past-verbs)
     "push past"))
   (msg 
     (if (in "{" verb)
