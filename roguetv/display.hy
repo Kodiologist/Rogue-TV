@@ -1,11 +1,13 @@
 (require [kodhy.macros [lc amap fmap afind-or whenn]] [roguetv.macros [*]])
 
 (import
+  random
   [math [floor ceil]]
   textwrap
   curses
   [heidegger.pos [Pos]]
   [kodhy.util [T F concat]]
+  roguetv.strings
   [roguetv.globals :as G]
   [roguetv.util [*]]
   [roguetv.input [look-at-keys]]
@@ -215,6 +217,9 @@
       item.invlet)))))
   (setv names (amap (.format "{:a:most}" it) G.inventory))
   (setv prices (amap (.apparent-price it) G.inventory))
+  (when (hallu)
+    (setv prompt (.format "What do you want to {}?"
+      (random.choice roguetv.strings.hallucinated-item-verbs))))
   (setv lines (amap (AttrStr.from-xml it) (+
     [prompt]
     (amap

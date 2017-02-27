@@ -6,7 +6,7 @@
   datetime
   [heidegger.pos [Pos]]
   [kodhy.util [T F signum seq keyword->str cat]]
-  [roguetv.strings [hallucinated-announcer-names]]
+  [roguetv.strings [hallucinated-announcer-names hallucinated-item-verbs]]
   [roguetv.globals :as G])
 
 (defn real-timestamp []
@@ -168,6 +168,11 @@
 (defn msgp [cr &rest args]
   (when (player? cr)
     (apply msg args)))
+
+(defn you-dont-have-anything-to [verb]
+  (msg "You don't have anything to {}." (if (hallu)
+    (random.choice hallucinated-item-verbs)
+    verb)))
 
 (defn update-msg-highlighting []
   ; This saves the number of the last message and its repeat

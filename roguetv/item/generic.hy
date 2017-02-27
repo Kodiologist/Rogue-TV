@@ -5,6 +5,7 @@
   [math [ceil]]
   re
   [kodhy.util [T F cat keyword->str shift ret]]
+  roguetv.strings
   [roguetv.english [NounPhrase NounPhraseNamed]]
   [roguetv.globals :as G]
   [roguetv.util [*]]
@@ -370,7 +371,7 @@
       (do
          (.use-time-and-charge self)
          (msg "Nothing happens."))
-      (msg "You don't have anything to {}." verb))
+      (you-dont-have-anything-to verb))
     (ret))
   (setv item (if unid
     (random.choice other-items)

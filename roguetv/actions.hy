@@ -99,7 +99,7 @@
       (unless (.use-item-while-here (Tile.at G.player.pos))
         (ret))
       (unless G.inventory
-        (msg "You don't have anything to drop.")
+        (you-dont-have-anything-to "drop")
         (ret))
       (setv i (inventory-loop "What do you want to drop?"))
       (when (none? i)
@@ -123,7 +123,7 @@
       (unless (.use-item-while-here (Tile.at G.player.pos))
         (ret))
       (unless G.inventory
-        (msg "You aren't carrying any items to apply.")
+        (you-dont-have-anything-to "apply")
         (ret))
       (setv i (inventory-loop "What do you want to apply?"))
       (when (none? i)
