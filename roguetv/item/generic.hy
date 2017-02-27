@@ -12,7 +12,7 @@
   [roguetv.types [MapObject Generated Scheduled Drawable NounPhraseNamed CanBeHallucinated]]
   [roguetv.map [Tile room-for?]])
 
-(defclass Item [MapObject Generated Scheduled Drawable NounPhraseNamed CanBeHallucinated] [
+(defclass Item [CanBeHallucinated MapObject Drawable NounPhraseNamed Scheduled Generated] [
   escape-xml-in-np-format T
   hallu-kind "item"
   tid None
