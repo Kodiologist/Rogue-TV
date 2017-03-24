@@ -252,7 +252,7 @@
       "It's the Nutshack!"}
   ; Not currently possible with roguetv.english:
   ;  "no tea"
-  ;    ; Another weird inventory item from the HHGttG text adventure
+  ;    ; Another weird inventory item from the HhGttG text adventure
   ;    "You're talking complete nonsense; pull yourself together."
   ;  "more cowbell"
   ;    ; https://en.wikipedia.org/wiki/More_cowbell
@@ -436,8 +436,10 @@
 
 (def hallucinated-item-verbs [
   "bamboozle"
+  "be when you grow up"
   "censor"
   "congratulate"
+  "cough up"
   "debug"
   "defenestrate"
   "disappoint"
@@ -445,26 +447,36 @@
   "embarrass"
   "embezzle"
   "endorse"
+  "enjoy"  ; An action in the HhGttG text adventure
   "enshrine"
   "excommunicate"
+  "fight"
   "finagle"
-  "fondly remember"
+  "fold, spindle, or mutilate"
+  "fondly regard"  ; http://mspaintadventures.wikia.com/wiki/Fondly_regard_creation
   "gank"
   "gently caress"  ; http://www.urbandictionary.com/define.php?term=Gently%20Caress
   "inflate"
   "lampoon"
   "like on Facebook"
+  "misunderstand"
+  "patent"
   "politicize"
   "polymorph into"
   "psychoanalyze"
   "reassure"
   "redecorate"
+  "reify"
   "repost"
   "romanticize"
   "sacrifice to Moloch"
+  "shave"
   "slander"
   "smuggle"
   "steal the identity of"
   "stick up your nose"
+  "trisect"
   "tweet"
-  "upcycle"])
+  "unravel"
+  "upcycle"
+  "vote for"])
