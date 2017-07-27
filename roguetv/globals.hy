@@ -55,7 +55,7 @@
 
 (def key-escape "\x1b")
 
-(def score-interval .8)
+(def score-interval ".8")
 
 (defs invlets (list "abcdefghijklmnopqrstuvwxyz"))
 

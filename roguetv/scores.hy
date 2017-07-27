@@ -5,6 +5,7 @@
   [itertools [groupby]]
   json
   errno
+  [decimal [Decimal]]
   [kodhy.util [T F ret ucfirst keyword->str]]
   [roguetv.english [english-list]]
   [roguetv.globals :as G]
@@ -80,7 +81,7 @@
       (out (show-character latest latest)))
     (setv printed-latest F)
 
-    (setv low-quantile (/ (- 1 G.score-interval) 2))
+    (setv low-quantile (/ (- 1 (Decimal G.score-interval)) 2))
     (setv high-quantile (- 1 low-quantile))
     (for [[text q f] [
         ["High score" high-quantile floor]
