@@ -50,7 +50,9 @@
 
   (setv accum [""])
   (defn out [&rest args]
-    (+= (get accum 0) (+ (apply .format (or args [""])) "\n")))
+    (+= (get accum 0) (+
+      (if args (.format (first args) #* (rest args)) "")
+      "\n")))
   (setv scores (get-scores path))
 
   (block

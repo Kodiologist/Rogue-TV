@@ -33,7 +33,7 @@
   :price-to-speed-time-ratio 10
 
   :__init__ (meth [&kwargs kw]
-    (apply Item.__init__ [@@] kw)
+    (Item.__init__ @@ #** kw)
     (@schedule)
     (@take-time (int (randexp @hunger-time)))
     None)
@@ -86,7 +86,7 @@
   :ready-time (minutes 5)
 
   :__init__ (meth [&kwargs kw]
-    (apply Item.__init__ [@@] kw)
+    (Item.__init__ @@ #** kw)
     (setv @ready T)
     None)
 

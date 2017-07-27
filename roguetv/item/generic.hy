@@ -142,8 +142,8 @@
     (.format "\n  {} {:a:full}\n\n{}"
       (.xml-symbol self)
       self
-      (apply .format
-        [(cond
+      (.format
+        (cond
           [(hallu)
             (. (.hallucinate self) info)]
           [(not (.identified? self))
@@ -156,7 +156,7 @@
             (self.info-extra)
             (when self.info-apply (+ "<b>Effect when applied:</b> " self.info-apply))
             (when self.info-carry (+ "<b>Effect when carried:</b> " self.info-carry))
-            (when self.info-constant (+ "<b>Constant effect:</b> " self.info-constant)))])]
+            (when self.info-constant (+ "<b>Constant effect:</b> " self.info-constant)))])
         ; This bit of magic below is to let you use an info
         ; string like "Does {foo-bar} and {G.baz-bing}." and
         ; these will be replaced with self.foo_bar and
@@ -166,7 +166,7 @@
         ; with "_time" are displayed with `show-duration`, so
         ; "Waits for {wait-time}." becomes "Waits for 2 minutes."
         ; or whatever.
-        (dict (+ [(, "G" information-G)] (lc [[k v] (.items (. (type self) __dict__))] (,
+        #** (dict (+ [(, "G" information-G)] (lc [[k v] (.items (. (type self) __dict__))] (,
           (.replace k "_" "-")
           (if (.endswith k "_time") (show-duration v) v))))))))
 

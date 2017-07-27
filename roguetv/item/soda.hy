@@ -39,10 +39,10 @@
     (.add-to-player self.effect self.effect-time
       (fn [] (if (string? self.start-msg)
         (msg self.start-msg)
-        (apply msg self.start-msg)))
+        (msg #* self.start-msg)))
       (fn [] (if (string? self.lengthen-msg)
         (msg self.lengthen-msg)
-        (apply msg self.lengthen-msg)))))])
+        (msg #* self.lengthen-msg)))))])
 
 (defn can-of [s]
   (NounPhrase

@@ -7,7 +7,7 @@ Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguel
 
 Currently, the game is playable, but a lot of features remain to be implemented.
 
-Dependencies include Hy_ (0.12.1), Kodhy_, Heidegger_, and curses. (All dependencies not already included with Python are in pure Python or Hy.) You can download the game and its dependencies as a self-contained bundle for `Unix-likes (POSIX-compliant systems)`_ or `Windows (64-bit only)`_. The POSIX bundle has been tested with Linux and Mac OS X, as well as Windows with Cygwin_ and Cygwin's Python installed. The Windows bundle includes a subset of Cygwin and Python so you don't have to install these first. I keep both bundles up to date with the master branch on GitHub.
+Dependencies include Hy_ (``d9a5acbcc93114031c70fd7ea497e4e59c868e25``), Kodhy_, Heidegger_, and curses. (All dependencies not already included with Python are in pure Python or Hy.) You can download the game and its dependencies as a self-contained bundle for `Unix-likes (POSIX-compliant systems)`_ or `Windows (64-bit only)`_. The POSIX bundle has been tested with Linux and Mac OS X, as well as Windows with Cygwin_ and Cygwin's Python installed. The Windows bundle includes a subset of Cygwin and Python so you don't have to install these first. I keep both bundles up to date with the master branch on GitHub.
 
 .. _Unix-likes (POSIX-compliant systems): http://arfer.net/downloads/roguetv-posix.tar.gz
 .. _Windows (64-bit only): http://arfer.net/downloads/roguetv-windows.tar.gz

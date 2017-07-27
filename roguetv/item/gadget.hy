@@ -22,7 +22,7 @@
   info-unidentified "This is some bizarre gizmo from a late-night infomercial included in Rogue TV as product placement. Goodness knows what it does; it could as easily be a soldering iron as a waffle iron. 'a'pply it to use it and find out. Each use will consume one of a limited number of charges. If the gadget can be aimed or otherwise controlled, you'll only be able to control it once you know what it is."
 
   __init__ (fn [self &kwargs kw]
-    (apply Item.__init__ [self] kw)
+    (Item.__init__ self #** kw)
     (setv self.charges (.get kw "charges" self.max-charges))
     None)
 
@@ -108,7 +108,7 @@
   :max-charges 3
 
   :__init__ (fn [self &kwargs kw]
-    (apply (. (super (get G.itypes "warpback") self) __init__) [] kw)
+    ((. (super (get G.itypes "warpback") self) __init__) #** kw)
     (setv self.warpback-pos None))
 
   ; No clone-setup is provided because we don't want warpback-pos

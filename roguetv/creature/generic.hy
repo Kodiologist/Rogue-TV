@@ -60,7 +60,7 @@
     (.format "\n  {} {:a}\n\n{}"
       (.xml-symbol self)
       self
-      (apply .format [(.get-info-text self)] (. (type self) __dict__))))
+      (.format (.get-info-text self) #** (. (type self) __dict__))))
 
   take-time (fn [self duration]
     (.take-time Scheduled self duration)

@@ -164,7 +164,7 @@
   (when (= G.screen-mode :look)
     (draw-look-legend focus)
     (curses.curs-set 1)
-    (apply G.T.move focus-t-coords))
+    (G.T.move #* focus-t-coords))
   (G.T.refresh))
 
 (defn render-text-screen [text-xml]

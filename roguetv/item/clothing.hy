@@ -28,7 +28,7 @@
       "<b>This item becomes cursed when it is unboxed.</b>")))
 
   __init__ (meth [&kwargs kw]
-    (apply Item.__init__ [@@] kw)
+    (Item.__init__ @@ #** kw)
     (setv @boxed (.get kw "boxed" T))
     None)
 

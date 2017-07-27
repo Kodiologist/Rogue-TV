@@ -190,9 +190,7 @@
     :sd_base 2 :sd_dl .25
     :minimum 1)))
 (defn gen-count-for [dl thingtype]
-  (apply gen-count [] (merge-dicts
-    (get gen-count-params thingtype)
-    {"dl" dl})))
+  (gen-count :dl dl #** (get gen-count-params thingtype)))
 
 (defn select-obstacles [dl]
   (setv weighted-otypes (amap

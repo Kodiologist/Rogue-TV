@@ -82,9 +82,8 @@
       :action "store_true"]])
 
   (for [x parameters]
-    (apply .add-argument
-      [parser (+ "--" (first x))]
-      (dict (amap2 (, (keyword->str a) b) (rest x)))))
+    (.add-argument parser (+ "--" (first x)) #** (dict
+      (amap2 (, (keyword->str a) b) (rest x)))))
   (setv p (.parse-args parser args))
 
   (unless p.save

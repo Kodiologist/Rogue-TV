@@ -61,7 +61,7 @@
   :info-constant "Produces ice around itself. An ice tile is generated within {ice-radius} squares about {ice-per-second} times per second."
 
   :__init__ (meth [&kwargs kw]
-    (apply CursedGem.__init__ [@@] kw)
+    (CursedGem.__init__ @@ #** kw)
     (@schedule)
     None)
 

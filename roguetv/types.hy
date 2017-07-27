@@ -206,9 +206,7 @@
 
     (defn match [s &kwargs kwargs]
       (when (.startswith stem s)
-        (apply NounPhrase
-          [(cut stem (len s))]
-          (merge-dicts {"gender" gender} kwargs))))
+        (NounPhrase (cut stem (len s)) :gender gender #** kwargs)))
     (setv @name (or
       (when (= stem "the thing that your aunt gave you")
         (NounPhrase "thing that your aunt gave you"

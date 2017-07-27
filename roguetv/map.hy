@@ -40,7 +40,7 @@
     (.format "\n  {} {:a:full}\n\n{}"
       (.xml-symbol self)
       self
-      (apply .format [self.info-text] (dict
+      (.format self.info-text #** (dict
         (+ [(, "G" information-G)] (list (.__dict__.items (type self))))))))
 
   name-suffix (fn [self]

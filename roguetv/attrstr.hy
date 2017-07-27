@@ -22,9 +22,9 @@
       (when (curses.can-change-color)
         (for [c [fg bg]]
           (setv cn (get G.color-numbers c))
-          (apply curses.init-color (+ [cn] (amap
+          (curses.init-color cn #* (amap
             (int (* it (/ 1000 256)))
-            (get roguetv.xterm-colors.table cn))))))
+            (get roguetv.xterm-colors.table cn)))))
       ; Now create the color pair.
       (setv i (+ 2 (len G.color-pairs)))
       (curses.init-pair i (get G.color-numbers fg) (get G.color-numbers bg))
@@ -75,7 +75,7 @@
   from-xml (classmethod (fn [self xml-string]
     (setv root (xml.etree.ElementTree.fromstring
       (.encode (+ "<root>" xml-string "</root>") "UTF-8")))
-    (apply AttrStr (-from-xml-f root 0))))
+    (AttrStr #* (-from-xml-f root 0))))
 
   __repr__ (fn [self]
     (.format "AttrStr({!r}, {!r})" self.chars self.attrs))

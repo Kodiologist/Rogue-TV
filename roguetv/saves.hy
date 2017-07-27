@@ -38,7 +38,7 @@
     (, it.__name__
       (filt (not (none? it)) (concat it.omap)))
     [Item Creature])))
-  (setv (get x "map") (list (reversed (amap (list it) (apply zip (amap
+  (setv (get x "map") (list (reversed (amap (list it) (zip #* (amap
     (amap (if (and (in (type it) tile-save-shorthand) (= (tuple (.keys it.__dict__)) (, "pos")))
       (get tile-save-shorthand (type it))
       it) it)
@@ -89,4 +89,4 @@
   (setv (get G.dates "loaded") (real-timestamp)))
 
 (defn transpose [l]
-  (amap (list it) (apply zip l)))
+  (amap (list it) (zip #* l)))

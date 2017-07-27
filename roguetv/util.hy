@@ -159,15 +159,14 @@
     (setv (get args 0) (.format "{} {}"
       (color-xml announcer (get G.announcer-colors mtype))
       (get args 0))))
-  (setv text
-    (apply .format args {"p" G.player}))
+  (setv text (.format (first args) #* (rest args) :p G.player))
   (if (and G.message-log (= (get G.message-log -1 1) text))
     (+= (get G.message-log -1 0) 1)
     (.append G.message-log [1 text])))
 
 (defn msgp [cr &rest args]
   (when (player? cr)
-    (apply msg args)))
+    (msg #* args)))
 
 (defn you-dont-have-anything-to [verb]
   (msg "You don't have anything to {}." (if (hallu)
