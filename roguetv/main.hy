@@ -76,6 +76,7 @@
           (. (get G.itypes "aoy") price))))
       (msg 'tara "The game begins on a level with {} by {} squares. Good luck, {p}."
         G.map-width G.map-height)
+      (msg "Type \"?\" (Shift-\"/\") for help.")
       (describe-tile G.player.pos))
 
     (Scheduled.game-loop)
