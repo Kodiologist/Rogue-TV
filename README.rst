@@ -1,3 +1,7 @@
+Update on 13 Nov 2023: I abandoned this project, in a working but incomplete state, in 2017. It requires various old versions of its dependencies, particularly Hy, to run. I went on to reuse a few of its ideas in `Infinitesimal Quest 2 + ε <https://github.com/hylang/simalq>`__.
+
+--------------------------------------------------
+
 Rogue TV is a nonviolent roguelike where you play a lucky contestant on a roguelike-themed game show. It draws inspiration from `Smash TV`_, `Weekend Warrior`_, MXC_, `Legends of the Hidden Temple`_, `Mazeworld Catacombs`_, `Scarab of RA`_, NetHack_, and, of course, Rogue_. It's written in Hy_ with Python 3. It runs on both CPython and PyPy; you can get better performance, especially for map generation, on PyPy.
 
 .. figure:: http://i.imgur.com/vcPgIAK.png
