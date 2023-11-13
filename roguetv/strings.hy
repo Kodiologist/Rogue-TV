@@ -328,6 +328,8 @@
       "The mysterious Green Ranger."
     "f:Carmen Sandiego"
       "You better watch out. She could steal the whole dungeon."
+    "m:Cookie Monster"
+      "Imagine how excited and then disappointed he must've been when he saw all the messages born of EU Directive 2009/136/EC."
     "m:a temple guard"
       ; Legends of the Hidden Temple
       "Uh-oh. Do you have any pendants left?"
@@ -425,6 +427,7 @@
   "MLG"
   "pwn"
   "diss"
+  "clap back at"
   "dominate"
   "wavedash past"
   "blaze"
